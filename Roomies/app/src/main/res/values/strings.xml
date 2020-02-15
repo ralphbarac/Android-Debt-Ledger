@@ -1,0 +1,8 @@
+<resources>
+    <string name="app_name">Roomies</string>
+    <string name="thing">thing</string>
+    <string name="other">other</string>
+    <string name="rent_per_month">Rent per Month</string>
+    <string name="house_clipart">house_clipart</string>
+    <string name="title_activity_create_transaction">Create Transaction</string>
+</resources>

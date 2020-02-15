@@ -1,0 +1,80 @@
+<?xml version="1.0" encoding="utf-8"?>
+<LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
+    xmlns:tools="http://schemas.android.com/tools"
+    android:layout_width="match_parent"
+    android:layout_height="match_parent"
+    tools:context=".MainActivity"
+    android:orientation="vertical"
+    tools:layout_editor_absoluteX="8dp"
+    tools:layout_editor_absoluteY="8dp">
+
+    <Spinner
+        android:id="@+id/spinnerPOV"
+        android:layout_width="match_parent"
+        android:layout_height="42dp"
+        android:textAlignment="center" />
+
+    <HorizontalScrollView
+        android:layout_width="match_parent"
+        android:layout_height="132dp">
+
+        <LinearLayout
+            android:layout_width="wrap_content"
+            android:layout_height="match_parent"
+            android:orientation="horizontal">
+
+            <Button
+                android:id="@+id/goToNewTransactionButton"
+                style="?attr/buttonBarStyle"
+                android:layout_width="143dp"
+                android:layout_height="match_parent"
+                android:layout_weight="1"
+                android:onClick="goToNewTransaction"
+                android:text="Create new Transaction" />
+
+            <Button
+                android:id="@+id/buttonShowAllTransactions"
+                style="?attr/buttonBarStyle"
+                android:layout_width="100dp"
+                android:layout_height="match_parent"
+                android:onClick="goToRecentTransactions"
+                android:text="Show Recent Transactions" />
+
+        </LinearLayout>
+    </HorizontalScrollView>
+
+    <ListView
+        android:id="@+id/listViewFriends"
+        android:layout_width="match_parent"
+        android:layout_height="331dp"
+        android:layout_weight="1">
+
+    </ListView>
+
+    <LinearLayout
+        android:layout_width="match_parent"
+        android:layout_height="100dp"
+        android:orientation="horizontal">
+
+        <Button
+            android:id="@+id/buttonTestArea"
+            android:layout_width="wrap_content"
+            android:layout_height="match_parent"
+            android:layout_weight="1"
+            android:layout_gravity="start"
+            android:onClick="goToTestArea"
+            android:text="Test Area" />
+
+        <android.support.design.widget.FloatingActionButton
+            android:id="@+id/floatingActionButton"
+            android:layout_width="112dp"
+            android:layout_height="91dp"
+            android:layout_gravity="end"
+            android:clickable="true"
+            app:backgroundTint="#4CAF50"
+            app:srcCompat="@android:drawable/ic_menu_add" />
+    </LinearLayout>
+
+
+</LinearLayout>
