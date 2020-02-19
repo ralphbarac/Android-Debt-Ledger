@@ -26,6 +26,7 @@ import cs4474.g9.debtledger.data.LoginRepository;
 import cs4474.g9.debtledger.data.Result;
 import cs4474.g9.debtledger.data.model.LoggedInUser;
 import cs4474.g9.debtledger.ui.MainActivity;
+import cs4474.g9.debtledger.ui.signup.SignupActivity;
 
 public class LoginActivity extends AppCompatActivity {
 
@@ -54,6 +55,7 @@ public class LoginActivity extends AppCompatActivity {
 
         final TextInputEditText emailInput = findViewById(R.id.email);
         final TextInputEditText passwordInput = findViewById(R.id.password);
+        final MaterialButton switchToSignupButton = findViewById(R.id.switch_to_signup);
         final MaterialButton loginButton = findViewById(R.id.login);
         final ProgressBar loadingProgressBar = findViewById(R.id.loading);
 
@@ -89,10 +91,6 @@ public class LoginActivity extends AppCompatActivity {
                 }
                 if (loginResult.getSuccess() != null) {
                     proceedToDashboard(loginResult.getSuccess());
-
-                    // If login successful, complete and destroy login activity
-                    setResult(Activity.RESULT_OK);
-                    finish();
                 }
             }
         });
@@ -128,6 +126,17 @@ public class LoginActivity extends AppCompatActivity {
             }
         });
 
+        // On clicking switch to signup button, redirect to signup page
+        switchToSignupButton.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                Intent toSignupPage = new Intent(LoginActivity.this, SignupActivity.class);
+                startActivity(toSignupPage);
+                setResult(Activity.RESULT_OK);
+                finish();
+            }
+        });
+
         // On clicking login button, attempts login
         loginButton.setOnClickListener(new View.OnClickListener() {
             @Override
@@ -141,8 +150,11 @@ public class LoginActivity extends AppCompatActivity {
     private void proceedToDashboard(LoggedInUser user) {
         String welcome = getString(R.string.welcome) + user.getFirstName();
         Toast.makeText(getApplicationContext(), welcome, Toast.LENGTH_LONG).show();
+
         Intent toDashboard = new Intent(this, MainActivity.class);
         startActivity(toDashboard);
+        setResult(Activity.RESULT_OK);
+        finish();
     }
 
     private void informUserOfFailedLogin(@StringRes Integer errorString) {
