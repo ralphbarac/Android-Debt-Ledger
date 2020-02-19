@@ -1,0 +1,11 @@
+<resources>
+    <string name="app_name">Debt Ledger</string>
+    <!-- Strings related to login -->
+    <string name="prompt_email">Email</string>
+    <string name="prompt_password">Password</string>
+    <string name="action_sign_in">Sign In</string>
+    <string name="invalid_email">Not a valid email!</string>
+    <string name="invalid_password">Password must be a minimum of 8 characters!</string>
+    <string name="welcome">"Welcome "</string>
+    <string name="login_failed">"Invalid Email and/or Password"</string>
+</resources>
