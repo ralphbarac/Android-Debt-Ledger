@@ -1,6 +1,7 @@
 package cs4474.g9.debtledger.ui.login;
 
 import android.app.Activity;
+import android.content.Intent;
 import android.os.Bundle;
 import android.text.Editable;
 import android.text.TextWatcher;
@@ -24,6 +25,7 @@ import cs4474.g9.debtledger.data.LoginAuthenticator;
 import cs4474.g9.debtledger.data.LoginRepository;
 import cs4474.g9.debtledger.data.Result;
 import cs4474.g9.debtledger.data.model.LoggedInUser;
+import cs4474.g9.debtledger.ui.MainActivity;
 
 public class LoginActivity extends AppCompatActivity {
 
@@ -87,11 +89,11 @@ public class LoginActivity extends AppCompatActivity {
                 }
                 if (loginResult.getSuccess() != null) {
                     proceedToDashboard(loginResult.getSuccess());
-                }
-                setResult(Activity.RESULT_OK);
 
-                //Complete and destroy login activity once successful
-                finish();
+                    // If login successful, complete and destroy login activity
+                    setResult(Activity.RESULT_OK);
+                    finish();
+                }
             }
         });
 
@@ -120,8 +122,7 @@ public class LoginActivity extends AppCompatActivity {
             @Override
             public boolean onEditorAction(TextView v, int actionId, KeyEvent event) {
                 if (actionId == EditorInfo.IME_ACTION_DONE) {
-                    loginViewModel.login(emailInput.getText().toString(),
-                            passwordInput.getText().toString());
+                    loginViewModel.login(emailInput.getText().toString(), passwordInput.getText().toString());
                 }
                 return false;
             }
@@ -132,8 +133,7 @@ public class LoginActivity extends AppCompatActivity {
             @Override
             public void onClick(View v) {
                 loadingProgressBar.setVisibility(View.VISIBLE);
-                loginViewModel.login(emailInput.getText().toString(),
-                        passwordInput.getText().toString());
+                loginViewModel.login(emailInput.getText().toString(), passwordInput.getText().toString());
             }
         });
     }
@@ -141,7 +141,8 @@ public class LoginActivity extends AppCompatActivity {
     private void proceedToDashboard(LoggedInUser user) {
         String welcome = getString(R.string.welcome) + user.getFirstName();
         Toast.makeText(getApplicationContext(), welcome, Toast.LENGTH_LONG).show();
-        // TODO: Re-direct to Dashboard
+        Intent toDashboard = new Intent(this, MainActivity.class);
+        startActivity(toDashboard);
     }
 
     private void informUserOfFailedLogin(@StringRes Integer errorString) {

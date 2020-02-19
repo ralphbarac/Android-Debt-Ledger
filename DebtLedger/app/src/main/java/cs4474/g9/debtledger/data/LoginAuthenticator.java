@@ -13,7 +13,7 @@ public class LoginAuthenticator {
 
         try {
             // TODO: Authenticate
-            if (email.equals("zsirohey@uwo.ca") && password.equals("zain")) {
+            if (email.equals("zsirohey@uwo.ca") && password.equals("zain1234")) {
                 LoggedInUser testUser = new LoggedInUser(
                         "XSJKJSKDJKJS93JSKJK88",
                         "Zain",
