@@ -14,15 +14,26 @@ public class LoginRepository {
 
     // Singleton, so private constructor
     private LoginRepository(LoginAuthenticator authenticator) {
+        // TODO: Load user data (token) which may have been persisted
         this.authenticator = authenticator;
     }
 
-    public static LoginRepository getInstance(LoginAuthenticator dataSource) {
-        // TODO: Load user data (token) which may have been persisted
+    public static LoginRepository getInstance() {
         if (instance == null) {
-            instance = new LoginRepository(dataSource);
+            instance = new LoginRepository(new LoginAuthenticator());
         }
         return instance;
+    }
+
+    public static LoginRepository getInstance(LoginAuthenticator source) {
+        if (instance == null) {
+            instance = new LoginRepository(source);
+        }
+        return instance;
+    }
+
+    public LoggedInUser getLoggedInUser() {
+        return user;
     }
 
     public boolean isUserLoggedIn() {

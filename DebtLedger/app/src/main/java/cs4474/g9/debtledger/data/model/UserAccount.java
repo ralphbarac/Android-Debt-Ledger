@@ -18,6 +18,12 @@ public class UserAccount {
         this.password = password;
     }
 
+    public UserAccount(String firstName, String lastName, String email) {
+        this.firstName = firstName;
+        this.lastName = lastName;
+        this.email = email;
+    }
+
     public long getId() {
         return id;
     }
