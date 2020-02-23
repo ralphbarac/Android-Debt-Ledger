@@ -10,7 +10,7 @@ import androidx.fragment.app.Fragment;
 import androidx.fragment.app.FragmentManager;
 import androidx.fragment.app.FragmentStatePagerAdapter;
 import cs4474.g9.debtledger.data.model.UserAccount;
-import cs4474.g9.debtledger.logic.OutstandingBalanceCalculator;
+import cs4474.g9.debtledger.logic.BalanceCalculator;
 
 public class DashboardPageAdapter extends FragmentStatePagerAdapter {
 
@@ -22,7 +22,7 @@ public class DashboardPageAdapter extends FragmentStatePagerAdapter {
     public Fragment getItem(int position) {
         Fragment fragment = new DashboardPageFragment();
         Bundle args = new Bundle();
-        OutstandingBalanceCalculator calculator = new OutstandingBalanceCalculator();
+        BalanceCalculator calculator = new BalanceCalculator();
         List<Pair<UserAccount, Integer>> outstandingBalances = calculator.calculateOutstandingBalances();
 
         List<Pair<UserAccount, Integer>> filteredBalances = new ArrayList<>();

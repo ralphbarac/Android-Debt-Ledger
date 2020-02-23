@@ -23,4 +23,9 @@
     <string name="login_failed">"Unable to login, invalid Email and/or Password!"</string>
     <string name="signup_failed">"Unable to signup!"</string>
 
+    <!-- Strings related to contacts -->
+    <string name="requests_to_me">Requests To Me</string>
+    <string name="my_requests">My Requests</string>
+    <string name="my_contacts">My Contacts</string>
+
 </resources>

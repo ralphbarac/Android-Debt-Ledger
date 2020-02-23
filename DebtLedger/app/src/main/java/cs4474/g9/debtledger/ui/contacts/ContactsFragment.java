@@ -4,31 +4,59 @@ import android.os.Bundle;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
-import android.widget.TextView;
+
+import java.util.ArrayList;
+import java.util.List;
 
 import androidx.annotation.NonNull;
-import androidx.annotation.Nullable;
 import androidx.fragment.app.Fragment;
-import androidx.lifecycle.Observer;
-import androidx.lifecycle.ViewModelProviders;
+import androidx.recyclerview.widget.LinearLayoutManager;
+import androidx.recyclerview.widget.RecyclerView;
 import cs4474.g9.debtledger.R;
+import cs4474.g9.debtledger.data.model.UserAccount;
+import cs4474.g9.debtledger.logic.BalanceCalculator;
 
 public class ContactsFragment extends Fragment {
 
-    private ContactsViewModel contactsViewModel;
+    private RecyclerView contactRequestsView;
+    private RecyclerView.Adapter contactRequestsAdapter;
 
-    public View onCreateView(@NonNull LayoutInflater inflater,
-                             ViewGroup container, Bundle savedInstanceState) {
-        contactsViewModel =
-                ViewModelProviders.of(this).get(ContactsViewModel.class);
+    private RecyclerView contactsRequestedView;
+    private RecyclerView.Adapter contactsRequestedAdapter;
+
+    private RecyclerView contactsView;
+    private RecyclerView.Adapter contactsAdapter;
+
+    public View onCreateView(@NonNull LayoutInflater inflater, ViewGroup container, Bundle savedInstanceState) {
         View root = inflater.inflate(R.layout.fragment_contacts, container, false);
-        final TextView textView = root.findViewById(R.id.text_contacts);
-        contactsViewModel.getText().observe(this, new Observer<String>() {
-            @Override
-            public void onChanged(@Nullable String s) {
-                textView.setText(s);
-            }
-        });
+
+        // TODO: Rethink usage of NestedScrollView
+
+        // TODO: Contact Requests query system
+        List<UserAccount> contactRequests = new ArrayList<>();
+        contactRequests.add(new UserAccount("Randal", "Smith", "rmsith@uwo.ca"));
+        contactRequestsView = root.findViewById(R.id.requests_to_me_list);
+        contactRequestsView.setHasFixedSize(true);
+        contactRequestsView.setLayoutManager(new LinearLayoutManager(getContext()));
+        contactRequestsAdapter = new ContactRequestListAdapter(contactRequests);
+        contactRequestsView.setAdapter(contactRequestsAdapter);
+
+        // TODO: Contacts Requested query system
+        List<UserAccount> contactsRequested = new ArrayList<>();
+        contactsRequested.add(new UserAccount("Mike", "Lee", "mlee@uwo.ca"));
+        contactsRequestedView = root.findViewById(R.id.my_requests_list);
+        contactsRequestedView.setHasFixedSize(true);
+        contactsRequestedView.setLayoutManager(new LinearLayoutManager(getContext()));
+        contactsRequestedAdapter = new ContactRequestedListAdapter(contactsRequested);
+        contactsRequestedView.setAdapter(contactsRequestedAdapter);
+
+        BalanceCalculator calculator = new BalanceCalculator();
+        contactsView = root.findViewById(R.id.my_contacts_list);
+        contactsView.setHasFixedSize(true);
+        contactsView.setLayoutManager(new LinearLayoutManager(getContext()));
+        contactsAdapter = new ContactListAdapter(calculator.calculateBalances());
+        contactsView.setAdapter(contactsAdapter);
+
         return root;
     }
 }

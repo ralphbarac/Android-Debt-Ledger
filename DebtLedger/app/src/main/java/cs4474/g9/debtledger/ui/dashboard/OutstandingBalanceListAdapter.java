@@ -33,7 +33,7 @@ public class OutstandingBalanceListAdapter extends RecyclerView.Adapter<Outstand
     @Override
     public Item onCreateViewHolder(@NonNull ViewGroup parent, int viewType) {
         View view = LayoutInflater.from(parent.getContext())
-                .inflate(R.layout.outstanding_balance_list_item, parent, false);
+                .inflate(R.layout.list_item_outstanding_balance, parent, false);
         return new Item(view);
     }
 
