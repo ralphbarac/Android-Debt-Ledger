@@ -19,6 +19,12 @@
             android:textColor="@color/black"
             android:textSize="20sp" />
 
+        <androidx.recyclerview.widget.RecyclerView
+            android:id="@+id/requests_to_me_list"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:nestedScrollingEnabled="false" />
+
         <TextView
             android:id="@+id/my_requests_title"
             android:layout_width="match_parent"
@@ -29,6 +35,12 @@
             android:text="@string/my_requests"
             android:textColor="@color/black"
             android:textSize="20sp" />
+
+        <androidx.recyclerview.widget.RecyclerView
+            android:id="@+id/my_requests_list"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:nestedScrollingEnabled="false" />
 
         <TextView
             android:id="@+id/my_contacts_title"
@@ -41,17 +53,6 @@
             android:textColor="@color/black"
             android:textSize="20sp" />
 
-        <androidx.recyclerview.widget.RecyclerView
-            android:id="@+id/my_requests_list"
-            android:layout_width="match_parent"
-            android:layout_height="wrap_content"
-            android:nestedScrollingEnabled="false" />
-
-        <androidx.recyclerview.widget.RecyclerView
-            android:id="@+id/requests_to_me_list"
-            android:layout_width="match_parent"
-            android:layout_height="wrap_content"
-            android:nestedScrollingEnabled="false" />
 
         <androidx.recyclerview.widget.RecyclerView
             android:id="@+id/my_contacts_list"
