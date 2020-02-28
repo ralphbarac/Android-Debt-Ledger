@@ -3,6 +3,7 @@ package cs4474.g9.debtledger.data;
 import java.io.IOException;
 
 import cs4474.g9.debtledger.data.model.LoggedInUser;
+import cs4474.g9.debtledger.data.model.UserAccount;
 
 /**
  * A class to handle logic related to authentication, and returning of appropriate user information
@@ -16,8 +17,11 @@ public class LoginAuthenticator {
             if (email.equals("zsirohey@uwo.ca") && password.equals("zain1234")) {
                 LoggedInUser testUser = new LoggedInUser(
                         "XSJKJSKDJKJS93JSKJK88",
-                        "Zain",
-                        "Sirohey"
+                        new UserAccount(
+                                "Zain",
+                                "Sirohey",
+                                "zsirohey@uwo.ca"
+                        )
                 );
                 return new Result.Success<>(testUser);
             } else {
@@ -34,8 +38,11 @@ public class LoginAuthenticator {
             if (token.equals("XSJKJSKDJKJS93JSKJK88")) {
                 LoggedInUser testUser = new LoggedInUser(
                         token,
-                        "Zain",
-                        "Sirohey"
+                        new UserAccount(
+                                "Zain",
+                                "Sirohey",
+                                "zsirohey@uwo.ca"
+                        )
                 );
                 return new Result.Success<>(testUser);
             } else {

@@ -6,13 +6,11 @@ package cs4474.g9.debtledger.data.model;
 public class LoggedInUser {
 
     private String token;
-    private String firstName;
-    private String lastName;
+    private UserAccount account;
 
-    public LoggedInUser(String token, String firstName, String lastName) {
+    public LoggedInUser(String token, UserAccount account) {
         this.token = token;
-        this.firstName = firstName;
-        this.lastName = lastName;
+        this.account = account;
     }
 
     public String getToken() {
@@ -20,10 +18,10 @@ public class LoggedInUser {
     }
 
     public String getFirstName() {
-        return firstName;
+        return account.getFirstName();
     }
 
     public String getLastName() {
-        return lastName;
+        return account.getLastName();
     }
 }
