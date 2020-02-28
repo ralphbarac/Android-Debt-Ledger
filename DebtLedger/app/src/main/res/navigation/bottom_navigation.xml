@@ -9,7 +9,7 @@
         android:id="@+id/navigation_dashboard"
         android:name="cs4474.g9.debtledger.ui.dashboard.DashboardFragment"
         android:label="@string/title_dashboard"
-        tools:layout="@layout/fragment_contacts" />
+        tools:layout="@layout/fragment_dashboard" />
 
     <fragment
         android:id="@+id/navigation_contacts"

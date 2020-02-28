@@ -1,6 +1,8 @@
 package cs4474.g9.debtledger.data.model;
 
-public class UserAccount {
+import java.io.Serializable;
+
+public class UserAccount implements Serializable {
 
     private long id;
 
