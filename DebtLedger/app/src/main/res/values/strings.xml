@@ -23,9 +23,23 @@
     <string name="login_failed">"Unable to login, invalid Email and/or Password!"</string>
     <string name="signup_failed">"Unable to signup!"</string>
 
+    <!-- Strings related to transactions -->
+    <string name="title_create_transaction">Add Debt</string>
+    <string name="title_select_contact">Who is Paying?</string>
+    <string name="title_select_multiple_contacts">Who Owes?</string>
+    <string name="heading_who_is_paying">Who is Paying?</string>
+    <string name="heading_who_owes">Who Owes?</string>
+    <string name="label_amount">Amount ($)</string>
+    <string name="prompt_description">Description</string>
+    <string name="prompt_amount">Amount</string>
+    <string name="action_submit">Submit</string>
+    <string name="action_split">Split</string>
+
     <!-- Strings related to contacts -->
     <string name="requests_to_me">Requests To Me</string>
     <string name="my_requests">My Requests</string>
     <string name="my_contacts">My Contacts</string>
+    <string name="action_select_contact">Select Contact</string>
+    <string name="action_select_contacts">Select Contact(s)</string>
 
 </resources>

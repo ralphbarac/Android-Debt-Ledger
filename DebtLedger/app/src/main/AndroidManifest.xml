@@ -9,10 +9,21 @@
         android:roundIcon="@mipmap/ic_launcher_round"
         android:supportsRtl="true"
         android:theme="@style/AppTheme">
-        <activity android:name=".ui.signup.SignupActivity"></activity>
+        <activity
+            android:name=".ui.transaction.CreateTransactionActivity"
+            android:label="@string/title_create_transaction" />
+        <activity
+            android:name=".ui.contacts.select.SelectMultipleContactsActivity"
+            android:label="@string/title_select_multiple_contacts" />
+        <activity
+            android:name=".ui.contacts.select.SelectContactActivity"
+            android:label="@string/title_select_contact" />
+        <activity
+            android:name=".ui.signup.SignupActivity"
+            android:label="@string/app_name" />
         <activity
             android:name=".ui.MainActivity"
-            android:label="@string/app_name"></activity>
+            android:label="@string/app_name" />
         <activity
             android:name=".ui.login.LoginActivity"
             android:label="@string/app_name">
