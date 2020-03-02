@@ -1,7 +1,11 @@
 package cs4474.g9.debtledger.ui.contacts;
 
 import android.os.Bundle;
+import android.util.Log;
 import android.view.LayoutInflater;
+import android.view.Menu;
+import android.view.MenuInflater;
+import android.view.MenuItem;
 import android.view.View;
 import android.view.ViewGroup;
 
@@ -29,8 +33,7 @@ public class ContactsFragment extends Fragment {
 
     public View onCreateView(@NonNull LayoutInflater inflater, ViewGroup container, Bundle savedInstanceState) {
         View root = inflater.inflate(R.layout.fragment_contacts, container, false);
-
-        // TODO: Rethink usage of NestedScrollView
+        setHasOptionsMenu(true);
 
         // TODO: Contact Requests query system
         List<UserAccount> contactRequests = new ArrayList<>();
@@ -58,5 +61,22 @@ public class ContactsFragment extends Fragment {
         contactsView.setAdapter(contactsAdapter);
 
         return root;
+    }
+
+    @Override
+    public void onCreateOptionsMenu(Menu menu, MenuInflater inflater) {
+        inflater.inflate(R.menu.menu_contacts, menu);
+    }
+
+    @Override
+    public boolean onOptionsItemSelected(MenuItem item) {
+        switch (item.getItemId()) {
+            case R.id.add_contact:
+                // TODO: Open Add Contact Dialog
+                Log.d("CONTACTS", "Add Contact icon clicked.");
+                return true;
+            default:
+                return super.onOptionsItemSelected(item);
+        }
     }
 }
