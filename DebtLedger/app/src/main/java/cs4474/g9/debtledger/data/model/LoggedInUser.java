@@ -17,6 +17,10 @@ public class LoggedInUser {
         return token;
     }
 
+    public UserAccount getAccount() {
+        return account;
+    }
+
     public String getFirstName() {
         return account.getFirstName();
     }

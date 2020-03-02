@@ -48,7 +48,7 @@
         android:layout_height="wrap_content"
         android:layout_marginTop="8dp"
         android:text="@string/label_amount"
-        android:textSize="20sp"
+        android:textSize="16sp"
         android:visibility="invisible"
 
         app:layout_constraintEnd_toEndOf="parent"
@@ -66,13 +66,13 @@
         app:layout_constraintStart_toStartOf="parent">
 
         <androidx.constraintlayout.widget.ConstraintLayout
+            android:id="@+id/who_is_paying_input_container"
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
-            android:layout_marginBottom="8dp"
             android:visibility="gone">
 
             <ImageView
-                android:id="@+id/contact_avatar"
+                android:id="@+id/who_is_paying_avatar"
                 android:layout_width="48dp"
                 android:layout_height="48dp"
                 app:layout_constraintBottom_toBottomOf="parent"
@@ -81,7 +81,7 @@
                 app:srcCompat="@drawable/circle" />
 
             <TextView
-                android:id="@+id/contact_avatar_character"
+                android:id="@+id/who_is_paying_avatar_character"
                 android:layout_width="48dp"
                 android:layout_height="48dp"
                 android:gravity="center_vertical|center"
@@ -92,7 +92,7 @@
                 app:layout_constraintTop_toTopOf="parent" />
 
             <TextView
-                android:id="@+id/contact_name"
+                android:id="@+id/who_is_paying_name"
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
                 android:layout_marginStart="8dp"
@@ -101,14 +101,14 @@
                 android:textSize="14sp"
 
                 app:layout_constraintBottom_toBottomOf="parent"
-                app:layout_constraintStart_toEndOf="@+id/contact_avatar"
+                app:layout_constraintStart_toEndOf="@+id/who_is_paying_avatar"
                 app:layout_constraintTop_toTopOf="parent" />
 
             <com.google.android.material.textfield.TextInputLayout
                 android:id="@+id/who_is_paying_amount_input_layout"
                 style="@style/Widget.MaterialComponents.TextInputLayout.OutlinedBox"
-                android:layout_width="150dp"
-                android:layout_height="48dp"
+                android:layout_width="100dp"
+                android:layout_height="wrap_content"
                 android:hint="@string/prompt_amount"
 
                 app:layout_constraintEnd_toEndOf="parent"
@@ -160,7 +160,7 @@
             </androidx.constraintlayout.widget.ConstraintLayout>
 
             <TextView
-                android:id="@+id/who_is_paying_add_contact_title"
+                android:id="@+id/who_is_paying_action_title"
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
                 android:layout_marginStart="8dp"
@@ -241,7 +241,7 @@
             </androidx.constraintlayout.widget.ConstraintLayout>
 
             <TextView
-                android:id="@+id/who_owes_add_contact_title"
+                android:id="@+id/who_owes_action_title"
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
                 android:layout_marginStart="8dp"

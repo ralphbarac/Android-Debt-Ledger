@@ -34,6 +34,8 @@
     <string name="prompt_amount">Amount</string>
     <string name="action_submit">Submit</string>
     <string name="action_split">Split</string>
+    <string name="invalid_amount">The amount must be a dollar value in format #.##</string>
+    <string name="invalid_mismatching_amounts">The amount paid must match the amounts owed</string>
 
     <!-- Strings related to contacts -->
     <string name="requests_to_me">Requests To Me</string>
@@ -41,5 +43,6 @@
     <string name="my_contacts">My Contacts</string>
     <string name="action_select_contact">Select Contact</string>
     <string name="action_select_contacts">Select Contact(s)</string>
+    <string name="action_confirm_selection">Confirm Selection</string>
 
 </resources>

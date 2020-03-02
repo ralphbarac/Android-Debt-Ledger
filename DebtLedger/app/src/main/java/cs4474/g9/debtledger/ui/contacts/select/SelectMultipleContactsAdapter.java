@@ -4,6 +4,7 @@ import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
 import android.widget.CheckBox;
+import android.widget.CompoundButton;
 import android.widget.ImageView;
 import android.widget.TextView;
 
@@ -22,10 +23,33 @@ public class SelectMultipleContactsAdapter extends RecyclerView.Adapter<SelectMu
     private List<UserAccount> contacts;
     private BitSet selectedContacts;
 
-    public SelectMultipleContactsAdapter(List<UserAccount> contacts) {
+    private List<OnContactChecked> onContactCheckedListeners;
+
+    public SelectMultipleContactsAdapter(List<UserAccount> contacts, List<UserAccount> currentlySelectedContacts) {
         super();
         this.contacts = contacts;
         this.selectedContacts = new BitSet(contacts.size());
+        this.onContactCheckedListeners = new ArrayList<>();
+
+        for (UserAccount currentlySelectedContact : currentlySelectedContacts) {
+            selectedContacts.set(contacts.indexOf(currentlySelectedContact));
+        }
+    }
+
+    public void addOnContactCheckedListener(OnContactChecked onContactChecked) {
+        onContactCheckedListeners.add(onContactChecked);
+    }
+
+    public void notifyListenersOfContactChecked() {
+        for (OnContactChecked onContactCheckedListener : onContactCheckedListeners) {
+            onContactCheckedListener.onContactChecked();
+        }
+    }
+
+    public void notifyListenersOfContactUnchecked() {
+        for (OnContactChecked onContactCheckedListener : onContactCheckedListeners) {
+            onContactCheckedListener.onContactUnchecked();
+        }
     }
 
     @NonNull
@@ -62,7 +86,15 @@ public class SelectMultipleContactsAdapter extends RecyclerView.Adapter<SelectMu
         return selections;
     }
 
-    public static class Item extends RecyclerView.ViewHolder {
+    public void setSelected(int position) {
+        selectedContacts.set(position);
+    }
+
+    public void clearSelected(int position) {
+        selectedContacts.clear(position);
+    }
+
+    public class Item extends RecyclerView.ViewHolder implements View.OnClickListener, CheckBox.OnCheckedChangeListener {
         public ImageView contactAvatar;
         public TextView contactAvatarCharacter;
         public TextView contactName;
@@ -70,10 +102,36 @@ public class SelectMultipleContactsAdapter extends RecyclerView.Adapter<SelectMu
 
         public Item(View view) {
             super(view);
+            view.setOnClickListener(this);
+
             this.contactAvatar = view.findViewById(R.id.contact_avatar);
             this.contactAvatarCharacter = view.findViewById(R.id.contact_avatar_character);
             this.contactName = view.findViewById(R.id.name);
             this.checkBox = view.findViewById(R.id.check_box);
+            this.checkBox.setOnCheckedChangeListener(this);
+        }
+
+        @Override
+        public void onClick(View v) {
+            checkBox.setChecked(!checkBox.isChecked());
+            if (checkBox.isChecked()) {
+                setSelected(getAdapterPosition());
+                notifyListenersOfContactChecked();
+            } else {
+                clearSelected(getAdapterPosition());
+                notifyListenersOfContactUnchecked();
+            }
+        }
+
+        @Override
+        public void onCheckedChanged(CompoundButton buttonView, boolean isChecked) {
+            if (isChecked) {
+                setSelected(getAdapterPosition());
+                notifyListenersOfContactChecked();
+            } else {
+                clearSelected(getAdapterPosition());
+                notifyListenersOfContactUnchecked();
+            }
         }
     }
 }
