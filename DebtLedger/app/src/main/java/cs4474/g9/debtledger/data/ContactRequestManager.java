@@ -14,11 +14,16 @@ public class ContactRequestManager {
     }
 
     public Result getAllContactRequestsFor(UserAccount user) {
-        List<UserAccount> contactRequestsFor = new ArrayList<>();
         // TODO: Implement, currently using dummy data
+        List<UserAccount> contactRequestsFor = new ArrayList<>();
         contactRequestsFor.add(new UserAccount("Randal", "Smith", "rmsith@uwo.ca"));
 
         return new Result.Success<>(contactRequestsFor);
+    }
+
+    public Result getCountOfContactRequestsFor(UserAccount user) {
+        // TODO: Implement, currently using dummy data
+        return new Result.Success<>(1);
     }
 
     public Result getAllContectRequestsBy(UserAccount user) {
