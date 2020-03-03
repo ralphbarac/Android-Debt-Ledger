@@ -37,7 +37,7 @@ public class SignupViewModel extends ViewModel {
 
     public void signup(String firstName, String lastName, String email, String password) {
         // Attempt to signup with given data
-        Result<UserAccount> userAccountResult = userAccountManager.create(
+        Result<UserAccount> userAccountResult = userAccountManager.createAccount(
                 new UserAccount(firstName, lastName, email, password)
         );
 

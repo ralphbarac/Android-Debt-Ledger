@@ -4,29 +4,29 @@ public class ContactRequest {
 
     private long id;
 
-    private UserAccount requester;
-    private UserAccount requestee;
+    private UserAccount requestFor;
+    private UserAccount requestBy;
 
-    public ContactRequest(UserAccount requester, UserAccount requestee) {
-        this.requester = requester;
-        this.requestee = requestee;
+    public ContactRequest(UserAccount requestFor, UserAccount requestBy) {
+        this.requestFor = requestFor;
+        this.requestBy = requestBy;
     }
 
-    public ContactRequest(long id, UserAccount requester, UserAccount requestee) {
+    public ContactRequest(long id, UserAccount requestFor, UserAccount requestBy) {
         this.id = id;
-        this.requester = requester;
-        this.requestee = requestee;
+        this.requestFor = requestFor;
+        this.requestBy = requestBy;
     }
 
     public long getId() {
         return id;
     }
 
-    public UserAccount getRequester() {
-        return requester;
+    public UserAccount getRequestFor() {
+        return requestFor;
     }
 
-    public UserAccount getRequestee() {
-        return requestee;
+    public UserAccount getRequestBy() {
+        return requestBy;
     }
 }

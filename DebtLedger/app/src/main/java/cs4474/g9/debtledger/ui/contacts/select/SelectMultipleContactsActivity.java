@@ -9,6 +9,7 @@ import android.widget.CheckBox;
 import android.widget.CompoundButton;
 import android.widget.ImageView;
 import android.widget.TextView;
+import android.widget.Toast;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -17,6 +18,8 @@ import androidx.appcompat.app.AppCompatActivity;
 import androidx.recyclerview.widget.LinearLayoutManager;
 import androidx.recyclerview.widget.RecyclerView;
 import cs4474.g9.debtledger.R;
+import cs4474.g9.debtledger.data.ContactManager;
+import cs4474.g9.debtledger.data.Result;
 import cs4474.g9.debtledger.data.login.LoginRepository;
 import cs4474.g9.debtledger.data.model.UserAccount;
 import cs4474.g9.debtledger.logic.ColourGenerator;
@@ -81,9 +84,14 @@ public class SelectMultipleContactsActivity extends AppCompatActivity implements
         });
 
 
-        // TODO: Contact query system
+        ContactManager manager = new ContactManager();
         List<UserAccount> contacts = new ArrayList<>();
-        contacts.add(new UserAccount("Randal", "Smith", "rmsith@uwo.ca"));
+        Result result = manager.getAllContactsOf(loggedInUser);
+        if (result instanceof Result.Success) {
+            contacts = (List<UserAccount>) ((Result.Success) result).getData();
+        } else {
+            Toast.makeText(this, R.string.failure_contacts, Toast.LENGTH_SHORT).show();
+        }
 
         final RecyclerView selectMultipleContactsView = findViewById(R.id.contacts_list);
         selectMultipleContactsView.setHasFixedSize(true);

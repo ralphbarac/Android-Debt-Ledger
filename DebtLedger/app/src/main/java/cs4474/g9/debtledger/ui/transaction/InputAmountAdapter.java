@@ -82,7 +82,7 @@ public class InputAmountAdapter extends RecyclerView.Adapter<InputAmountAdapter.
             holder.contactName.setText(contact.getFirstName() + " " + contact.getLastName());
         }
 
-        // Only change the amount text if it is different - otherwise we may create an infinite loop with the text watcher
+        // Only change the amount text if it is different - otherwise we may createAccount an infinite loop with the text watcher
         if (!holder.amount.getText().toString().equals(amounts.get(position))) {
             holder.amount.setText(amounts.get(position));
         }

@@ -10,6 +10,7 @@ import cs4474.g9.debtledger.data.model.UserAccount;
 public class BalanceCalculator {
 
     public List<Pair<UserAccount, Integer>> calculateOutstandingBalances(/* TODO: Pass Information */) {
+        // TODO: Implement, currently using dummy data
         List<Pair<UserAccount, Integer>> list = new ArrayList<>();
 
         list.add(
@@ -38,6 +39,7 @@ public class BalanceCalculator {
     }
 
     public List<Pair<UserAccount, Integer>> calculateBalances(/* TODO: Pass Information */) {
+        // TODO: Implement, currently using dummy data
         List<Pair<UserAccount, Integer>> list = new ArrayList<>();
 
 

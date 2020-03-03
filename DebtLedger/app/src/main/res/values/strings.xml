@@ -51,4 +51,8 @@
     <!-- Strings related to groups -->
     <string name="action_add_group">Add Group</string>
 
+    <!-- Strings related to database/query failures -->
+    <string name="failure_contact_requests">Unable to get contact requests</string>
+    <string name="failure_contacts">Unable to get contacts</string>
+
 </resources>

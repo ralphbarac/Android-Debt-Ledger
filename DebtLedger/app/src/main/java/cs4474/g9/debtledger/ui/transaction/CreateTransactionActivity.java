@@ -4,6 +4,7 @@ import android.content.Intent;
 import android.os.Bundle;
 import android.text.Editable;
 import android.text.TextWatcher;
+import android.util.Log;
 import android.view.View;
 import android.widget.ImageView;
 import android.widget.TextView;
@@ -94,6 +95,13 @@ public class CreateTransactionActivity extends AppCompatActivity implements OnIn
         splitButton = findViewById(R.id.split);
 
         submitButton = findViewById(R.id.submit);
+        submitButton.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                // TODO: Submit Transaction
+                Log.d("CREATE-TRANSACTION", "Submit button clicked.");
+            }
+        });
 
         // Who is paying input listener
         whoIsPayingAmountInput = findViewById(R.id.who_is_paying_amount_input);
