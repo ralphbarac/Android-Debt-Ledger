@@ -52,13 +52,14 @@ public class DashboardPageAdapter extends FragmentStatePagerAdapter {
 
     @Override
     public CharSequence getPageTitle(int position) {
-        if (position == 0) {
-            return "OWED";
-        } else if (position == 2) {
-            return "OWE";
-        } else {
-            return "ALL";
-        }
+        return "";
+//        if (position == 0) {
+//            return "OWED";
+//        } else if (position == 2) {
+//            return "OWE";
+//        } else {
+//            return "ALL";
+//        }
     }
 
 }
