@@ -17,8 +17,7 @@ import androidx.appcompat.app.AppCompatActivity;
 import androidx.recyclerview.widget.LinearLayoutManager;
 import androidx.recyclerview.widget.RecyclerView;
 import cs4474.g9.debtledger.R;
-import cs4474.g9.debtledger.data.LoginRepository;
-import cs4474.g9.debtledger.data.model.LoggedInUser;
+import cs4474.g9.debtledger.data.login.LoginRepository;
 import cs4474.g9.debtledger.data.model.UserAccount;
 import cs4474.g9.debtledger.logic.ColourGenerator;
 
@@ -51,7 +50,7 @@ public class SelectMultipleContactsActivity extends AppCompatActivity implements
         final TextView myAvatarCharacter = findViewById(R.id.my_avatar_character);
         myCheckBox = findViewById(R.id.my_check_box);
 
-        LoggedInUser loggedInUser = LoginRepository.getInstance().getLoggedInUser();
+        UserAccount loggedInUser = LoginRepository.getInstance(this).getLoggedInUser();
         myAvatar.setColorFilter(ColourGenerator.generateFromName(loggedInUser.getFirstName(), loggedInUser.getLastName()));
         myAvatarCharacter.setText(loggedInUser.getFirstName().substring(0, 1));
 

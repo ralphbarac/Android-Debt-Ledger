@@ -1,7 +1,7 @@
 package cs4474.g9.debtledger.ui.signup;
 
 import androidx.annotation.Nullable;
-import cs4474.g9.debtledger.data.model.LoggedInUser;
+import cs4474.g9.debtledger.data.model.UserAccount;
 
 /**
  * Result of login, to be used with LiveData and Observer
@@ -9,7 +9,7 @@ import cs4474.g9.debtledger.data.model.LoggedInUser;
 class SignupResult {
 
     @Nullable
-    private LoggedInUser success;
+    private UserAccount success;
     @Nullable
     private Integer error;
 
@@ -17,12 +17,12 @@ class SignupResult {
         this.error = error;
     }
 
-    SignupResult(@Nullable LoggedInUser success) {
+    SignupResult(@Nullable UserAccount success) {
         this.success = success;
     }
 
     @Nullable
-    LoggedInUser getSuccess() {
+    UserAccount getSuccess() {
         return success;
     }
 

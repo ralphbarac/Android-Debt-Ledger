@@ -22,7 +22,7 @@ import androidx.lifecycle.ViewModelProviders;
 import androidx.recyclerview.widget.LinearLayoutManager;
 import androidx.recyclerview.widget.RecyclerView;
 import cs4474.g9.debtledger.R;
-import cs4474.g9.debtledger.data.LoginRepository;
+import cs4474.g9.debtledger.data.login.LoginRepository;
 import cs4474.g9.debtledger.data.model.UserAccount;
 import cs4474.g9.debtledger.logic.ColourGenerator;
 import cs4474.g9.debtledger.ui.contacts.select.SelectContactActivity;
@@ -84,7 +84,7 @@ public class CreateTransactionActivity extends AppCompatActivity implements OnIn
         whoOwesInputView.setLayoutManager(new LinearLayoutManager(this));
 
         // Initializing who owes input adapter
-        whoOwesInputAdapter = new InputAmountAdapter(whoOwes, LoginRepository.getInstance().getLoggedInUser());
+        whoOwesInputAdapter = new InputAmountAdapter(whoOwes, LoginRepository.getInstance(this).getLoggedInUser());
         whoOwesInputAdapter.addOnInputChangedListener(this);
         whoOwesInputView.setAdapter(whoOwesInputAdapter);
 
@@ -168,7 +168,7 @@ public class CreateTransactionActivity extends AppCompatActivity implements OnIn
 
                     whoOwes = new ArrayList<>();
                     if (selectedSelf) {
-                        whoOwes.add(LoginRepository.getInstance().getLoggedInUser().getAccount());
+                        whoOwes.add(LoginRepository.getInstance(this).getLoggedInUser());
                     }
                     whoOwes.addAll(selectedContacts);
                     updateWhoOwesSection();
@@ -182,7 +182,7 @@ public class CreateTransactionActivity extends AppCompatActivity implements OnIn
             whoIsPayingInputContainer.setVisibility(View.VISIBLE);
             whoIsPayingAvatar.setColorFilter(ColourGenerator.generateFromName(whoIsPaying.getFirstName(), whoIsPaying.getLastName()));
             whoIsPayingAvatarCharacter.setText(whoIsPaying.getFirstName().substring(0, 1));
-            if (whoIsPaying.equals(LoginRepository.getInstance().getLoggedInUser().getAccount())) {
+            if (whoIsPaying.equals(LoginRepository.getInstance(this).getLoggedInUser())) {
                 whoIsPayingName.setText("Me");
             } else {
                 whoIsPayingName.setText(whoIsPaying.getFirstName() + " " + whoIsPaying.getLastName());

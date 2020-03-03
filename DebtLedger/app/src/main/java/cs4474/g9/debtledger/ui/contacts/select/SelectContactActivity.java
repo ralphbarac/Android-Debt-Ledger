@@ -13,8 +13,7 @@ import androidx.appcompat.app.AppCompatActivity;
 import androidx.recyclerview.widget.LinearLayoutManager;
 import androidx.recyclerview.widget.RecyclerView;
 import cs4474.g9.debtledger.R;
-import cs4474.g9.debtledger.data.LoginRepository;
-import cs4474.g9.debtledger.data.model.LoggedInUser;
+import cs4474.g9.debtledger.data.login.LoginRepository;
 import cs4474.g9.debtledger.data.model.UserAccount;
 import cs4474.g9.debtledger.logic.ColourGenerator;
 
@@ -31,13 +30,13 @@ public class SelectContactActivity extends AppCompatActivity implements OnContac
         final TextView myAvatarCharacter = findViewById(R.id.my_avatar_character);
         final View myContactContainer = findViewById(R.id.my_contact_container);
 
-        final LoggedInUser loggedInUser = LoginRepository.getInstance().getLoggedInUser();
+        final UserAccount loggedInUser = LoginRepository.getInstance(this).getLoggedInUser();
         myAvatar.setColorFilter(ColourGenerator.generateFromName(loggedInUser.getFirstName(), loggedInUser.getLastName()));
         myAvatarCharacter.setText(loggedInUser.getFirstName().substring(0, 1));
         myContactContainer.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
-                onContactSelected(loggedInUser.getAccount());
+                onContactSelected(loggedInUser);
             }
         });
 

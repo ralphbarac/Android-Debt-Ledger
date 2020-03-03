@@ -12,6 +12,7 @@
     <string name="prompt_first_name">First Name</string>
     <string name="prompt_last_name">Last Name</string>
     <string name="action_login">Login</string>
+    <string name="action_logout">Logout</string>
     <string name="action_sign_up">Sign Up</string>
     <string name="action_switch_to_login">Already a User? Login!</string>
     <string name="action_switch_to_sign_up">Not a User? Sign up!</string>
@@ -20,6 +21,7 @@
     <string name="invalid_email">Not a valid email!</string>
     <string name="invalid_password">Password must be a minimum of 8 characters!</string>
     <string name="welcome">"Welcome "</string>
+    <string name="goodbye">"Goodbye "</string>
     <string name="login_failed">"Unable to login, invalid Email and/or Password!"</string>
     <string name="signup_failed">"Unable to signup!"</string>
 

@@ -8,24 +8,23 @@ import androidx.lifecycle.LiveData;
 import androidx.lifecycle.MutableLiveData;
 import androidx.lifecycle.ViewModel;
 import cs4474.g9.debtledger.R;
-import cs4474.g9.debtledger.data.LoginAuthenticator;
-import cs4474.g9.debtledger.data.LoginRepository;
 import cs4474.g9.debtledger.data.Result;
 import cs4474.g9.debtledger.data.UserAccountManager;
-import cs4474.g9.debtledger.data.model.LoggedInUser;
+import cs4474.g9.debtledger.data.login.LoginRepository;
 import cs4474.g9.debtledger.data.model.UserAccount;
 
 public class SignupViewModel extends ViewModel {
 
     public static final Pattern NAME = Pattern.compile("^[a-zA-Z]+$");
+
     private MutableLiveData<SignupFormState> signupFormState = new MutableLiveData<>();
     private MutableLiveData<SignupResult> signupResult = new MutableLiveData<>();
     private UserAccountManager userAccountManager;
     private LoginRepository loginRepository;
 
-    public SignupViewModel() {
+    public SignupViewModel(LoginRepository loginRepository) {
         this.userAccountManager = new UserAccountManager();
-        this.loginRepository = LoginRepository.getInstance(new LoginAuthenticator());
+        this.loginRepository = loginRepository;
     }
 
     LiveData<SignupFormState> getSignupFormState() {
@@ -44,12 +43,12 @@ public class SignupViewModel extends ViewModel {
 
         if (userAccountResult instanceof Result.Success) {
             // Login to newly created account
-            Result<LoggedInUser> loginResult = loginRepository.login(email, password);
+            Result<UserAccount> loginResult = loginRepository.login(email, password);
 
             // Update value of signup result, which is propagated to the view
             if (loginResult instanceof Result.Success) {
-                LoggedInUser user = ((Result.Success<LoggedInUser>) loginResult).getData();
-                signupResult.setValue(new SignupResult(user));
+                UserAccount loggedInUser = ((Result.Success<UserAccount>) loginResult).getData();
+                signupResult.setValue(new SignupResult(loggedInUser));
             } else {
                 signupResult.setValue(new SignupResult(R.string.signup_failed));
             }

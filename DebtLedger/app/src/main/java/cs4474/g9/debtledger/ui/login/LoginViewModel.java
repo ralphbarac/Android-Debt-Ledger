@@ -6,10 +6,9 @@ import androidx.lifecycle.LiveData;
 import androidx.lifecycle.MutableLiveData;
 import androidx.lifecycle.ViewModel;
 import cs4474.g9.debtledger.R;
-import cs4474.g9.debtledger.data.LoginAuthenticator;
-import cs4474.g9.debtledger.data.LoginRepository;
 import cs4474.g9.debtledger.data.Result;
-import cs4474.g9.debtledger.data.model.LoggedInUser;
+import cs4474.g9.debtledger.data.login.LoginRepository;
+import cs4474.g9.debtledger.data.model.UserAccount;
 
 public class LoginViewModel extends ViewModel {
 
@@ -17,8 +16,8 @@ public class LoginViewModel extends ViewModel {
     private MutableLiveData<LoginResult> loginResult = new MutableLiveData<>();
     private LoginRepository loginRepository;
 
-    public LoginViewModel() {
-        this.loginRepository = LoginRepository.getInstance(new LoginAuthenticator());
+    public LoginViewModel(LoginRepository loginRepository) {
+        this.loginRepository = loginRepository;
     }
 
     LiveData<LoginFormState> getLoginFormState() {
@@ -31,12 +30,12 @@ public class LoginViewModel extends ViewModel {
 
     public void login(String email, String password) {
         // Attempt to login with given credentials
-        Result<LoggedInUser> result = loginRepository.login(email, password);
+        Result<UserAccount> result = loginRepository.login(email, password);
 
         // Update value of login result, which is propagated to the view
         if (result instanceof Result.Success) {
-            LoggedInUser user = ((Result.Success<LoggedInUser>) result).getData();
-            loginResult.setValue(new LoginResult(user));
+            UserAccount loggedInUser = ((Result.Success<UserAccount>) result).getData();
+            loginResult.setValue(new LoginResult(loggedInUser));
         } else {
             loginResult.setValue(new LoginResult(R.string.login_failed));
         }

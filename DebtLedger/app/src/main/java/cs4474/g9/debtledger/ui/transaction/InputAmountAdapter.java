@@ -16,7 +16,6 @@ import java.util.List;
 import androidx.annotation.NonNull;
 import androidx.recyclerview.widget.RecyclerView;
 import cs4474.g9.debtledger.R;
-import cs4474.g9.debtledger.data.model.LoggedInUser;
 import cs4474.g9.debtledger.data.model.UserAccount;
 import cs4474.g9.debtledger.logic.ColourGenerator;
 
@@ -24,11 +23,11 @@ public class InputAmountAdapter extends RecyclerView.Adapter<InputAmountAdapter.
 
     private List<UserAccount> contacts;
     private List<String> amounts;
-    private LoggedInUser user;
+    private UserAccount loggedInUser;
 
     private List<OnInputAmountsChanged> onInputChangedListeners = new ArrayList<>();
 
-    public InputAmountAdapter(List<UserAccount> contacts, LoggedInUser user) {
+    public InputAmountAdapter(List<UserAccount> contacts, UserAccount loggedInUser) {
         super();
         this.contacts = contacts;
 
@@ -38,7 +37,7 @@ public class InputAmountAdapter extends RecyclerView.Adapter<InputAmountAdapter.
             amounts.add("");
         }
 
-        this.user = user;
+        this.loggedInUser = loggedInUser;
     }
 
     public void addOnInputChangedListener(OnInputAmountsChanged onInputAmountsChanged) {
@@ -77,7 +76,7 @@ public class InputAmountAdapter extends RecyclerView.Adapter<InputAmountAdapter.
 
         holder.contactAvatar.setColorFilter(ColourGenerator.generateFromName(contact.getFirstName(), contact.getLastName()));
         holder.contactAvatarCharacter.setText(contact.getFirstName().substring(0, 1));
-        if (contact.equals(user.getAccount())) {
+        if (contact.equals(loggedInUser)) {
             holder.contactName.setText("Me");
         } else {
             holder.contactName.setText(contact.getFirstName() + " " + contact.getLastName());

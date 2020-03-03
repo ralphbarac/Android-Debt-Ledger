@@ -21,10 +21,8 @@ import androidx.appcompat.app.AppCompatActivity;
 import androidx.lifecycle.Observer;
 import androidx.lifecycle.ViewModelProviders;
 import cs4474.g9.debtledger.R;
-import cs4474.g9.debtledger.data.LoginAuthenticator;
-import cs4474.g9.debtledger.data.LoginRepository;
-import cs4474.g9.debtledger.data.Result;
-import cs4474.g9.debtledger.data.model.LoggedInUser;
+import cs4474.g9.debtledger.data.login.LoginRepository;
+import cs4474.g9.debtledger.data.model.UserAccount;
 import cs4474.g9.debtledger.ui.MainActivity;
 import cs4474.g9.debtledger.ui.signup.SignupActivity;
 
@@ -38,20 +36,16 @@ public class LoginActivity extends AppCompatActivity {
         super.onCreate(savedInstanceState);
 
         // Check if user has already logged in, if so, proceed to dashboard
-        loginRepository = LoginRepository.getInstance(new LoginAuthenticator());
-        if (loginRepository.isUserLoggedIn()) {
-            // Authenticate login
-            Result<LoggedInUser> authenticationResult = loginRepository.authenticateLoggedInUser();
-            if (authenticationResult instanceof Result.Success) {
-                LoggedInUser user = (LoggedInUser) ((Result.Success) authenticationResult).getData();
-                proceedToDashboard(user);
-            }
+        loginRepository = LoginRepository.getInstance(this);
+        if (loginRepository.isUserLoggedInAndAuthenticated()) {
+            proceedToDashboard(loginRepository.getLoggedInUser());
         }
 
         setContentView(R.layout.activity_login);
 
         // View model is used to manage and operate on data inputted through interface
-        loginViewModel = ViewModelProviders.of(this).get(LoginViewModel.class);
+        LoginViewModelFactory factory = new LoginViewModelFactory(loginRepository);
+        loginViewModel = ViewModelProviders.of(this, factory).get(LoginViewModel.class);
 
         final TextInputEditText emailInput = findViewById(R.id.email);
         final TextInputEditText passwordInput = findViewById(R.id.password);
@@ -91,6 +85,8 @@ public class LoginActivity extends AppCompatActivity {
                 }
                 if (loginResult.getSuccess() != null) {
                     proceedToDashboard(loginResult.getSuccess());
+                    // TODO: If stay logged in...
+                    loginRepository.storeToken(LoginActivity.this);
                 }
             }
         });
@@ -147,9 +143,9 @@ public class LoginActivity extends AppCompatActivity {
         });
     }
 
-    private void proceedToDashboard(LoggedInUser user) {
-        String welcome = getString(R.string.welcome) + user.getFirstName();
-        Toast.makeText(getApplicationContext(), welcome, Toast.LENGTH_LONG).show();
+    private void proceedToDashboard(UserAccount loggedInUser) {
+        String welcome = getString(R.string.welcome) + loggedInUser.getFirstName();
+        Toast.makeText(this, welcome, Toast.LENGTH_LONG).show();
 
         Intent toDashboard = new Intent(this, MainActivity.class);
         startActivity(toDashboard);
@@ -158,6 +154,6 @@ public class LoginActivity extends AppCompatActivity {
     }
 
     private void informUserOfFailedLogin(@StringRes Integer errorString) {
-        Toast.makeText(getApplicationContext(), errorString, Toast.LENGTH_SHORT).show();
+        Toast.makeText(this, errorString, Toast.LENGTH_SHORT).show();
     }
 }

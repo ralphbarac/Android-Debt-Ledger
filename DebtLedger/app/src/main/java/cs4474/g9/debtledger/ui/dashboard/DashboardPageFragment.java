@@ -15,7 +15,7 @@ import androidx.fragment.app.Fragment;
 import androidx.recyclerview.widget.LinearLayoutManager;
 import androidx.recyclerview.widget.RecyclerView;
 import cs4474.g9.debtledger.R;
-import cs4474.g9.debtledger.data.LoginRepository;
+import cs4474.g9.debtledger.data.login.LoginRepository;
 import cs4474.g9.debtledger.data.model.UserAccount;
 
 public class DashboardPageFragment extends Fragment {
@@ -43,7 +43,7 @@ public class DashboardPageFragment extends Fragment {
         outstandingBalancesView.setLayoutManager(new LinearLayoutManager(getContext()));
 
         // TODO: How to propagate logged in user information...
-        outstandingBalancesAdapter = new OutstandingBalanceListAdapter(LoginRepository.getInstance().getLoggedInUser(), outstandingBalances);
+        outstandingBalancesAdapter = new OutstandingBalanceListAdapter(LoginRepository.getInstance(getContext()).getLoggedInUser(), outstandingBalances);
         outstandingBalancesView.setAdapter(outstandingBalancesAdapter);
 
         return root;

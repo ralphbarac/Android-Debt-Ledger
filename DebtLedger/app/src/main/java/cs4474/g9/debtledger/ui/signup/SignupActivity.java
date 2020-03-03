@@ -20,7 +20,8 @@ import androidx.appcompat.app.AppCompatActivity;
 import androidx.lifecycle.Observer;
 import androidx.lifecycle.ViewModelProviders;
 import cs4474.g9.debtledger.R;
-import cs4474.g9.debtledger.data.model.LoggedInUser;
+import cs4474.g9.debtledger.data.login.LoginRepository;
+import cs4474.g9.debtledger.data.model.UserAccount;
 import cs4474.g9.debtledger.ui.MainActivity;
 import cs4474.g9.debtledger.ui.login.LoginActivity;
 
@@ -35,7 +36,9 @@ public class SignupActivity extends AppCompatActivity {
         setContentView(R.layout.activity_signup);
 
         // View model is used to manage and operate on data inputted through interface
-        signupViewModel = ViewModelProviders.of(this).get(SignupViewModel.class);
+        final LoginRepository loginRepository = LoginRepository.getInstance(this);
+        SignupViewModelFactory factory = new SignupViewModelFactory(loginRepository);
+        signupViewModel = ViewModelProviders.of(this, factory).get(SignupViewModel.class);
 
         final TextInputEditText firstNameInput = findViewById(R.id.first_name);
         final TextInputEditText lastNameInput = findViewById(R.id.last_name);
@@ -81,6 +84,8 @@ public class SignupActivity extends AppCompatActivity {
                 }
                 if (signupResult.getSuccess() != null) {
                     proceedToDashboard(signupResult.getSuccess());
+                    // TODO: If stay logged in...
+                    loginRepository.storeToken(SignupActivity.this);
                 }
             }
         });
@@ -152,9 +157,9 @@ public class SignupActivity extends AppCompatActivity {
         });
     }
 
-    private void proceedToDashboard(LoggedInUser user) {
-        String welcome = getString(R.string.welcome) + user.getFirstName();
-        Toast.makeText(getApplicationContext(), welcome, Toast.LENGTH_LONG).show();
+    private void proceedToDashboard(UserAccount loggedInUser) {
+        String welcome = getString(R.string.welcome) + loggedInUser.getFirstName();
+        Toast.makeText(this, welcome, Toast.LENGTH_LONG).show();
 
         Intent toDashboard = new Intent(this, MainActivity.class);
         startActivity(toDashboard);
@@ -163,6 +168,6 @@ public class SignupActivity extends AppCompatActivity {
     }
 
     private void informUserOfFailedSignup(@StringRes Integer errorString) {
-        Toast.makeText(getApplicationContext(), errorString, Toast.LENGTH_SHORT).show();
+        Toast.makeText(this, errorString, Toast.LENGTH_SHORT).show();
     }
 }

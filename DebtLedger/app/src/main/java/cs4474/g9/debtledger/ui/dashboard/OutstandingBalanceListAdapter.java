@@ -14,16 +14,15 @@ import java.util.Locale;
 import androidx.annotation.NonNull;
 import androidx.recyclerview.widget.RecyclerView;
 import cs4474.g9.debtledger.R;
-import cs4474.g9.debtledger.data.model.LoggedInUser;
 import cs4474.g9.debtledger.data.model.UserAccount;
 import cs4474.g9.debtledger.logic.ColourGenerator;
 
 public class OutstandingBalanceListAdapter extends RecyclerView.Adapter<OutstandingBalanceListAdapter.Item> {
 
-    private LoggedInUser loggedInUser;
+    private UserAccount loggedInUser;
     private List<Pair<UserAccount, Integer>> outstandingBalances;
 
-    public OutstandingBalanceListAdapter(LoggedInUser loggedInUser, List<Pair<UserAccount, Integer>> outstandingBalances) {
+    public OutstandingBalanceListAdapter(UserAccount loggedInUser, List<Pair<UserAccount, Integer>> outstandingBalances) {
         super();
         this.loggedInUser = loggedInUser;
         this.outstandingBalances = outstandingBalances;

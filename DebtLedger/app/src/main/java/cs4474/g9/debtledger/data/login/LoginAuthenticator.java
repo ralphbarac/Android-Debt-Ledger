@@ -1,21 +1,22 @@
-package cs4474.g9.debtledger.data;
+package cs4474.g9.debtledger.data.login;
 
 import java.io.IOException;
 
-import cs4474.g9.debtledger.data.model.LoggedInUser;
+import cs4474.g9.debtledger.data.Result;
 import cs4474.g9.debtledger.data.model.UserAccount;
 
 /**
  * A class to handle logic related to authentication, and returning of appropriate user information
+ * and token - this class emulates what should be an external authentication API
  */
-public class LoginAuthenticator {
+class LoginAuthenticator {
 
-    public Result<LoggedInUser> loginAndAuthenticate(String email, String password) {
+    Result<LoggedInUserHolder> loginAndAuthenticate(String email, String password) {
 
         try {
             // TODO: Authenticate
             if (email.equals("zsirohey@uwo.ca") && password.equals("zain1234")) {
-                LoggedInUser testUser = new LoggedInUser(
+                LoggedInUserHolder testUser = new LoggedInUserHolder(
                         "XSJKJSKDJKJS93JSKJK88",
                         new UserAccount(
                                 "Zain",
@@ -32,11 +33,11 @@ public class LoginAuthenticator {
         }
     }
 
-    public Result<LoggedInUser> authenticate(String token) {
+    Result<LoggedInUserHolder> authenticate(String token) {
         try {
             // TODO: Authenticate
             if (token.equals("XSJKJSKDJKJS93JSKJK88")) {
-                LoggedInUser testUser = new LoggedInUser(
+                LoggedInUserHolder testUser = new LoggedInUserHolder(
                         token,
                         new UserAccount(
                                 "Zain",
@@ -53,7 +54,7 @@ public class LoginAuthenticator {
         }
     }
 
-    public void revokeAuthentication(String token) {
+    void revokeAuthentication(String token) {
         // TODO: Remove Authentication
     }
 }
