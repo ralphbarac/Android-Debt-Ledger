@@ -57,7 +57,7 @@ public class ContactsFragment extends Fragment {
         contactRequestsView.setAdapter(contactRequestsAdapter);
 
         List<UserAccount> requestsByUser = new ArrayList<>();
-        result = requestManager.getAllContactRequestsFor(loggedInUser);
+        result = requestManager.getAllContectRequestsBy(loggedInUser);
         if (result instanceof Result.Success) {
             requestsByUser = (List<UserAccount>) ((Result.Success) result).getData();
         } else {
