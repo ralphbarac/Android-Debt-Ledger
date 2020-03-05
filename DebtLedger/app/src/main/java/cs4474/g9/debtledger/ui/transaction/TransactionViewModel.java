@@ -89,7 +89,7 @@ public class TransactionViewModel extends ViewModel {
         return DOLLAR_AMOUNT.matcher(value).matches();
     }
 
-    private static int parseAmountValue(String value) {
+    public static int parseAmountValue(String value) {
         int indexOfDecimal = value.indexOf(".");
         if (indexOfDecimal == -1 || indexOfDecimal == value.length() - 1) {
             // If no decimal place or decimal place is last character

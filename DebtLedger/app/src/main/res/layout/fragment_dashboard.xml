@@ -27,6 +27,7 @@
         android:focusable="true"
         android:onClick="createTransaction"
         app:tint="@color/white"
+        app:backgroundTint="@color/colorPrimary"
         app:srcCompat="@drawable/ic_add_white_24dp"
 
 

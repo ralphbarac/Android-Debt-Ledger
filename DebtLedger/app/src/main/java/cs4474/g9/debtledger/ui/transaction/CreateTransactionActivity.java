@@ -93,6 +93,16 @@ public class CreateTransactionActivity extends AppCompatActivity implements OnIn
         whoOwesAddEditIcon = findViewById(R.id.who_owes_add_edit_icon);
         whoOwesActionTitle = findViewById(R.id.who_owes_action_title);
         splitButton = findViewById(R.id.split);
+        splitButton.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                Log.d("CREATE-TRANSACTION", "Split button clicked.");
+                int amountPaid = TransactionViewModel.isAmountValid(CreateTransactionActivity.this.amountPaid)
+                        ? TransactionViewModel.parseAmountValue(CreateTransactionActivity.this.amountPaid)
+                        : 0;
+                whoOwesInputAdapter.splitAmount(amountPaid);
+            }
+        });
 
         submitButton = findViewById(R.id.submit);
         submitButton.setOnClickListener(new View.OnClickListener() {

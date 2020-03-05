@@ -57,6 +57,12 @@ public class UserAccount implements Serializable {
     }
 
     @Override
+    public int hashCode() {
+        // TODO: Improve Hash Code...
+        return firstName.hashCode() + lastName.hashCode();
+    }
+
+    @Override
     public boolean equals(@Nullable Object obj) {
         if (obj instanceof UserAccount) {
             UserAccount userAccount = (UserAccount) obj;

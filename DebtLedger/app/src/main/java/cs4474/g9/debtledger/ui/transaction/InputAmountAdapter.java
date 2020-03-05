@@ -11,7 +11,10 @@ import android.widget.TextView;
 import com.google.android.material.textfield.TextInputEditText;
 
 import java.util.ArrayList;
+import java.util.HashMap;
 import java.util.List;
+import java.util.Locale;
+import java.util.Map;
 
 import androidx.annotation.NonNull;
 import androidx.recyclerview.widget.RecyclerView;
@@ -50,14 +53,35 @@ public class InputAmountAdapter extends RecyclerView.Adapter<InputAmountAdapter.
         }
     }
 
-    public void updateContacts(List<UserAccount> contacts) {
-        this.contacts = contacts;
+    public void updateContacts(List<UserAccount> newContacts) {
+        // Create map of contact to amount, to store old inputs
+        Map<UserAccount, String> oldAmounts = new HashMap<>();
+        if (contacts != null) {
+            for (int i = 0; i < contacts.size(); i++) {
+                oldAmounts.put(contacts.get(i), amounts.get(i));
+            }
+        }
 
-        // TODO: Maintain previous input
-        int numContacts = contacts == null ? 0 : contacts.size();
-        this.amounts = new ArrayList<>(numContacts);
-        for (int i = 0; i < numContacts; i++) {
-            amounts.add("");
+        // Set contacts and amounts variables and retain input if contact is the same
+        this.contacts = newContacts;
+        int numNewContacts = newContacts == null ? 0 : newContacts.size();
+        this.amounts = new ArrayList<>(numNewContacts);
+        for (int i = 0; i < numNewContacts; i++) {
+            amounts.add(oldAmounts.containsKey(contacts.get(i)) ? oldAmounts.get(contacts.get(i)) : "");
+        }
+        notifyListenersOfInputAmountChanged();
+        notifyDataSetChanged();
+    }
+
+    public void splitAmount(int amount) {
+        if (amounts.size() == 0) return;
+
+        int wholeShare = amount / amounts.size();
+        int remainder = amount % amounts.size();
+
+        for (int i = 0; i < amounts.size(); i++) {
+            int share = wholeShare + (i < remainder ? 1 : 0);
+            amounts.set(i, String.format(Locale.CANADA, "%.2f", share / 100.0));
         }
         notifyDataSetChanged();
     }
@@ -117,6 +141,10 @@ public class InputAmountAdapter extends RecyclerView.Adapter<InputAmountAdapter.
                     amounts.set(getAdapterPosition(), s.toString());
                     if (!TransactionViewModel.isAmountValid(s.toString())) {
                         amount.setError(amount.getContext().getString(R.string.invalid_amount));
+                    } else {
+                        // Normally, the given error would be removed upon entering new text...
+                        // Since the input can be changed programmatically, we must remove error
+                        amount.setError(null);
                     }
                     notifyListenersOfInputAmountChanged();
                 }
