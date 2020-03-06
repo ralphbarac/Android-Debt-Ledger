@@ -5,6 +5,8 @@ import android.os.Bundle;
 import android.text.Editable;
 import android.text.TextWatcher;
 import android.util.Log;
+import android.view.Menu;
+import android.view.MenuItem;
 import android.view.View;
 import android.widget.ImageView;
 import android.widget.TextView;
@@ -36,6 +38,7 @@ public class CreateTransactionActivity extends AppCompatActivity implements OnIn
     final int SELECT_WHO_OWES = 1;
 
     private TransactionViewModel viewModel;
+    private boolean isFormSubmittable = false;
 
     private UserAccount whoIsPaying;
     private String amountPaid = "";
@@ -68,6 +71,9 @@ public class CreateTransactionActivity extends AppCompatActivity implements OnIn
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_create_transaction);
+
+        getSupportActionBar().setHomeAsUpIndicator(R.drawable.ic_close_white_24dp);
+        getSupportActionBar().setDisplayHomeAsUpEnabled(true);
 
         amountTitle = findViewById(R.id.amount_title);
 
@@ -108,8 +114,8 @@ public class CreateTransactionActivity extends AppCompatActivity implements OnIn
         submitButton.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
-                // TODO: Submit Transaction
                 Log.d("CREATE-TRANSACTION", "Submit button clicked.");
+                submitTransaction();
             }
         });
 
@@ -143,7 +149,14 @@ public class CreateTransactionActivity extends AppCompatActivity implements OnIn
                 if (transactionFormState == null) {
                     return;
                 }
-                submitButton.setEnabled(transactionFormState.isDataValid());
+                boolean shouldFormBeSubmittable = transactionFormState.isDataValid();
+
+                // Enable submit button and submit menu icon
+                submitButton.setEnabled(shouldFormBeSubmittable);
+                if (isFormSubmittable != shouldFormBeSubmittable) {
+                    isFormSubmittable = shouldFormBeSubmittable;
+                    invalidateOptionsMenu();
+                }
 
                 if (transactionFormState.getMiscError() != null) {
                     // TODO: Display Miscellaneous error
@@ -151,6 +164,13 @@ public class CreateTransactionActivity extends AppCompatActivity implements OnIn
             }
         });
 
+    }
+
+    @Override
+    public boolean onSupportNavigateUp() {
+        // When clicking X in top left, mimic behaviour of back
+        onBackPressed();
+        return true;
     }
 
     public void selectWhoIsPaying(View view) {
@@ -163,6 +183,32 @@ public class CreateTransactionActivity extends AppCompatActivity implements OnIn
         SelectMultipleContactsWrapper wrapper = new SelectMultipleContactsWrapper(selectedSelf, selectedGroups, selectedContacts);
         toSelectWhoOwes.putExtra(SelectMultipleContactsActivity.SELECTED_CONTACTS, wrapper);
         startActivityForResult(toSelectWhoOwes, SELECT_WHO_OWES);
+    }
+
+    @Override
+    public boolean onCreateOptionsMenu(Menu menu) {
+        getMenuInflater().inflate(R.menu.menu_create_transaction, menu);
+
+        MenuItem item = menu.getItem(0);
+        if (isFormSubmittable) {
+            item.setEnabled(true);
+            item.getIcon().mutate().setAlpha(255);
+        } else {
+            item.setEnabled(false);
+            item.getIcon().mutate().setAlpha(130);
+        }
+        return true;
+    }
+
+    @Override
+    public boolean onOptionsItemSelected(MenuItem item) {
+        switch (item.getItemId()) {
+            case R.id.confirm_selection:
+                submitTransaction();
+                return true;
+            default:
+                return super.onOptionsItemSelected(item);
+        }
     }
 
     @Override
@@ -250,4 +296,9 @@ public class CreateTransactionActivity extends AppCompatActivity implements OnIn
         amountsOwed = new ArrayList<>(amounts);
         viewModel.transactionDataChanged(whoIsPaying, amountPaid, whoOwes, amountsOwed);
     }
+
+    private void submitTransaction() {
+        // TODO: Submit Transaction
+    }
+
 }
