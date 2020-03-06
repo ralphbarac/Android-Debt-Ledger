@@ -12,9 +12,8 @@
             android:id="@+id/request_to_me_title"
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
-            android:layout_marginStart="8dp"
+            android:layout_marginStart="12dp"
             android:layout_marginTop="8dp"
-            android:layout_marginEnd="8dp"
             android:text="@string/requests_to_me"
             android:textColor="@color/black"
             android:textSize="20sp" />
@@ -29,9 +28,8 @@
             android:id="@+id/my_requests_title"
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
-            android:layout_marginStart="8dp"
+            android:layout_marginStart="12dp"
             android:layout_marginTop="8dp"
-            android:layout_marginEnd="8dp"
             android:text="@string/my_requests"
             android:textColor="@color/black"
             android:textSize="20sp" />
@@ -46,9 +44,8 @@
             android:id="@+id/my_contacts_title"
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
-            android:layout_marginStart="8dp"
+            android:layout_marginStart="12dp"
             android:layout_marginTop="8dp"
-            android:layout_marginEnd="8dp"
             android:text="@string/my_contacts"
             android:textColor="@color/black"
             android:textSize="20sp" />
