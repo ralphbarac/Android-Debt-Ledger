@@ -101,7 +101,7 @@ public class InputAmountAdapter extends RecyclerView.Adapter<InputAmountAdapter.
         holder.contactAvatar.setColorFilter(ColourGenerator.generateFromName(contact.getFirstName(), contact.getLastName()));
         holder.contactAvatarCharacter.setText(contact.getFirstName().substring(0, 1));
         if (contact.equals(loggedInUser)) {
-            holder.contactName.setText("Me");
+            holder.contactName.setText(holder.contactName.getContext().getString(R.string.self_identifier));
         } else {
             holder.contactName.setText(contact.getFirstName() + " " + contact.getLastName());
         }

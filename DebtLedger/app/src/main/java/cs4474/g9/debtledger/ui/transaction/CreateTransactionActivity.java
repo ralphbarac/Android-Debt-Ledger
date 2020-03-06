@@ -201,7 +201,7 @@ public class CreateTransactionActivity extends AppCompatActivity implements OnIn
             whoIsPayingAvatar.setColorFilter(ColourGenerator.generateFromName(whoIsPaying.getFirstName(), whoIsPaying.getLastName()));
             whoIsPayingAvatarCharacter.setText(whoIsPaying.getFirstName().substring(0, 1));
             if (whoIsPaying.equals(LoginRepository.getInstance(this).getLoggedInUser())) {
-                whoIsPayingName.setText("Me");
+                whoIsPayingName.setText(getString(R.string.self_identifier));
             } else {
                 whoIsPayingName.setText(whoIsPaying.getFirstName() + " " + whoIsPaying.getLastName());
             }
