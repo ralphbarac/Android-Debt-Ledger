@@ -1,6 +1,7 @@
 package cs4474.g9.debtledger.ui.contacts;
 
 import android.graphics.Color;
+import android.util.Log;
 import android.util.Pair;
 import android.view.LayoutInflater;
 import android.view.View;
@@ -59,7 +60,14 @@ public class ContactListAdapter extends RecyclerView.Adapter<ContactListAdapter.
         return balances == null ? 0 : balances.size();
     }
 
-    public static class Item extends RecyclerView.ViewHolder {
+    public void addNewContact(UserAccount contact) {
+        // TODO: Currently just adding contact to top of list
+        balances.add(0, Pair.create(contact, 0));
+//        notifyItemInserted(0);
+        notifyDataSetChanged();
+    }
+
+    public static class Item extends RecyclerView.ViewHolder implements View.OnClickListener {
         public ImageView contactAvatar;
         public TextView contactAvatarCharacter;
         public TextView contactName;
@@ -71,6 +79,16 @@ public class ContactListAdapter extends RecyclerView.Adapter<ContactListAdapter.
             this.contactAvatarCharacter = view.findViewById(R.id.contact_avatar_character);
             this.contactName = view.findViewById(R.id.name);
             this.amount = view.findViewById(R.id.amount);
+
+            view.setOnClickListener(this);
+            view.findViewById(R.id.expand_arrow).setOnClickListener(this);
+        }
+
+        @Override
+        public void onClick(View v) {
+            Log.d("CONTACTS", "Contact clicked.");
+            // TODO: Intent to view contact
+            //Intent toContact = new Intent()
         }
     }
 }

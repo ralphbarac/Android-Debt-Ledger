@@ -23,17 +23,18 @@ import cs4474.g9.debtledger.data.Result;
 import cs4474.g9.debtledger.data.login.LoginRepository;
 import cs4474.g9.debtledger.data.model.UserAccount;
 import cs4474.g9.debtledger.logic.BalanceCalculator;
+import cs4474.g9.debtledger.ui.MainActivity;
 
-public class ContactsFragment extends Fragment {
+public class ContactsFragment extends Fragment implements OnRequestReply {
 
     private RecyclerView contactRequestsView;
-    private RecyclerView.Adapter contactRequestsAdapter;
+    private ContactRequestListAdapter contactRequestsAdapter;
 
     private RecyclerView contactsRequestedView;
-    private RecyclerView.Adapter contactsRequestedAdapter;
+    private ContactRequestedListAdapter contactsRequestedAdapter;
 
     private RecyclerView contactsView;
-    private RecyclerView.Adapter contactsAdapter;
+    private ContactListAdapter contactsAdapter;
 
     public View onCreateView(@NonNull LayoutInflater inflater, ViewGroup container, Bundle savedInstanceState) {
         View root = inflater.inflate(R.layout.fragment_contacts, container, false);
@@ -54,6 +55,7 @@ public class ContactsFragment extends Fragment {
         contactRequestsView.setHasFixedSize(true);
         contactRequestsView.setLayoutManager(new LinearLayoutManager(getContext()));
         contactRequestsAdapter = new ContactRequestListAdapter(requestsForUser);
+        contactRequestsAdapter.addOnContactAcceptedListener(this);
         contactRequestsView.setAdapter(contactRequestsAdapter);
 
         List<UserAccount> requestsByUser = new ArrayList<>();
@@ -93,6 +95,24 @@ public class ContactsFragment extends Fragment {
                 return true;
             default:
                 return super.onOptionsItemSelected(item);
+        }
+    }
+
+    @Override
+    public void onContactAccepted(UserAccount contact) {
+        contactsAdapter.addNewContact(contact);
+
+        // Update notification badge
+        if (getActivity() instanceof MainActivity) {
+            ((MainActivity) getActivity()).updateContactsNotificationBadge();
+        }
+    }
+
+    @Override
+    public void onContactRejected(UserAccount contact) {
+        // Update notification badge
+        if (getActivity() instanceof MainActivity) {
+            ((MainActivity) getActivity()).updateContactsNotificationBadge();
         }
     }
 }

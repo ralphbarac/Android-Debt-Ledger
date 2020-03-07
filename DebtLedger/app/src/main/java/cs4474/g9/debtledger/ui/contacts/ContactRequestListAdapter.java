@@ -1,11 +1,16 @@
 package cs4474.g9.debtledger.ui.contacts;
 
+import android.content.DialogInterface;
+import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
 import android.widget.ImageView;
 import android.widget.TextView;
 
+import com.google.android.material.dialog.MaterialAlertDialogBuilder;
+
+import java.util.ArrayList;
 import java.util.List;
 
 import androidx.annotation.NonNull;
@@ -17,10 +22,16 @@ import cs4474.g9.debtledger.logic.ColourGenerator;
 public class ContactRequestListAdapter extends RecyclerView.Adapter<ContactRequestListAdapter.Item> {
 
     private List<UserAccount> contactRequests;
+    private List<OnRequestReply> onRequestReplyListeners;
 
     public ContactRequestListAdapter(List<UserAccount> contactRequests) {
         super();
         this.contactRequests = contactRequests;
+        this.onRequestReplyListeners = new ArrayList<>();
+    }
+
+    public void addOnContactAcceptedListener(OnRequestReply listener) {
+        this.onRequestReplyListeners.add(listener);
     }
 
     @NonNull
@@ -45,7 +56,31 @@ public class ContactRequestListAdapter extends RecyclerView.Adapter<ContactReque
         return contactRequests == null ? 0 : contactRequests.size();
     }
 
-    public static class Item extends RecyclerView.ViewHolder {
+    public void addContactRequest(UserAccount contactRequest) {
+        contactRequests.add(contactRequest);
+//        notifyItemInserted(contactRequests.size() - 1);
+        notifyDataSetChanged();
+    }
+
+    private void removeContactRequest(int position) {
+        contactRequests.remove(position);
+//        notifyItemRemoved(position);
+        notifyDataSetChanged();
+    }
+
+    private void notifyListenersOfContactAccepted(UserAccount contact) {
+        for (OnRequestReply onRequestReplyListener : onRequestReplyListeners) {
+            onRequestReplyListener.onContactAccepted(contact);
+        }
+    }
+
+    private void notifyListenersOfContactRejected(UserAccount contact) {
+        for (OnRequestReply onRequestReplyListener : onRequestReplyListeners) {
+            onRequestReplyListener.onContactAccepted(contact);
+        }
+    }
+
+    public class Item extends RecyclerView.ViewHolder implements View.OnClickListener {
         public ImageView contactAvatar;
         public TextView contactAvatarCharacter;
         public TextView contactName;
@@ -59,6 +94,60 @@ public class ContactRequestListAdapter extends RecyclerView.Adapter<ContactReque
             this.contactName = view.findViewById(R.id.name);
             this.accept = view.findViewById(R.id.accept);
             this.reject = view.findViewById(R.id.reject);
+
+            // On click confirm acceptance of contact request
+            this.accept.setOnClickListener(new View.OnClickListener() {
+                @Override
+                public void onClick(View v) {
+                    final UserAccount contactRequest = contactRequests.get(getAdapterPosition());
+                    String name = contactRequest.getFirstName() + " " + contactRequest.getLastName();
+                    new MaterialAlertDialogBuilder(v.getContext())
+                            .setTitle("Confirm Accept")
+                            .setMessage("Are you sure you want to accept the contact request from " + name + "?")
+                            .setPositiveButton("Yes", new DialogInterface.OnClickListener() {
+                                @Override
+                                public void onClick(DialogInterface dialog, int which) {
+                                    // TODO: Add contact in database
+                                    removeContactRequest(getAdapterPosition());
+                                    notifyListenersOfContactAccepted(contactRequest);
+                                }
+                            })
+                            .setNegativeButton("No", null)
+                            .show();
+                }
+            });
+
+            // On click confirm rejection of contact request
+            this.reject.setOnClickListener(new View.OnClickListener() {
+                @Override
+                public void onClick(View v) {
+                    final UserAccount contactRequest = contactRequests.get(getAdapterPosition());
+                    String name = contactRequest.getFirstName() + " " + contactRequest.getLastName();
+                    new MaterialAlertDialogBuilder(v.getContext())
+                            .setTitle("Confirm Reject")
+                            .setMessage("Are you sure you want to reject the contact request from " + name + "?")
+                            .setPositiveButton("No", null)
+                            .setNegativeButton("Yes", new DialogInterface.OnClickListener() {
+                                @Override
+                                public void onClick(DialogInterface dialog, int which) {
+                                    // TODO: Delete contact request from database
+                                    removeContactRequest(getAdapterPosition());
+                                    notifyListenersOfContactRejected(contactRequest);
+                                }
+                            })
+                            .show();
+                }
+            });
+
+            view.setOnClickListener(this);
+            view.findViewById(R.id.expand_arrow).setOnClickListener(this);
+        }
+
+        @Override
+        public void onClick(View v) {
+            Log.d("CONTACTS", "Contact Request clicked.");
+            // TODO: Intent to view contact
+            //Intent toContact = new Intent()
         }
     }
 }

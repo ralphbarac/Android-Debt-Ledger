@@ -1,10 +1,14 @@
 package cs4474.g9.debtledger.ui.contacts;
 
+import android.content.DialogInterface;
+import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
 import android.widget.ImageView;
 import android.widget.TextView;
+
+import com.google.android.material.dialog.MaterialAlertDialogBuilder;
 
 import java.util.List;
 
@@ -45,7 +49,19 @@ public class ContactRequestedListAdapter extends RecyclerView.Adapter<ContactReq
         return contactsRequested == null ? 0 : contactsRequested.size();
     }
 
-    public static class Item extends RecyclerView.ViewHolder {
+    public void addRequestedContact(UserAccount requestedContact) {
+        contactsRequested.add(requestedContact);
+//        notifyItemInserted(contactsRequested.size() - 1);
+        notifyDataSetChanged();
+    }
+
+    private void removeRequestedContact(int position) {
+        contactsRequested.remove(position);
+//        notifyItemRemoved(position);
+        notifyDataSetChanged();
+    }
+
+    public class Item extends RecyclerView.ViewHolder implements View.OnClickListener {
         public ImageView contactAvatar;
         public TextView contactAvatarCharacter;
         public TextView contactName;
@@ -56,7 +72,38 @@ public class ContactRequestedListAdapter extends RecyclerView.Adapter<ContactReq
             this.contactAvatar = view.findViewById(R.id.contact_avatar);
             this.contactAvatarCharacter = view.findViewById(R.id.contact_avatar_character);
             this.contactName = view.findViewById(R.id.name);
-            this.cancel = view.findViewById(R.id.accept);
+            this.cancel = view.findViewById(R.id.cancel);
+
+            // On click confirm cancellation of contact request
+            this.cancel.setOnClickListener(new View.OnClickListener() {
+                @Override
+                public void onClick(View v) {
+                    UserAccount contactRequest = contactsRequested.get(getAdapterPosition());
+                    String name = contactRequest.getFirstName() + " " + contactRequest.getLastName();
+                    new MaterialAlertDialogBuilder(v.getContext())
+                            .setTitle("Confirm Cancel")
+                            .setMessage("Are you sure you want to cancel your contact request to " + name + "?")
+                            .setPositiveButton("No", null)
+                            .setNegativeButton("Yes", new DialogInterface.OnClickListener() {
+                                @Override
+                                public void onClick(DialogInterface dialog, int which) {
+                                    // TODO: Delete contact request from database
+                                    removeRequestedContact(getAdapterPosition());
+                                }
+                            })
+                            .show();
+                }
+            });
+
+            view.setOnClickListener(this);
+            view.findViewById(R.id.expand_arrow).setOnClickListener(this);
+        }
+
+        @Override
+        public void onClick(View v) {
+            Log.d("CONTACTS", "Requested Contact clicked.");
+            // TODO: Intent to view contact
+            //Intent toContact = new Intent()
         }
     }
 }
