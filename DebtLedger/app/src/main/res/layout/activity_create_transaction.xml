@@ -42,7 +42,7 @@
             android:layout_marginTop="8dp"
             android:text="@string/heading_who_is_paying"
             android:textColor="@color/black"
-            android:textSize="20sp"
+            android:textSize="16sp"
 
             app:layout_constraintStart_toStartOf="parent"
             app:layout_constraintTop_toBottomOf="@id/description_layout" />
@@ -74,6 +74,8 @@
                 android:id="@+id/who_is_paying_input_container"
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
+                android:paddingTop="8dp"
+                android:paddingBottom="8dp"
                 android:visibility="gone">
 
                 <ImageView
@@ -111,10 +113,10 @@
 
                 <com.google.android.material.textfield.TextInputLayout
                     android:id="@+id/who_is_paying_amount_input_layout"
-                    style="@style/Widget.MaterialComponents.TextInputLayout.OutlinedBox"
+                    style="@style/Widget.MaterialComponents.TextInputLayout.OutlinedBox.Dense"
+                    app:hintEnabled="false"
                     android:layout_width="100dp"
-                    android:layout_height="wrap_content"
-                    android:hint="@string/prompt_amount"
+                    android:layout_height="40dp"
 
                     app:layout_constraintEnd_toEndOf="parent"
                     app:layout_constraintTop_toTopOf="parent"
@@ -123,7 +125,10 @@
                     <com.google.android.material.textfield.TextInputEditText
                         android:id="@+id/who_is_paying_amount_input"
                         android:layout_width="match_parent"
-                        android:layout_height="wrap_content"
+                        android:layout_height="40dp"
+                        android:paddingTop="0dp"
+                        android:paddingBottom="0dp"
+                        android:hint="@string/prompt_amount"
                         android:inputType="numberDecimal"
                         android:imeOptions="actionDone" />
 
@@ -192,7 +197,7 @@
             android:layout_marginTop="8dp"
             android:text="@string/heading_who_owes"
             android:textColor="@color/black"
-            android:textSize="20sp"
+            android:textSize="16sp"
 
             app:layout_constraintStart_toStartOf="parent"
             app:layout_constraintTop_toBottomOf="@id/who_is_paying_container" />
