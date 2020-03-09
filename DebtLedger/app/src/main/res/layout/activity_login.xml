@@ -19,34 +19,10 @@
             android:id="@+id/loading"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
-            android:layout_gravity="center"
-            android:layout_marginStart="32dp"
-            android:layout_marginTop="64dp"
-            android:layout_marginEnd="32dp"
-            android:layout_marginBottom="64dp"
-            android:visibility="gone"
-            app:layout_constraintBottom_toBottomOf="parent"
-            app:layout_constraintEnd_toEndOf="@+id/password_layout"
-            app:layout_constraintStart_toStartOf="@+id/password_layout"
-            app:layout_constraintTop_toTopOf="parent"
-            app:layout_constraintVertical_bias="0.3" />
-
-        <com.google.android.material.button.MaterialButton
-            android:id="@+id/switch_to_signup"
-            style="@style/Widget.MaterialComponents.Button.TextButton"
-            android:layout_width="wrap_content"
-            android:layout_height="wrap_content"
-            android:layout_gravity="start"
-            android:layout_marginStart="48dp"
-            android:layout_marginTop="16dp"
-            android:layout_marginEnd="48dp"
-            android:layout_marginBottom="64dp"
-            android:text="@string/action_switch_to_sign_up"
-            app:layout_constraintBottom_toBottomOf="parent"
-            app:layout_constraintEnd_toEndOf="parent"
-            app:layout_constraintStart_toStartOf="parent"
-            app:layout_constraintTop_toBottomOf="@+id/password_layout"
-            app:layout_constraintVertical_bias="0.2" />
+            android:layout_marginLeft="16dp"
+            android:visibility="invisible"
+            app:layout_constraintTop_toTopOf="@id/login"
+            app:layout_constraintStart_toEndOf="@+id/login" />
 
         <com.google.android.material.button.MaterialButton
             android:id="@+id/login"
@@ -59,10 +35,29 @@
             android:layout_marginBottom="64dp"
             android:enabled="false"
             android:text="@string/action_login"
+
             app:layout_constraintBottom_toBottomOf="parent"
             app:layout_constraintEnd_toEndOf="parent"
             app:layout_constraintStart_toStartOf="parent"
-            app:layout_constraintTop_toBottomOf="@+id/switch_to_signup"
+            app:layout_constraintTop_toBottomOf="@+id/password_layout"
+            app:layout_constraintVertical_bias="0.2" />
+
+        <com.google.android.material.button.MaterialButton
+            android:id="@+id/switch_to_signup"
+            style="@style/Widget.MaterialComponents.Button.TextButton"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_gravity="start"
+            android:layout_marginStart="48dp"
+            android:layout_marginTop="16dp"
+            android:layout_marginEnd="48dp"
+            android:layout_marginBottom="64dp"
+            android:text="@string/action_switch_to_sign_up"
+
+            app:layout_constraintBottom_toBottomOf="parent"
+            app:layout_constraintEnd_toEndOf="parent"
+            app:layout_constraintStart_toStartOf="parent"
+            app:layout_constraintTop_toBottomOf="@+id/login"
             app:layout_constraintVertical_bias="0" />
 
         <com.google.android.material.textfield.TextInputLayout

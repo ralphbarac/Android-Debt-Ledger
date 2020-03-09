@@ -45,7 +45,7 @@ public class SignupActivity extends AppCompatActivity {
         final TextInputEditText emailInput = findViewById(R.id.email);
         final TextInputEditText passwordInput = findViewById(R.id.password);
         final MaterialButton switchToLoginButton = findViewById(R.id.switch_to_login);
-        final MaterialButton signupButton = findViewById(R.id.login);
+        final MaterialButton signupButton = findViewById(R.id.signup);
 
         // Listen for any changes to the signup form state, which will display errors and/or enable/disable button
         signupViewModel.getSignupFormState().observe(this, new Observer<SignupFormState>() {

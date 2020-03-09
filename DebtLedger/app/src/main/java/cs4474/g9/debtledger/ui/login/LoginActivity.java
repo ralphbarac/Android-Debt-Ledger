@@ -1,6 +1,7 @@
 package cs4474.g9.debtledger.ui.login;
 
 import android.app.Activity;
+import android.content.Context;
 import android.content.Intent;
 import android.os.Bundle;
 import android.text.Editable;
@@ -8,6 +9,7 @@ import android.text.TextWatcher;
 import android.view.KeyEvent;
 import android.view.View;
 import android.view.inputmethod.EditorInfo;
+import android.view.inputmethod.InputMethodManager;
 import android.widget.ProgressBar;
 import android.widget.TextView;
 import android.widget.Toast;
@@ -79,7 +81,7 @@ public class LoginActivity extends AppCompatActivity {
                 if (loginResult == null) {
                     return;
                 }
-                loadingProgressBar.setVisibility(View.GONE);
+                loadingProgressBar.setVisibility(View.INVISIBLE);
                 if (loginResult.getError() != null) {
                     informUserOfFailedLogin(loginResult.getError());
                 }
@@ -116,6 +118,11 @@ public class LoginActivity extends AppCompatActivity {
             @Override
             public boolean onEditorAction(TextView v, int actionId, KeyEvent event) {
                 if (actionId == EditorInfo.IME_ACTION_DONE) {
+                    // Hide the keyboard
+                    ((InputMethodManager) getSystemService(Context.INPUT_METHOD_SERVICE))
+                            .hideSoftInputFromWindow(v.getWindowToken(), 0);
+
+                    loadingProgressBar.setVisibility(View.VISIBLE);
                     loginViewModel.login(emailInput.getText().toString(), passwordInput.getText().toString());
                 }
                 return false;
