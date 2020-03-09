@@ -140,7 +140,6 @@ public class ContactRequestListAdapter extends RecyclerView.Adapter<ContactReque
             });
 
             view.setOnClickListener(this);
-            view.findViewById(R.id.expand_arrow).setOnClickListener(this);
         }
 
         @Override

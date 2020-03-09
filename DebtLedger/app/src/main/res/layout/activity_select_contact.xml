@@ -11,6 +11,7 @@
         android:id="@+id/my_contact_container"
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
+        android:background="?attr/selectableItemBackground"
         android:paddingStart="12dp"
         android:paddingEnd="8dp"
         android:paddingTop="8dp"

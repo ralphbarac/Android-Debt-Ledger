@@ -81,7 +81,6 @@ public class ContactListAdapter extends RecyclerView.Adapter<ContactListAdapter.
             this.amount = view.findViewById(R.id.amount);
 
             view.setOnClickListener(this);
-            view.findViewById(R.id.expand_arrow).setOnClickListener(this);
         }
 
         @Override

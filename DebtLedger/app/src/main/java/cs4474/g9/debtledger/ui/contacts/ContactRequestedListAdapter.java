@@ -96,7 +96,6 @@ public class ContactRequestedListAdapter extends RecyclerView.Adapter<ContactReq
             });
 
             view.setOnClickListener(this);
-            view.findViewById(R.id.expand_arrow).setOnClickListener(this);
         }
 
         @Override
