@@ -12,6 +12,7 @@ import android.widget.ImageView;
 import android.widget.TextView;
 
 import com.google.android.material.button.MaterialButton;
+import com.google.android.material.dialog.MaterialAlertDialogBuilder;
 import com.google.android.material.textfield.TextInputEditText;
 
 import java.io.Serializable;
@@ -158,8 +159,17 @@ public class CreateTransactionActivity extends AppCompatActivity implements OnIn
                     invalidateOptionsMenu();
                 }
 
+                View miscErrorContainer = findViewById(R.id.misc_error_container);
                 if (transactionFormState.getMiscError() != null) {
-                    // TODO: Display Miscellaneous error
+                    if (miscErrorContainer.getVisibility() == View.GONE) {
+                        miscErrorContainer.setVisibility(View.VISIBLE);
+                    }
+                    TextView miscError = findViewById(R.id.misc_error);
+                    miscError.setText(getString(transactionFormState.getMiscError()));
+                } else {
+                    if (miscErrorContainer.getVisibility() == View.VISIBLE) {
+                        miscErrorContainer.setVisibility(View.GONE);
+                    }
                 }
             }
         });
@@ -298,7 +308,16 @@ public class CreateTransactionActivity extends AppCompatActivity implements OnIn
     }
 
     private void submitTransaction() {
-        // TODO: Submit Transaction
+        UserAccount loggedInUser = LoginRepository.getInstance(this).getLoggedInUser();
+        if (!whoIsPaying.equals(loggedInUser) && !whoOwes.contains(loggedInUser)) {
+            new MaterialAlertDialogBuilder(this)
+                    .setTitle("You Aren't Involved!")
+                    .setMessage("In order to add debt, you must either be paying or owe!")
+                    .setPositiveButton("Ok", null)
+                    .show();
+        } else {
+            // TODO: Submit Transaction
+        }
     }
 
 }

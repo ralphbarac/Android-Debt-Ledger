@@ -285,6 +285,33 @@
 
         </LinearLayout>
 
+        <LinearLayout
+            android:id="@+id/misc_error_container"
+            android:orientation="horizontal"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_marginTop="8dp"
+            android:visibility="gone"
+
+            app:layout_constraintStart_toStartOf="parent"
+            app:layout_constraintTop_toBottomOf="@id/who_owes_container"
+            app:layout_constraintBottom_toTopOf="@id/submit">
+
+            <ImageView
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:layout_marginEnd="4dp"
+                android:src="@drawable/ic_error_red_24dp" />
+
+            <TextView
+                android:id="@+id/misc_error"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:textColor="@color/red"
+                android:textSize="16sp"
+                android:text="@string/invalid_mismatching_amounts" />
+        </LinearLayout>
+
         <com.google.android.material.button.MaterialButton
             android:id="@+id/submit"
             style="@style/Widget.MaterialComponents.Button.TextButton"
