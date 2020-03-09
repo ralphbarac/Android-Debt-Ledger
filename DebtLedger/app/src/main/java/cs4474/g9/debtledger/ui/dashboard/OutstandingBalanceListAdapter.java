@@ -1,6 +1,7 @@
 package cs4474.g9.debtledger.ui.dashboard;
 
 import android.graphics.Color;
+import android.util.Log;
 import android.util.Pair;
 import android.view.LayoutInflater;
 import android.view.View;
@@ -64,7 +65,7 @@ public class OutstandingBalanceListAdapter extends RecyclerView.Adapter<Outstand
         return outstandingBalances == null ? 0 : outstandingBalances.size();
     }
 
-    public static class Item extends RecyclerView.ViewHolder {
+    public static class Item extends RecyclerView.ViewHolder implements View.OnClickListener {
         public ImageView myAvatar;
         public TextView myAvatarCharacter;
         public TextView amount;
@@ -82,6 +83,15 @@ public class OutstandingBalanceListAdapter extends RecyclerView.Adapter<Outstand
             this.them = view.findViewById(R.id.them);
             this.theirAvatar = view.findViewById(R.id.their_avatar);
             this.theirAvatarCharacter = view.findViewById(R.id.their_avatar_character);
+
+            view.setOnClickListener(this);
+        }
+
+        @Override
+        public void onClick(View v) {
+            Log.d("DASHBOARD", "Contact clicked.");
+            // TODO: Intent to view contact
+            //Intent toContact = new Intent()
         }
     }
 }
