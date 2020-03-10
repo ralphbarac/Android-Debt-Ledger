@@ -15,6 +15,8 @@ class LoginAuthenticator {
 
         try {
             // TODO: Authenticate
+            // TODO: Remove sleep, here to simulate delay needed for call to backend
+            Thread.sleep(3000);
             if (email.equals("zsirohey@uwo.ca") && password.equals("zain1234")) {
                 LoggedInUserHolder testUser = new LoggedInUserHolder(
                         "XSJKJSKDJKJS93JSKJK88",

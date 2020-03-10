@@ -28,10 +28,12 @@ public class LoginViewModel extends ViewModel {
         return loginResult;
     }
 
-    public void login(String email, String password) {
+    public Result<UserAccount> login(String email, String password) {
         // Attempt to login with given credentials
-        Result<UserAccount> result = loginRepository.login(email, password);
+        return loginRepository.login(email, password);
+    }
 
+    public void loginResultChanged(Result<UserAccount> result) {
         // Update value of login result, which is propagated to the view
         if (result instanceof Result.Success) {
             UserAccount loggedInUser = ((Result.Success<UserAccount>) result).getData();

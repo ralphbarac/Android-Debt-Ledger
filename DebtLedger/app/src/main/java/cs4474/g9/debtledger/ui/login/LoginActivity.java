@@ -3,6 +3,7 @@ package cs4474.g9.debtledger.ui.login;
 import android.app.Activity;
 import android.content.Context;
 import android.content.Intent;
+import android.os.AsyncTask;
 import android.os.Bundle;
 import android.text.Editable;
 import android.text.TextWatcher;
@@ -23,6 +24,7 @@ import androidx.appcompat.app.AppCompatActivity;
 import androidx.lifecycle.Observer;
 import androidx.lifecycle.ViewModelProviders;
 import cs4474.g9.debtledger.R;
+import cs4474.g9.debtledger.data.Result;
 import cs4474.g9.debtledger.data.login.LoginRepository;
 import cs4474.g9.debtledger.data.model.UserAccount;
 import cs4474.g9.debtledger.ui.MainActivity;
@@ -32,6 +34,8 @@ public class LoginActivity extends AppCompatActivity {
 
     private LoginViewModel loginViewModel;
     private LoginRepository loginRepository;
+
+    private AsyncTask<String, Void, Result> loginProcess;
 
     @Override
     public void onCreate(Bundle savedInstanceState) {
@@ -123,7 +127,10 @@ public class LoginActivity extends AppCompatActivity {
                             .hideSoftInputFromWindow(v.getWindowToken(), 0);
 
                     loadingProgressBar.setVisibility(View.VISIBLE);
-                    loginViewModel.login(emailInput.getText().toString(), passwordInput.getText().toString());
+                    if (loginProcess == null || loginProcess.getStatus() == AsyncTask.Status.FINISHED) {
+                        loginProcess = new LoginProcess();
+                        loginProcess.execute(emailInput.getText().toString(), passwordInput.getText().toString());
+                    }
                 }
                 return false;
             }
@@ -145,7 +152,10 @@ public class LoginActivity extends AppCompatActivity {
             @Override
             public void onClick(View v) {
                 loadingProgressBar.setVisibility(View.VISIBLE);
-                loginViewModel.login(emailInput.getText().toString(), passwordInput.getText().toString());
+                if (loginProcess == null || loginProcess.getStatus() == AsyncTask.Status.FINISHED) {
+                    loginProcess = new LoginProcess();
+                    loginProcess.execute(emailInput.getText().toString(), passwordInput.getText().toString());
+                }
             }
         });
     }
@@ -162,5 +172,36 @@ public class LoginActivity extends AppCompatActivity {
 
     private void informUserOfFailedLogin(@StringRes Integer errorString) {
         Toast.makeText(this, errorString, Toast.LENGTH_SHORT).show();
+    }
+
+    @Override
+    protected void onDestroy() {
+        super.onDestroy();
+        if (loginProcess != null) {
+            loginProcess.cancel(true);
+        }
+    }
+
+    private final class LoginProcess extends AsyncTask<String, Void, Result> {
+
+        @Override
+        protected Result doInBackground(String... params) {
+            Result<UserAccount> result;
+            if (params.length == 2) {
+                String email = params[0];
+                String password = params[1];
+                result = loginViewModel.login(email, password);
+            } else {
+                result = new Result.Error(new IllegalArgumentException());
+            }
+            return result;
+        }
+
+        @Override
+        protected void onPostExecute(Result result) {
+            super.onPostExecute(result);
+            loginViewModel.loginResultChanged(result);
+        }
+
     }
 }

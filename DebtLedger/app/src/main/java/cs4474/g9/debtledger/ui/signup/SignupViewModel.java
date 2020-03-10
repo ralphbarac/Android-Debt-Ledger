@@ -35,25 +35,27 @@ public class SignupViewModel extends ViewModel {
         return signupResult;
     }
 
-    public void signup(String firstName, String lastName, String email, String password) {
+    public Result<UserAccount> signup(String firstName, String lastName, String email, String password) {
         // Attempt to signup with given data
-        Result<UserAccount> userAccountResult = userAccountManager.createAccount(
+        Result<UserAccount> signupResult = userAccountManager.createAccount(
                 new UserAccount(firstName, lastName, email, password)
         );
 
-        if (userAccountResult instanceof Result.Success) {
+        if (signupResult instanceof Result.Success) {
             // Login to newly created account
             Result<UserAccount> loginResult = loginRepository.login(email, password);
-
-            // Update value of signup result, which is propagated to the view
-            if (loginResult instanceof Result.Success) {
-                UserAccount loggedInUser = ((Result.Success<UserAccount>) loginResult).getData();
-                signupResult.setValue(new SignupResult(loggedInUser));
-            } else {
-                signupResult.setValue(new SignupResult(R.string.signup_failed));
-            }
+            return loginResult;
         } else {
-            // Update value of signup result, which is propagated to the view
+            return signupResult;
+        }
+    }
+
+    public void signupResultChanged(Result<UserAccount> result) {
+        // Update value of signup result, which is propagated to the view
+        if (result instanceof Result.Success) {
+            UserAccount loggedInUser = ((Result.Success<UserAccount>) result).getData();
+            signupResult.setValue(new SignupResult(loggedInUser));
+        } else {
             signupResult.setValue(new SignupResult(R.string.signup_failed));
         }
     }
