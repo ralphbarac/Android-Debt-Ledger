@@ -9,7 +9,9 @@
         android:roundIcon="@mipmap/ic_launcher_round"
         android:supportsRtl="true"
         android:theme="@style/AppTheme">
-        <activity android:name=".ViewContactActivity"></activity>
+        <activity android:name=".ui.contacts.select.SelectGroupMembersActivity"></activity>
+        <activity android:name=".ui.groups.CreateEditGroupActivity" />
+        <activity android:name=".ViewContactActivity" />
         <activity
             android:name=".ui.transaction.CreateTransactionActivity"
             android:label="@string/title_create_transaction" />

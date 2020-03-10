@@ -1,5 +1,6 @@
 package cs4474.g9.debtledger.ui.groups;
 
+import android.content.Intent;
 import android.os.Bundle;
 import android.util.Log;
 import android.view.LayoutInflater;
@@ -35,6 +36,9 @@ public class GroupsFragment extends Fragment {
         switch (item.getItemId()) {
             case R.id.add_group:
                 // TODO: Open Add Group Activity
+                Intent toAddGroup = new Intent(getActivity(), CreateEditGroupActivity.class);
+                toAddGroup.putExtra(CreateEditGroupActivity.MODE, CreateEditGroupActivity.CREATE_MODE);
+                startActivity(toAddGroup);
                 Log.d("GROUPS", "Add Group icon clicked.");
                 return true;
             default:

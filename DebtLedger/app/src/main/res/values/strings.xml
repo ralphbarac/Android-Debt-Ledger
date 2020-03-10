@@ -51,6 +51,10 @@
 
     <!-- Strings related to groups -->
     <string name="action_add_group">Add Group</string>
+    <string name="title_add_group">Add Group</string>
+    <string name="title_edit_group">Edit Group</string>
+    <string name="prompt_group_name">Group Name</string>
+    <string name="heading_members">Members</string>
 
     <!-- Strings related to database/query failures -->
     <string name="failure_contact_requests">Unable to get contact requests</string>
