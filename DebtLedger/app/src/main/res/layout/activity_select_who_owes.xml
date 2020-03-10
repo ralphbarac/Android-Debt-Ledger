@@ -5,10 +5,10 @@
     android:orientation="vertical"
     android:layout_width="match_parent"
     android:layout_height="match_parent"
-    tools:context=".ui.contacts.select.SelectContactActivity">
+    tools:context=".ui.contacts.select.SelectWhoIsPayingActivity">
 
     <androidx.constraintlayout.widget.ConstraintLayout
-        android:id="@+id/my_contact_container"
+        android:id="@+id/my_container"
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
         android:background="?attr/selectableItemBackground"
@@ -27,13 +27,14 @@
             app:layout_constraintTop_toTopOf="parent"
             app:srcCompat="@drawable/circle" />
 
-        <ImageView
-            android:layout_width="24dp"
-            android:layout_height="24dp"
+        <CheckBox
+            android:id="@+id/my_check_box"
+            android:layoutDirection="rtl"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
             app:layout_constraintBottom_toBottomOf="parent"
             app:layout_constraintEnd_toEndOf="parent"
-            app:layout_constraintTop_toTopOf="parent"
-            app:srcCompat="@drawable/ic_keyboard_arrow_right_black_24dp" />
+            app:layout_constraintTop_toTopOf="parent" />
 
 
         <TextView

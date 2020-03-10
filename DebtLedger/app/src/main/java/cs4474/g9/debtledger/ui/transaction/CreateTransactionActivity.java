@@ -29,9 +29,8 @@ import cs4474.g9.debtledger.R;
 import cs4474.g9.debtledger.data.login.LoginRepository;
 import cs4474.g9.debtledger.data.model.UserAccount;
 import cs4474.g9.debtledger.logic.ColourGenerator;
-import cs4474.g9.debtledger.ui.contacts.select.SelectContactActivity;
-import cs4474.g9.debtledger.ui.contacts.select.SelectMultipleContactsActivity;
-import cs4474.g9.debtledger.ui.contacts.select.SelectMultipleContactsWrapper;
+import cs4474.g9.debtledger.ui.contacts.select.SelectWhoIsPayingActivity;
+import cs4474.g9.debtledger.ui.contacts.select.SelectWhoOwesActivity;
 
 public class CreateTransactionActivity extends AppCompatActivity implements OnInputAmountsChanged {
 
@@ -184,14 +183,14 @@ public class CreateTransactionActivity extends AppCompatActivity implements OnIn
     }
 
     public void selectWhoIsPaying(View view) {
-        Intent toSelectWhoIsPaying = new Intent(this, SelectContactActivity.class);
+        Intent toSelectWhoIsPaying = new Intent(this, SelectWhoIsPayingActivity.class);
         startActivityForResult(toSelectWhoIsPaying, SELECT_WHO_IS_PAYING);
     }
 
     public void selectWhoOwes(View view) {
-        Intent toSelectWhoOwes = new Intent(this, SelectMultipleContactsActivity.class);
-        SelectMultipleContactsWrapper wrapper = new SelectMultipleContactsWrapper(selectedSelf, selectedGroups, selectedContacts);
-        toSelectWhoOwes.putExtra(SelectMultipleContactsActivity.SELECTED_CONTACTS, wrapper);
+        Intent toSelectWhoOwes = new Intent(this, SelectWhoOwesActivity.class);
+        WhoOwesWrapper wrapper = new WhoOwesWrapper(selectedSelf, selectedGroups, selectedContacts);
+        toSelectWhoOwes.putExtra(SelectWhoOwesActivity.SELECTED_CONTACTS, wrapper);
         startActivityForResult(toSelectWhoOwes, SELECT_WHO_OWES);
     }
 
@@ -225,7 +224,7 @@ public class CreateTransactionActivity extends AppCompatActivity implements OnIn
     protected void onActivityResult(int requestCode, int resultCode, @Nullable Intent data) {
         if (requestCode == SELECT_WHO_IS_PAYING) {
             if (resultCode == RESULT_OK) {
-                Serializable value = data.getSerializableExtra(SelectContactActivity.SELECTED_CONTACT);
+                Serializable value = data.getSerializableExtra(SelectWhoIsPayingActivity.SELECTED_CONTACT);
                 if (value instanceof UserAccount) {
                     whoIsPaying = (UserAccount) value;
                     updateWhoIsPayingSection();
@@ -233,9 +232,9 @@ public class CreateTransactionActivity extends AppCompatActivity implements OnIn
             }
         } else if (requestCode == SELECT_WHO_OWES) {
             if (resultCode == RESULT_OK) {
-                Serializable value = data.getSerializableExtra(SelectMultipleContactsActivity.SELECTED_CONTACTS);
-                if (value instanceof SelectMultipleContactsWrapper) {
-                    SelectMultipleContactsWrapper wrapper = (SelectMultipleContactsWrapper) value;
+                Serializable value = data.getSerializableExtra(SelectWhoOwesActivity.SELECTED_CONTACTS);
+                if (value instanceof WhoOwesWrapper) {
+                    WhoOwesWrapper wrapper = (WhoOwesWrapper) value;
                     selectedSelf = wrapper.isSelectedSelf();
                     selectedGroups = wrapper.getSelectedGroups();
                     selectedContacts = wrapper.getSelectedContacts();

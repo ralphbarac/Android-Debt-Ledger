@@ -23,8 +23,9 @@ import cs4474.g9.debtledger.data.Result;
 import cs4474.g9.debtledger.data.login.LoginRepository;
 import cs4474.g9.debtledger.data.model.UserAccount;
 import cs4474.g9.debtledger.logic.ColourGenerator;
+import cs4474.g9.debtledger.ui.transaction.WhoOwesWrapper;
 
-public class SelectMultipleContactsActivity extends AppCompatActivity implements OnContactChecked {
+public class SelectWhoOwesActivity extends AppCompatActivity implements OnContactChecked {
 
     public static final String SELECTED_CONTACTS = "selected_contacts";
 
@@ -41,9 +42,9 @@ public class SelectMultipleContactsActivity extends AppCompatActivity implements
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
-        setContentView(R.layout.activity_select_multiple_contacts);
+        setContentView(R.layout.activity_select_who_owes);
 
-        SelectMultipleContactsWrapper wrapper = (SelectMultipleContactsWrapper) getIntent().getSerializableExtra(SELECTED_CONTACTS);
+        WhoOwesWrapper wrapper = (WhoOwesWrapper) getIntent().getSerializableExtra(SELECTED_CONTACTS);
         selectedSelf = wrapper.isSelectedSelf();
         selectedGroups = wrapper.getSelectedGroups();
         selectedContacts = wrapper.getSelectedContacts();
@@ -131,7 +132,7 @@ public class SelectMultipleContactsActivity extends AppCompatActivity implements
     private void returnResult() {
         Intent data = new Intent();
         selectedContacts = multipleContactsAdapter.getSelectedContacts();
-        SelectMultipleContactsWrapper wrapper = new SelectMultipleContactsWrapper(selectedSelf, selectedGroups, selectedContacts);
+        WhoOwesWrapper wrapper = new WhoOwesWrapper(selectedSelf, selectedGroups, selectedContacts);
         data.putExtra(SELECTED_CONTACTS, wrapper);
         setResult(RESULT_OK, data);
         finish();

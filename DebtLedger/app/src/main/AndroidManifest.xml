@@ -14,10 +14,10 @@
             android:name=".ui.transaction.CreateTransactionActivity"
             android:label="@string/title_create_transaction" />
         <activity
-            android:name=".ui.contacts.select.SelectMultipleContactsActivity"
+            android:name=".ui.contacts.select.SelectWhoOwesActivity"
             android:label="@string/title_select_multiple_contacts" />
         <activity
-            android:name=".ui.contacts.select.SelectContactActivity"
+            android:name=".ui.contacts.select.SelectWhoIsPayingActivity"
             android:label="@string/title_select_contact" />
         <activity
             android:name=".ui.signup.SignupActivity"
