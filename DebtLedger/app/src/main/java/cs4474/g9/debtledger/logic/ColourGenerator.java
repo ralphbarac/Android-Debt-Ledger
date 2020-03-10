@@ -12,4 +12,12 @@ public class ColourGenerator {
         hsv[2] = 30;
         return Color.HSVToColor(hsv);
     }
+
+    public static int generateFromGroupName(String groupName) {
+        float[] hsv = new float[3];
+        hsv[0] = (groupName.hashCode()) % 360;
+        hsv[1] = 30;
+        hsv[2] = 30;
+        return Color.HSVToColor(hsv);
+    }
 }
