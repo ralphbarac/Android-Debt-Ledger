@@ -1,8 +1,6 @@
 package cs4474.g9.debtledger.ui.groups;
 
-import android.graphics.Color;
 import android.util.Log;
-import android.util.Pair;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
@@ -11,13 +9,12 @@ import android.widget.TextView;
 
 import java.util.ArrayList;
 import java.util.List;
-import java.util.Locale;
 
 import androidx.annotation.NonNull;
 import androidx.recyclerview.widget.RecyclerView;
 import cs4474.g9.debtledger.R;
-import cs4474.g9.debtledger.data.model.UserAccount;
 import cs4474.g9.debtledger.data.model.Group;
+import cs4474.g9.debtledger.data.model.UserAccount;
 import cs4474.g9.debtledger.logic.ColourGenerator;
 
 public class GroupListAdapter extends RecyclerView.Adapter<GroupListAdapter.Item> {
@@ -33,7 +30,7 @@ public class GroupListAdapter extends RecyclerView.Adapter<GroupListAdapter.Item
     @Override
     public Item onCreateViewHolder(@NonNull ViewGroup parent, int viewType) {
         View view = LayoutInflater.from(parent.getContext())
-                .inflate(R.layout.list_item_group, parent,false);
+                .inflate(R.layout.list_item_group, parent, false);
         return new Item(view);
     }
 
@@ -44,22 +41,18 @@ public class GroupListAdapter extends RecyclerView.Adapter<GroupListAdapter.Item
         List<UserAccount> group_members = group.getGroupMembers();
         List<String> group_first_names = new ArrayList<>();
         int memberCount = group_members.size();
-        String member_first_name;
         // Add all the first names of the group members to a list
-        for(int i = 0; i < memberCount; ++i){
-            member_first_name = group_members.get(i).getFirstName();
-            group_first_names.add(member_first_name);
+        for (int i = 0; i < memberCount; ++i) {
+            group_first_names.add(group_members.get(i).getFirstName());
         }
 
-        String firstNameString = " ";
-        int overflowCount = 0;
+        String firstNameString = "";
         // If there are more than 2 members we need to summarize
-        if(memberCount > 2){
-          overflowCount = memberCount - 2;
-          firstNameString.concat(group_first_names.get(0) + ", " + group_first_names.get(1) + ", +" + overflowCount + " others");
-        }
-        else {
-            firstNameString.concat(group_first_names.get(0) + ", " + group_first_names.get(1));
+        if (memberCount > 2) {
+            int overflowCount = memberCount - 2;
+            firstNameString = firstNameString.concat(group_first_names.get(0) + ", " + group_first_names.get(1) + ", +" + overflowCount + " others");
+        } else {
+            firstNameString = firstNameString.concat(group_first_names.get(0) + ", " + group_first_names.get(1));
         }
 
         holder.groupAvatar.setColorFilter(ColourGenerator.generateFromGroupName(group_name));
@@ -69,7 +62,9 @@ public class GroupListAdapter extends RecyclerView.Adapter<GroupListAdapter.Item
     }
 
     @Override
-    public int getItemCount() { return group_list == null ? 0 : group_list.size(); }
+    public int getItemCount() {
+        return group_list == null ? 0 : group_list.size();
+    }
 
     public void addNewGroup(Group group) {
         //TODO: Currently just adds to top of list

@@ -9,17 +9,15 @@ import android.view.MenuInflater;
 import android.view.MenuItem;
 import android.view.View;
 import android.view.ViewGroup;
-import android.widget.TextView;
 import android.widget.Toast;
+
+import java.util.ArrayList;
+import java.util.List;
 
 import androidx.annotation.NonNull;
 import androidx.fragment.app.Fragment;
 import androidx.recyclerview.widget.LinearLayoutManager;
 import androidx.recyclerview.widget.RecyclerView;
-
-import java.util.ArrayList;
-import java.util.List;
-
 import cs4474.g9.debtledger.R;
 import cs4474.g9.debtledger.data.GroupManager;
 import cs4474.g9.debtledger.data.Result;
@@ -51,6 +49,9 @@ public class GroupsFragment extends Fragment {
         groupView = root.findViewById(R.id.group_list);
         groupView.setHasFixedSize(true);
         groupView.setLayoutManager(new LinearLayoutManager(getContext()));
+
+        GroupListAdapter groupListAdapter = new GroupListAdapter(userGroups);
+        groupView.setAdapter(groupListAdapter);
 
         return root;
     }

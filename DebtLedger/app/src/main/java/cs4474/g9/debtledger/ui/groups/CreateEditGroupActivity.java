@@ -23,8 +23,7 @@ import androidx.appcompat.app.AppCompatActivity;
 import androidx.recyclerview.widget.LinearLayoutManager;
 import androidx.recyclerview.widget.RecyclerView;
 import cs4474.g9.debtledger.R;
-import cs4474.g9.debtledger.data.ContactManager;
-import cs4474.g9.debtledger.data.Result;
+import cs4474.g9.debtledger.data.model.Group;
 import cs4474.g9.debtledger.data.model.UserAccount;
 import cs4474.g9.debtledger.logic.ColourGenerator;
 import cs4474.g9.debtledger.ui.contacts.select.SelectGroupMembersActivity;
@@ -65,12 +64,9 @@ public class CreateEditGroupActivity extends AppCompatActivity implements OnMemb
         if (intent.getIntExtra(MODE, CREATE_MODE) == EDIT_MODE) {
             isCreateMode = false;
             setTitle(R.string.title_edit_group);
-            // TODO: Fix once Group is implemented
-//            Group group = (Group) intent.getSerializableExtra(GROUP);
-//            name = group.getName();
-//            members = group.getMembers();
-            name = "Roommates";
-            members = (List<UserAccount>) ((Result.Success) new ContactManager().getAllContactsOf(null)).getData();
+            Group group = (Group) intent.getSerializableExtra(GROUP);
+            name = group.getGroupName();
+            members = group.getGroupMembers();
         } else {
             isCreateMode = true;
             setTitle(R.string.title_add_group);
@@ -83,6 +79,10 @@ public class CreateEditGroupActivity extends AppCompatActivity implements OnMemb
         groupNameTitle = findViewById(R.id.group_name_title);
         memberCount = findViewById(R.id.member_count);
         groupNameInput = findViewById(R.id.group_name_input);
+
+        if (!isCreateMode) {
+            groupNameInput.setText(name);
+        }
         groupNameInput.addTextChangedListener(new TextWatcher() {
             @Override
             public void beforeTextChanged(CharSequence s, int start, int count, int after) {
@@ -124,7 +124,7 @@ public class CreateEditGroupActivity extends AppCompatActivity implements OnMemb
             groupAvatar.setColorFilter(Color.BLACK);
             groupAvatarCharacter.setText("");
         } else {
-            groupAvatar.setColorFilter(ColourGenerator.generateFromName(name, name));
+            groupAvatar.setColorFilter(ColourGenerator.generateFromGroupName(name));
             groupAvatarCharacter.setText(name.substring(0, 1));
         }
 
