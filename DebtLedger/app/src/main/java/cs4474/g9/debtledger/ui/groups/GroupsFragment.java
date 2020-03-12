@@ -10,19 +10,48 @@ import android.view.MenuItem;
 import android.view.View;
 import android.view.ViewGroup;
 import android.widget.TextView;
+import android.widget.Toast;
 
 import androidx.annotation.NonNull;
 import androidx.fragment.app.Fragment;
+import androidx.recyclerview.widget.LinearLayoutManager;
+import androidx.recyclerview.widget.RecyclerView;
+
+import java.util.ArrayList;
+import java.util.List;
+
 import cs4474.g9.debtledger.R;
+import cs4474.g9.debtledger.data.GroupManager;
+import cs4474.g9.debtledger.data.Result;
+import cs4474.g9.debtledger.data.login.LoginRepository;
+import cs4474.g9.debtledger.data.model.Group;
+import cs4474.g9.debtledger.data.model.UserAccount;
 
 public class GroupsFragment extends Fragment {
+
+    private RecyclerView groupView;
 
     public View onCreateView(@NonNull LayoutInflater inflater, ViewGroup container, Bundle savedInstanceState) {
         View root = inflater.inflate(R.layout.fragment_groups, container, false);
         setHasOptionsMenu(true);
 
-        final TextView textView = root.findViewById(R.id.text_groups);
-        textView.setText("This is groups fragment");
+        Result result;
+        UserAccount loggedInUser = LoginRepository.getInstance(getContext()).getLoggedInUser();
+
+        List<Group> userGroups = new ArrayList<>();
+        GroupManager groupManager = new GroupManager();
+        result = groupManager.getGroupsOf(loggedInUser);
+        if(result instanceof Result.Success) {
+            userGroups = (List<Group>) ((Result.Success) result).getData();
+        }
+        else {
+            Toast.makeText(getContext(), "Unable to get groups", Toast.LENGTH_SHORT).show();
+        }
+
+        groupView = root.findViewById(R.id.group_list);
+        groupView.setHasFixedSize(true);
+        groupView.setLayoutManager(new LinearLayoutManager(getContext()));
+
         return root;
     }
 
