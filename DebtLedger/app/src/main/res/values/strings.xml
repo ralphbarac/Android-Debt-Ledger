@@ -50,6 +50,7 @@
     <string name="action_confirm_selection">Confirm Selection</string>
 
     <!-- Strings related to groups -->
+    <string name="my_groups">My Groups</string>
     <string name="action_add_group">Add Group</string>
     <string name="title_add_group">Add Group</string>
     <string name="title_edit_group">Edit Group</string>

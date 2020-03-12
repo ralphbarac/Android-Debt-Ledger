@@ -27,6 +27,7 @@ import androidx.recyclerview.widget.LinearLayoutManager;
 import androidx.recyclerview.widget.RecyclerView;
 import cs4474.g9.debtledger.R;
 import cs4474.g9.debtledger.data.login.LoginRepository;
+import cs4474.g9.debtledger.data.model.Group;
 import cs4474.g9.debtledger.data.model.UserAccount;
 import cs4474.g9.debtledger.logic.ColourGenerator;
 import cs4474.g9.debtledger.ui.contacts.select.SelectWhoIsPayingActivity;
@@ -45,7 +46,7 @@ public class CreateTransactionActivity extends AppCompatActivity implements OnIn
 
     private List<UserAccount> whoOwes;
     private boolean selectedSelf = false;
-    private List<Object> selectedGroups = new ArrayList<>();
+    private List<Group> selectedGroups = new ArrayList<>();
     private List<UserAccount> selectedContacts = new ArrayList<>();
     private List<String> amountsOwed = new ArrayList<>();
 

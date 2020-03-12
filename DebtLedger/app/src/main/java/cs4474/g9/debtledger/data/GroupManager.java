@@ -1,6 +1,5 @@
 package cs4474.g9.debtledger.data;
 
-import java.lang.reflect.Array;
 import java.util.ArrayList;
 import java.util.List;
 
@@ -20,6 +19,7 @@ public class GroupManager {
         List<UserAccount> group2list = new ArrayList<>();
         group1list.add(new UserAccount("John", "Doe", ""));
         group1list.add(new UserAccount("Thomas", "Morphew", ""));
+        group2list.add(new UserAccount("Thomas", "Morphew", ""));
         group2list.add(new UserAccount("Timothy", "Young", ""));
         group2list.add(new UserAccount("Will", "Smith", ""));
 

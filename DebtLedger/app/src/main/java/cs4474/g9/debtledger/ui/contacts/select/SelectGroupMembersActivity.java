@@ -94,7 +94,7 @@ public class SelectGroupMembersActivity extends AppCompatActivity implements OnC
     }
 
     @Override
-    public void onContactChecked() {
+    public void onContactChecked(UserAccount contact) {
         selectedContacts = multipleContactsAdapter.getSelectedContacts();
         boolean shouldMenuIconBeEnabled = !selectedContacts.isEmpty();
 
@@ -105,7 +105,7 @@ public class SelectGroupMembersActivity extends AppCompatActivity implements OnC
     }
 
     @Override
-    public void onContactUnchecked() {
+    public void onContactUnchecked(UserAccount contact) {
         selectedContacts = multipleContactsAdapter.getSelectedContacts();
         boolean shouldMenuIconBeEnabled = !selectedContacts.isEmpty();
 
