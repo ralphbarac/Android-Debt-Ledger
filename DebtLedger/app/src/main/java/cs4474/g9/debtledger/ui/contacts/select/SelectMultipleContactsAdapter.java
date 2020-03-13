@@ -37,6 +37,13 @@ public class SelectMultipleContactsAdapter extends RecyclerView.Adapter<SelectMu
         }
     }
 
+    public SelectMultipleContactsAdapter() {
+        super();
+        this.contacts = new ArrayList<>();
+        this.selectedContacts = new BitSet(contacts.size());
+        this.onContactCheckedListeners = new ArrayList<>();
+    }
+
     public void addOnContactCheckedListener(OnContactChecked onContactChecked) {
         onContactCheckedListeners.add(onContactChecked);
     }
@@ -51,6 +58,16 @@ public class SelectMultipleContactsAdapter extends RecyclerView.Adapter<SelectMu
         for (OnContactChecked onContactCheckedListener : onContactCheckedListeners) {
             onContactCheckedListener.onContactUnchecked(contact);
         }
+    }
+
+    public void setContacts(List<UserAccount> contacts, List<UserAccount> currentlySelectedContacts) {
+        this.contacts = contacts;
+        this.selectedContacts = new BitSet(contacts.size());
+
+        for (UserAccount currentlySelectedContact : currentlySelectedContacts) {
+            selectedContacts.set(contacts.indexOf(currentlySelectedContact));
+        }
+        notifyDataSetChanged();
     }
 
     @NonNull

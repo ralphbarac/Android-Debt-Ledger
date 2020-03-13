@@ -26,6 +26,12 @@ public class SelectContactAdapter extends RecyclerView.Adapter<SelectContactAdap
         this.onContactSelectedListeners = new ArrayList<>();
     }
 
+    public SelectContactAdapter() {
+        super();
+        this.contacts = new ArrayList<>();
+        this.onContactSelectedListeners = new ArrayList<>();
+    }
+
     public void addOnContactSelectedListener(OnContactSelected listener) {
         this.onContactSelectedListeners.add(listener);
     }
@@ -34,6 +40,11 @@ public class SelectContactAdapter extends RecyclerView.Adapter<SelectContactAdap
         for (OnContactSelected onContactSelectedListener : onContactSelectedListeners) {
             onContactSelectedListener.onContactSelected(contact);
         }
+    }
+
+    public void setContacts(List<UserAccount> contacts) {
+        this.contacts = contacts;
+        notifyDataSetChanged();
     }
 
     @NonNull

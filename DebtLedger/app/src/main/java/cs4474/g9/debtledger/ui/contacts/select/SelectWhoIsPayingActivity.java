@@ -1,28 +1,35 @@
 package cs4474.g9.debtledger.ui.contacts.select;
 
 import android.content.Intent;
+import android.os.AsyncTask;
 import android.os.Bundle;
 import android.view.View;
 import android.widget.ImageView;
 import android.widget.TextView;
-import android.widget.Toast;
 
-import java.util.ArrayList;
 import java.util.List;
 
 import androidx.appcompat.app.AppCompatActivity;
 import androidx.recyclerview.widget.LinearLayoutManager;
-import androidx.recyclerview.widget.RecyclerView;
 import cs4474.g9.debtledger.R;
 import cs4474.g9.debtledger.data.ContactManager;
 import cs4474.g9.debtledger.data.Result;
 import cs4474.g9.debtledger.data.login.LoginRepository;
 import cs4474.g9.debtledger.data.model.UserAccount;
 import cs4474.g9.debtledger.logic.ColourGenerator;
+import cs4474.g9.debtledger.ui.MainActivity;
+import cs4474.g9.debtledger.ui.shared.LoadableRecyclerView;
+import cs4474.g9.debtledger.ui.shared.OnActionButtonClickedListener;
 
-public class SelectWhoIsPayingActivity extends AppCompatActivity implements OnContactSelected {
+public class SelectWhoIsPayingActivity extends AppCompatActivity implements OnContactSelected, OnActionButtonClickedListener {
 
     public static final String SELECTED_CONTACT = "selected_contact";
+    public static final String ADD_NEW_CONTACT = "add_new_contact";
+
+    private AsyncTask<UserAccount, Void, Result> getContactsProcess;
+
+    private LoadableRecyclerView selectContactView;
+    private SelectContactAdapter selectContactAdapter;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -43,23 +50,17 @@ public class SelectWhoIsPayingActivity extends AppCompatActivity implements OnCo
             }
         });
 
-
-        ContactManager manager = new ContactManager();
-        List<UserAccount> contacts = new ArrayList<>();
-        Result result = manager.getAllContactsOf(loggedInUser);
-        if (result instanceof Result.Success) {
-            contacts = (List<UserAccount>) ((Result.Success) result).getData();
-        } else {
-            Toast.makeText(this, R.string.failure_contacts, Toast.LENGTH_SHORT).show();
-        }
-
-        RecyclerView selectContactView = findViewById(R.id.contacts_list);
+        selectContactView = findViewById(R.id.contacts_list);
         selectContactView.setHasFixedSize(true);
         selectContactView.setLayoutManager(new LinearLayoutManager(this));
+        selectContactView.addOnActionButtonClickedClickListener(this);
 
-        SelectContactAdapter selectContactAdapter = new SelectContactAdapter(contacts);
+        selectContactAdapter = new SelectContactAdapter();
         selectContactAdapter.addOnContactSelectedListener(this);
         selectContactView.setAdapter(selectContactAdapter);
+
+        getContactsProcess = new GetContactsProcess();
+        getContactsProcess.execute(loggedInUser);
     }
 
     @Override
@@ -68,5 +69,66 @@ public class SelectWhoIsPayingActivity extends AppCompatActivity implements OnCo
         data.putExtra(SELECTED_CONTACT, contact);
         setResult(RESULT_OK, data);
         finish();
+    }
+
+    @Override
+    protected void onDestroy() {
+        super.onDestroy();
+        if (getContactsProcess != null) {
+            getContactsProcess.cancel(true);
+        }
+    }
+
+    @Override
+    public void onFailedToLoadActionButtonClicked() {
+        // Retry getting contacts
+        if (getContactsProcess == null || getContactsProcess.getStatus() == AsyncTask.Status.FINISHED) {
+            getContactsProcess = new GetContactsProcess();
+            getContactsProcess.execute(LoginRepository.getInstance(this).getLoggedInUser());
+        }
+    }
+
+    @Override
+    public void onEmptyActionButtonClicked() {
+        Intent toContacts = new Intent(this, MainActivity.class);
+        toContacts.putExtra(ADD_NEW_CONTACT, true);
+        toContacts.putExtra(MainActivity.CHANGE_TAB, MainActivity.CONTACTS_TAB);
+        setResult(RESULT_CANCELED, toContacts);
+        finish();
+    }
+
+    private final class GetContactsProcess extends AsyncTask<UserAccount, Void, Result> {
+
+        @Override
+        protected void onPreExecute() {
+            super.onPreExecute();
+            selectContactView.onBeginLoading();
+        }
+
+        @Override
+        protected Result doInBackground(UserAccount... params) {
+            UserAccount loggedInUser = params[0];
+            ContactManager manager = new ContactManager();
+            // TODO: Remove sleep
+            try {
+                Thread.sleep(3000);
+            } catch (InterruptedException e) {
+                e.printStackTrace();
+            }
+            return manager.getAllContactsOf(loggedInUser);
+        }
+
+        @Override
+        protected void onPostExecute(Result result) {
+            super.onPostExecute(result);
+            if (result instanceof Result.Success) {
+                List<UserAccount> contacts;
+                contacts = (List<UserAccount>) ((Result.Success) result).getData();
+                selectContactAdapter.setContacts(contacts);
+            } else {
+                selectContactView.onFailToFinishLoading();
+            }
+        }
+
     }
 }

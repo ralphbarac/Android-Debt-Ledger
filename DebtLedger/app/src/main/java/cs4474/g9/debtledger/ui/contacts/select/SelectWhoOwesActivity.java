@@ -1,6 +1,7 @@
 package cs4474.g9.debtledger.ui.contacts.select;
 
 import android.content.Intent;
+import android.os.AsyncTask;
 import android.os.Bundle;
 import android.view.Menu;
 import android.view.MenuItem;
@@ -9,14 +10,11 @@ import android.widget.CheckBox;
 import android.widget.CompoundButton;
 import android.widget.ImageView;
 import android.widget.TextView;
-import android.widget.Toast;
 
-import java.util.ArrayList;
 import java.util.List;
 
 import androidx.appcompat.app.AppCompatActivity;
 import androidx.recyclerview.widget.LinearLayoutManager;
-import androidx.recyclerview.widget.RecyclerView;
 import cs4474.g9.debtledger.R;
 import cs4474.g9.debtledger.data.ContactManager;
 import cs4474.g9.debtledger.data.GroupManager;
@@ -25,13 +23,18 @@ import cs4474.g9.debtledger.data.login.LoginRepository;
 import cs4474.g9.debtledger.data.model.Group;
 import cs4474.g9.debtledger.data.model.UserAccount;
 import cs4474.g9.debtledger.logic.ColourGenerator;
+import cs4474.g9.debtledger.ui.MainActivity;
 import cs4474.g9.debtledger.ui.groups.select.OnGroupChecked;
 import cs4474.g9.debtledger.ui.groups.select.SelectMultipleGroupsAdapter;
+import cs4474.g9.debtledger.ui.shared.LoadableRecyclerView;
+import cs4474.g9.debtledger.ui.shared.OnActionButtonClickedListener;
 import cs4474.g9.debtledger.ui.transaction.WhoOwesWrapper;
 
 public class SelectWhoOwesActivity extends AppCompatActivity implements OnContactChecked, OnGroupChecked {
 
     public static final String SELECTED_CONTACTS = "selected_contacts";
+    public static final String ADD_NEW_CONTACT = "add_new_contact";
+    public static final String ADD_NEW_GROUP = "add_new_group";
 
     private boolean selectedSelf;
     private List<Group> selectedGroups;
@@ -39,7 +42,12 @@ public class SelectWhoOwesActivity extends AppCompatActivity implements OnContac
 
     private boolean isMenuIconEnabled = false;
 
+    private AsyncTask<UserAccount, Void, Result> getContactsProcess;
+    private AsyncTask<UserAccount, Void, Result> getGroupsProcess;
+
+    private LoadableRecyclerView selectMultipleContactsView;
     private SelectMultipleContactsAdapter multipleContactsAdapter;
+    private LoadableRecyclerView selectMultipleGroupsView;
     private SelectMultipleGroupsAdapter multipleGroupsAdapter;
 
     private CheckBox myCheckBox;
@@ -89,40 +97,63 @@ public class SelectWhoOwesActivity extends AppCompatActivity implements OnContac
             }
         });
 
+        selectMultipleGroupsView = findViewById(R.id.groups_list);
+        selectMultipleGroupsView.addOnActionButtonClickedClickListener(new OnActionButtonClickedListener() {
+            @Override
+            public void onFailedToLoadActionButtonClicked() {
+                if (getGroupsProcess == null || getGroupsProcess.getStatus() == AsyncTask.Status.FINISHED) {
+                    getGroupsProcess = new GetGroupsProcess();
+                    getGroupsProcess.execute(LoginRepository.getInstance(SelectWhoOwesActivity.this).getLoggedInUser());
+                }
+            }
 
-        ContactManager manager = new ContactManager();
-        List<UserAccount> contacts = new ArrayList<>();
-        Result result = manager.getAllContactsOf(loggedInUser);
-        if (result instanceof Result.Success) {
-            contacts = (List<UserAccount>) ((Result.Success) result).getData();
-        } else {
-            Toast.makeText(this, R.string.failure_contacts, Toast.LENGTH_SHORT).show();
-        }
-
-        GroupManager groupManager = new GroupManager();
-        List<Group> groups = new ArrayList<>();
-        result = groupManager.getGroupsOf(loggedInUser);
-        if (result instanceof Result.Success) {
-            groups = (List<Group>) ((Result.Success) result).getData();
-        } else {
-            Toast.makeText(this, "Unable to get groups", Toast.LENGTH_SHORT).show();
-        }
-
-        final RecyclerView selectMultipleGroupsView = findViewById(R.id.groups_list);
+            @Override
+            public void onEmptyActionButtonClicked() {
+                Intent toGroups = new Intent(SelectWhoOwesActivity.this, MainActivity.class);
+                toGroups.putExtra(ADD_NEW_GROUP, true);
+                toGroups.putExtra(MainActivity.CHANGE_TAB, MainActivity.GROUPS_TAB);
+                setResult(RESULT_CANCELED, toGroups);
+                finish();
+            }
+        });
         selectMultipleGroupsView.setHasFixedSize(true);
         selectMultipleGroupsView.setLayoutManager(new LinearLayoutManager(this));
 
-        multipleGroupsAdapter = new SelectMultipleGroupsAdapter(groups, selectedGroups);
+        multipleGroupsAdapter = new SelectMultipleGroupsAdapter();
         multipleGroupsAdapter.addOnGroupCheckedListener(this);
         selectMultipleGroupsView.setAdapter(multipleGroupsAdapter);
 
-        final RecyclerView selectMultipleContactsView = findViewById(R.id.contacts_list);
+        selectMultipleContactsView = findViewById(R.id.contacts_list);
+        selectMultipleContactsView.addOnActionButtonClickedClickListener(new OnActionButtonClickedListener() {
+            @Override
+            public void onFailedToLoadActionButtonClicked() {
+                if (getContactsProcess == null || getContactsProcess.getStatus() == AsyncTask.Status.FINISHED) {
+                    getContactsProcess = new GetContactsProcess();
+                    getContactsProcess.execute(LoginRepository.getInstance(SelectWhoOwesActivity.this).getLoggedInUser());
+                }
+            }
+
+            @Override
+            public void onEmptyActionButtonClicked() {
+                Intent toContacts = new Intent(SelectWhoOwesActivity.this, MainActivity.class);
+                toContacts.putExtra(ADD_NEW_CONTACT, true);
+                toContacts.putExtra(MainActivity.CHANGE_TAB, MainActivity.CONTACTS_TAB);
+                setResult(RESULT_CANCELED, toContacts);
+                finish();
+            }
+        });
         selectMultipleContactsView.setHasFixedSize(true);
         selectMultipleContactsView.setLayoutManager(new LinearLayoutManager(this));
 
-        multipleContactsAdapter = new SelectMultipleContactsAdapter(contacts, selectedContacts);
+        multipleContactsAdapter = new SelectMultipleContactsAdapter();
         multipleContactsAdapter.addOnContactCheckedListener(this);
         selectMultipleContactsView.setAdapter(multipleContactsAdapter);
+
+        getContactsProcess = new GetContactsProcess();
+        getContactsProcess.execute(loggedInUser);
+
+        getGroupsProcess = new GetGroupsProcess();
+        getGroupsProcess.execute(loggedInUser);
     }
 
     @Override
@@ -198,6 +229,87 @@ public class SelectWhoOwesActivity extends AppCompatActivity implements OnContac
             isMenuIconEnabled = shouldMenuIconBeEnabled;
             invalidateOptionsMenu();
         }
+    }
+
+    @Override
+    protected void onDestroy() {
+        super.onDestroy();
+        if (getContactsProcess != null) {
+            getContactsProcess.cancel(true);
+        }
+        if (getGroupsProcess != null) {
+            getGroupsProcess.cancel(true);
+        }
+    }
+
+    private final class GetGroupsProcess extends AsyncTask<UserAccount, Void, Result> {
+
+        @Override
+        protected void onPreExecute() {
+            super.onPreExecute();
+            selectMultipleGroupsView.onBeginLoading();
+        }
+
+        @Override
+        protected Result doInBackground(UserAccount... params) {
+            UserAccount loggedInUser = params[0];
+            GroupManager manager = new GroupManager();
+            // TODO: Remove sleep
+            try {
+                Thread.sleep(3000);
+            } catch (InterruptedException e) {
+                e.printStackTrace();
+            }
+            return manager.getGroupsOf(loggedInUser);
+        }
+
+        @Override
+        protected void onPostExecute(Result result) {
+            super.onPostExecute(result);
+            if (result instanceof Result.Success) {
+                List<Group> groups;
+                groups = (List<Group>) ((Result.Success) result).getData();
+                multipleGroupsAdapter.setGroups(groups, selectedGroups);
+            } else {
+                selectMultipleGroupsView.onFailToFinishLoading();
+            }
+        }
+
+    }
+
+    private final class GetContactsProcess extends AsyncTask<UserAccount, Void, Result> {
+
+        @Override
+        protected void onPreExecute() {
+            super.onPreExecute();
+            selectMultipleContactsView.onBeginLoading();
+        }
+
+        @Override
+        protected Result doInBackground(UserAccount... params) {
+            UserAccount loggedInUser = params[0];
+            ContactManager manager = new ContactManager();
+            // TODO: Remove sleep
+            try {
+                Thread.sleep(2000);
+            } catch (InterruptedException e) {
+                e.printStackTrace();
+            }
+            return manager.getAllContactsOf(loggedInUser);
+        }
+
+        @Override
+        protected void onPostExecute(Result result) {
+            super.onPostExecute(result);
+            if (result instanceof Result.Success) {
+                List<UserAccount> contacts;
+                contacts = (List<UserAccount>) ((Result.Success) result).getData();
+                multipleContactsAdapter.setContacts(contacts, selectedContacts);
+            } else {
+                selectMultipleContactsView.onFailToFinishLoading();
+            }
+        }
+
     }
 
 }

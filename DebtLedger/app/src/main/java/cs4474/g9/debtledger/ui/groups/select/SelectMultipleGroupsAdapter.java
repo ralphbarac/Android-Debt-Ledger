@@ -26,6 +26,13 @@ public class SelectMultipleGroupsAdapter extends RecyclerView.Adapter<SelectMult
 
     private List<OnGroupChecked> onGroupCheckedListeners;
 
+    public SelectMultipleGroupsAdapter() {
+        super();
+        this.groups = new ArrayList<>();
+        this.selectedGroups = new BitSet(groups.size());
+        this.onGroupCheckedListeners = new ArrayList<>();
+    }
+
     public SelectMultipleGroupsAdapter(List<Group> groups, List<Group> currentlySelectedGroups) {
         super();
         this.groups = groups;
@@ -51,6 +58,16 @@ public class SelectMultipleGroupsAdapter extends RecyclerView.Adapter<SelectMult
         for (OnGroupChecked onGroupCheckedListener : onGroupCheckedListeners) {
             onGroupCheckedListener.onGroupUnchecked(group);
         }
+    }
+
+    public void setGroups(List<Group> groups, List<Group> currentlySelectedGroups) {
+        this.groups = groups;
+        this.selectedGroups = new BitSet(groups.size());
+
+        for (Group currentlySelectedContact : currentlySelectedGroups) {
+            selectedGroups.set(groups.indexOf(currentlySelectedContact));
+        }
+        notifyDataSetChanged();
     }
 
     @NonNull

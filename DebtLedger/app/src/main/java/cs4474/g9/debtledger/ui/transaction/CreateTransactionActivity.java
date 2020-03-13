@@ -223,16 +223,24 @@ public class CreateTransactionActivity extends AppCompatActivity implements OnIn
 
     @Override
     protected void onActivityResult(int requestCode, int resultCode, @Nullable Intent data) {
+        super.onActivityResult(requestCode, resultCode, data);
+
         if (requestCode == SELECT_WHO_IS_PAYING) {
-            if (resultCode == RESULT_OK) {
+            if (resultCode == RESULT_OK && data != null) {
                 Serializable value = data.getSerializableExtra(SelectWhoIsPayingActivity.SELECTED_CONTACT);
                 if (value instanceof UserAccount) {
                     whoIsPaying = (UserAccount) value;
                     updateWhoIsPayingSection();
                 }
+            } else if (resultCode == RESULT_CANCELED && data != null) {
+                // If request from select who is paying to add new contact, direct back to add new contact
+                if (data.getBooleanExtra(SelectWhoIsPayingActivity.ADD_NEW_CONTACT, false)) {
+                    setResult(RESULT_CANCELED, data);
+                    finish();
+                }
             }
         } else if (requestCode == SELECT_WHO_OWES) {
-            if (resultCode == RESULT_OK) {
+            if (resultCode == RESULT_OK && data != null) {
                 Serializable value = data.getSerializableExtra(SelectWhoOwesActivity.SELECTED_CONTACTS);
                 if (value instanceof WhoOwesWrapper) {
                     WhoOwesWrapper wrapper = (WhoOwesWrapper) value;
@@ -246,6 +254,12 @@ public class CreateTransactionActivity extends AppCompatActivity implements OnIn
                     }
                     whoOwes.addAll(selectedContacts);
                     updateWhoOwesSection();
+                }
+            } else if (resultCode == RESULT_CANCELED && data != null) {
+                if (data.getBooleanExtra(SelectWhoOwesActivity.ADD_NEW_GROUP, false) ||
+                        data.getBooleanExtra(SelectWhoOwesActivity.ADD_NEW_CONTACT, false)) {
+                    setResult(RESULT_CANCELED, data);
+                    finish();
                 }
             }
         }

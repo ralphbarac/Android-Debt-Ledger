@@ -76,11 +76,54 @@
             android:textColor="@color/black"
             android:textSize="20sp" />
 
-        <androidx.recyclerview.widget.RecyclerView
+        <cs4474.g9.debtledger.ui.shared.LoadableRecyclerView
             android:id="@+id/groups_list"
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
-            android:nestedScrollingEnabled="false" />
+            android:nestedScrollingEnabled="false"
+
+            app:statusContainer="@id/status_container_groups"
+            app:loadingProgressBar="@id/loading_progress_bar_groups"
+            app:messageTextView="@id/message_text_view_groups"
+            app:actionButton="@id/action_button_groups"
+
+            app:loadingMessage=""
+            app:failedToLoadMessage="Failed to load Groups ):"
+            app:failedToLoadAction="Retry"
+            app:emptyMessage="No Groups ):"
+            app:emptyAction="Add Group" />
+
+        <LinearLayout
+            android:id="@+id/status_container_groups"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:orientation="vertical"
+            android:layout_marginTop="8dp"
+            android:layout_marginBottom="8dp">
+
+            <ProgressBar
+                android:id="@+id/loading_progress_bar_groups"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:layout_gravity="center_horizontal" />
+
+            <TextView
+                android:id="@+id/message_text_view_groups"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:layout_marginTop="16dp"
+                android:layout_marginBottom="8dp"
+                android:layout_gravity="center_horizontal"
+                android:textSize="20sp" />
+
+            <com.google.android.material.button.MaterialButton
+                android:id="@+id/action_button_groups"
+                style="@style/Widget.MaterialComponents.Button.TextButton"
+                app:strokeColor="@color/colorPrimary"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:layout_gravity="center_horizontal" />
+        </LinearLayout>
 
         <TextView
             android:id="@+id/contacts_title"
@@ -92,11 +135,54 @@
             android:textColor="@color/black"
             android:textSize="20sp" />
 
-        <androidx.recyclerview.widget.RecyclerView
+        <cs4474.g9.debtledger.ui.shared.LoadableRecyclerView
             android:id="@+id/contacts_list"
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
-            android:nestedScrollingEnabled="false" />
+            android:nestedScrollingEnabled="false"
+
+            app:statusContainer="@id/status_container_contacts"
+            app:loadingProgressBar="@id/loading_progress_bar_contacts"
+            app:messageTextView="@id/message_text_view_contacts"
+            app:actionButton="@id/action_button_contacts"
+
+            app:loadingMessage=""
+            app:failedToLoadMessage="Failed to load Contacts ):"
+            app:failedToLoadAction="Retry"
+            app:emptyMessage="No Contacts ):"
+            app:emptyAction="Add Contact" />
+
+        <LinearLayout
+            android:id="@+id/status_container_contacts"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:orientation="vertical"
+            android:layout_marginTop="8dp"
+            android:layout_marginBottom="8dp">
+
+            <ProgressBar
+                android:id="@+id/loading_progress_bar_contacts"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:layout_gravity="center_horizontal" />
+
+            <TextView
+                android:id="@+id/message_text_view_contacts"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:layout_marginTop="16dp"
+                android:layout_marginBottom="8dp"
+                android:layout_gravity="center_horizontal"
+                android:textSize="20sp" />
+
+            <com.google.android.material.button.MaterialButton
+                android:id="@+id/action_button_contacts"
+                style="@style/Widget.MaterialComponents.Button.TextButton"
+                app:strokeColor="@color/colorPrimary"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:layout_gravity="center_horizontal" />
+        </LinearLayout>
 
     </LinearLayout>
 

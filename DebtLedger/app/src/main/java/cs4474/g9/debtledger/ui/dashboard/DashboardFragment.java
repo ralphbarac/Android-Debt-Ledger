@@ -19,6 +19,8 @@ import cs4474.g9.debtledger.ui.transaction.CreateTransactionActivity;
 
 public class DashboardFragment extends Fragment {
 
+    public static final int FROM_DASHBOARD = 0;
+
     private final int SEMI_TRANSPARENT = 130;
     private final int SOLID = 255;
 
@@ -36,7 +38,7 @@ public class DashboardFragment extends Fragment {
             @Override
             public void onClick(View v) {
                 Intent toCreateTransaction = new Intent(getActivity(), CreateTransactionActivity.class);
-                startActivity(toCreateTransaction);
+                startActivityForResult(toCreateTransaction, FROM_DASHBOARD);
             }
         });
 
