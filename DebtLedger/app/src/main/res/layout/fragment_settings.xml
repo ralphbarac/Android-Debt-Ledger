@@ -7,8 +7,8 @@
 
     <ImageView
         android:id="@+id/user_avatar"
-        android:layout_width="145dp"
-        android:layout_height="145dp"
+        android:layout_width="180dp"
+        android:layout_height="180dp"
         android:layout_marginStart="8dp"
         android:layout_marginTop="32dp"
         app:layout_constraintStart_toStartOf="parent"
@@ -41,7 +41,7 @@
 
     <com.google.android.material.textfield.TextInputEditText
         android:id="@+id/first_name_input"
-        android:layout_width="213dp"
+        android:layout_width="180dp"
         android:layout_height="wrap_content"
         android:layout_marginStart="16dp"
         android:layout_marginTop="8dp"
@@ -65,13 +65,13 @@
 
     <com.google.android.material.textfield.TextInputEditText
         android:id="@+id/last_name_input"
-        android:layout_width="213dp"
+        android:layout_width="180dp"
         android:layout_height="wrap_content"
         android:layout_marginTop="8dp"
         android:hint="@string/prompt_last_name"
+        android:imeOptions="actionDone"
         android:inputType="textPersonName"
         android:selectAllOnFocus="true"
-        android:imeOptions="actionDone"
         android:singleLine="true"
         app:layout_constraintEnd_toEndOf="parent"
         app:layout_constraintStart_toEndOf="@+id/user_avatar"
