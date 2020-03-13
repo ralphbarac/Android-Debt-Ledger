@@ -20,8 +20,8 @@ public class ViewGroupFragment extends Fragment {
         View root = inflater.inflate(R.layout.fragment_settings, container, false);
         setHasOptionsMenu(true);
 
-        final TextView textView = root.findViewById(R.id.text_groups);
-        textView.setText("This is groups fragment");
+        //final TextView textView = root.findViewById(R.id.text_groups);
+        //textView.setText("This is groups fragment");
         return root;
     }
 
