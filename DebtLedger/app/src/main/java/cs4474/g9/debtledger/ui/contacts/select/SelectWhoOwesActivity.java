@@ -19,31 +19,37 @@ import androidx.recyclerview.widget.LinearLayoutManager;
 import androidx.recyclerview.widget.RecyclerView;
 import cs4474.g9.debtledger.R;
 import cs4474.g9.debtledger.data.ContactManager;
+import cs4474.g9.debtledger.data.GroupManager;
 import cs4474.g9.debtledger.data.Result;
 import cs4474.g9.debtledger.data.login.LoginRepository;
+import cs4474.g9.debtledger.data.model.Group;
 import cs4474.g9.debtledger.data.model.UserAccount;
 import cs4474.g9.debtledger.logic.ColourGenerator;
+import cs4474.g9.debtledger.ui.groups.select.OnGroupChecked;
+import cs4474.g9.debtledger.ui.groups.select.SelectMultipleGroupsAdapter;
+import cs4474.g9.debtledger.ui.transaction.WhoOwesWrapper;
 
-public class SelectMultipleContactsActivity extends AppCompatActivity implements OnContactChecked {
+public class SelectWhoOwesActivity extends AppCompatActivity implements OnContactChecked, OnGroupChecked {
 
     public static final String SELECTED_CONTACTS = "selected_contacts";
 
     private boolean selectedSelf;
-    private List<Object> selectedGroups;
+    private List<Group> selectedGroups;
     private List<UserAccount> selectedContacts;
 
     private boolean isMenuIconEnabled = false;
 
     private SelectMultipleContactsAdapter multipleContactsAdapter;
+    private SelectMultipleGroupsAdapter multipleGroupsAdapter;
 
     private CheckBox myCheckBox;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
-        setContentView(R.layout.activity_select_multiple_contacts);
+        setContentView(R.layout.activity_select_who_owes);
 
-        SelectMultipleContactsWrapper wrapper = (SelectMultipleContactsWrapper) getIntent().getSerializableExtra(SELECTED_CONTACTS);
+        WhoOwesWrapper wrapper = (WhoOwesWrapper) getIntent().getSerializableExtra(SELECTED_CONTACTS);
         selectedSelf = wrapper.isSelectedSelf();
         selectedGroups = wrapper.getSelectedGroups();
         selectedContacts = wrapper.getSelectedContacts();
@@ -53,7 +59,7 @@ public class SelectMultipleContactsActivity extends AppCompatActivity implements
         final TextView myAvatarCharacter = findViewById(R.id.my_avatar_character);
         myCheckBox = findViewById(R.id.my_check_box);
 
-        UserAccount loggedInUser = LoginRepository.getInstance(this).getLoggedInUser();
+        final UserAccount loggedInUser = LoginRepository.getInstance(this).getLoggedInUser();
         myAvatar.setColorFilter(ColourGenerator.generateFromName(loggedInUser.getFirstName(), loggedInUser.getLastName()));
         myAvatarCharacter.setText(loggedInUser.getFirstName().substring(0, 1));
 
@@ -63,9 +69,9 @@ public class SelectMultipleContactsActivity extends AppCompatActivity implements
             public void onCheckedChanged(CompoundButton buttonView, boolean isChecked) {
                 selectedSelf = isChecked;
                 if (isChecked) {
-                    onContactChecked();
+                    onContactChecked(loggedInUser);
                 } else {
-                    onContactUnchecked();
+                    onContactUnchecked(loggedInUser);
                 }
             }
         });
@@ -76,9 +82,9 @@ public class SelectMultipleContactsActivity extends AppCompatActivity implements
                 myCheckBox.setChecked(!myCheckBox.isChecked());
                 selectedSelf = myCheckBox.isChecked();
                 if (myCheckBox.isChecked()) {
-                    onContactChecked();
+                    onContactChecked(loggedInUser);
                 } else {
-                    onContactUnchecked();
+                    onContactUnchecked(loggedInUser);
                 }
             }
         });
@@ -92,6 +98,23 @@ public class SelectMultipleContactsActivity extends AppCompatActivity implements
         } else {
             Toast.makeText(this, R.string.failure_contacts, Toast.LENGTH_SHORT).show();
         }
+
+        GroupManager groupManager = new GroupManager();
+        List<Group> groups = new ArrayList<>();
+        result = groupManager.getGroupsOf(loggedInUser);
+        if (result instanceof Result.Success) {
+            groups = (List<Group>) ((Result.Success) result).getData();
+        } else {
+            Toast.makeText(this, "Unable to get groups", Toast.LENGTH_SHORT).show();
+        }
+
+        final RecyclerView selectMultipleGroupsView = findViewById(R.id.groups_list);
+        selectMultipleGroupsView.setHasFixedSize(true);
+        selectMultipleGroupsView.setLayoutManager(new LinearLayoutManager(this));
+
+        multipleGroupsAdapter = new SelectMultipleGroupsAdapter(groups, selectedGroups);
+        multipleGroupsAdapter.addOnGroupCheckedListener(this);
+        selectMultipleGroupsView.setAdapter(multipleGroupsAdapter);
 
         final RecyclerView selectMultipleContactsView = findViewById(R.id.contacts_list);
         selectMultipleContactsView.setHasFixedSize(true);
@@ -131,26 +154,44 @@ public class SelectMultipleContactsActivity extends AppCompatActivity implements
     private void returnResult() {
         Intent data = new Intent();
         selectedContacts = multipleContactsAdapter.getSelectedContacts();
-        SelectMultipleContactsWrapper wrapper = new SelectMultipleContactsWrapper(selectedSelf, selectedGroups, selectedContacts);
+        WhoOwesWrapper wrapper = new WhoOwesWrapper(selectedSelf, selectedGroups, selectedContacts);
         data.putExtra(SELECTED_CONTACTS, wrapper);
         setResult(RESULT_OK, data);
         finish();
     }
 
     @Override
-    public void onContactChecked() {
+    public void onContactChecked(UserAccount contact) {
         selectedContacts = multipleContactsAdapter.getSelectedContacts();
-        boolean shouldMenuIconBeEnabled = selectedSelf || !selectedContacts.isEmpty();
-
-        if (isMenuIconEnabled != shouldMenuIconBeEnabled) {
-            isMenuIconEnabled = shouldMenuIconBeEnabled;
-            invalidateOptionsMenu();
-        }
+        updateMenuIconIfNecessary();
     }
 
     @Override
-    public void onContactUnchecked() {
+    public void onContactUnchecked(UserAccount contact) {
         selectedContacts = multipleContactsAdapter.getSelectedContacts();
+        multipleGroupsAdapter.unselectGroupsIfNecessary(contact);
+        selectedGroups = multipleGroupsAdapter.getSelectedGroups();
+        updateMenuIconIfNecessary();
+    }
+
+    @Override
+    public void onGroupChecked(Group group) {
+        selectedGroups = multipleGroupsAdapter.getSelectedGroups();
+        multipleContactsAdapter.selectContactsFromGroup(group);
+        selectedContacts = multipleContactsAdapter.getSelectedContacts();
+        updateMenuIconIfNecessary();
+    }
+
+    @Override
+    public void onGroupUnchecked(Group group) {
+        multipleGroupsAdapter.unselectGroupsIfNecessary(group);
+        selectedGroups = multipleGroupsAdapter.getSelectedGroups();
+        multipleContactsAdapter.unselectContactsFromGroup(group);
+        selectedContacts = multipleContactsAdapter.getSelectedContacts();
+        updateMenuIconIfNecessary();
+    }
+
+    private void updateMenuIconIfNecessary() {
         boolean shouldMenuIconBeEnabled = selectedSelf || !selectedContacts.isEmpty();
 
         if (isMenuIconEnabled != shouldMenuIconBeEnabled) {

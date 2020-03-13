@@ -15,6 +15,7 @@ import java.util.List;
 import androidx.annotation.NonNull;
 import androidx.recyclerview.widget.RecyclerView;
 import cs4474.g9.debtledger.R;
+import cs4474.g9.debtledger.data.model.Group;
 import cs4474.g9.debtledger.data.model.UserAccount;
 import cs4474.g9.debtledger.logic.ColourGenerator;
 
@@ -40,15 +41,15 @@ public class SelectMultipleContactsAdapter extends RecyclerView.Adapter<SelectMu
         onContactCheckedListeners.add(onContactChecked);
     }
 
-    public void notifyListenersOfContactChecked() {
+    public void notifyListenersOfContactChecked(UserAccount contact) {
         for (OnContactChecked onContactCheckedListener : onContactCheckedListeners) {
-            onContactCheckedListener.onContactChecked();
+            onContactCheckedListener.onContactChecked(contact);
         }
     }
 
-    public void notifyListenersOfContactUnchecked() {
+    public void notifyListenersOfContactUnchecked(UserAccount contact) {
         for (OnContactChecked onContactCheckedListener : onContactCheckedListeners) {
-            onContactCheckedListener.onContactUnchecked();
+            onContactCheckedListener.onContactUnchecked(contact);
         }
     }
 
@@ -86,11 +87,27 @@ public class SelectMultipleContactsAdapter extends RecyclerView.Adapter<SelectMu
         return selections;
     }
 
-    public void setSelected(int position) {
+    public void selectContactsFromGroup(Group group) {
+        for (UserAccount groupMember : group.getGroupMembers()) {
+            int position = contacts.indexOf(groupMember);
+            selectedContacts.set(position);
+            notifyItemChanged(position);
+        }
+    }
+
+    public void unselectContactsFromGroup(Group group) {
+        for (UserAccount groupMember : group.getGroupMembers()) {
+            int position = contacts.indexOf(groupMember);
+            selectedContacts.clear(position);
+            notifyItemChanged(position);
+        }
+    }
+
+    private void setSelected(int position) {
         selectedContacts.set(position);
     }
 
-    public void clearSelected(int position) {
+    private void clearSelected(int position) {
         selectedContacts.clear(position);
     }
 
@@ -116,21 +133,25 @@ public class SelectMultipleContactsAdapter extends RecyclerView.Adapter<SelectMu
             checkBox.setChecked(!checkBox.isChecked());
             if (checkBox.isChecked()) {
                 setSelected(getAdapterPosition());
-                notifyListenersOfContactChecked();
+                notifyListenersOfContactChecked(contacts.get(getAdapterPosition()));
             } else {
                 clearSelected(getAdapterPosition());
-                notifyListenersOfContactUnchecked();
+                notifyListenersOfContactUnchecked(contacts.get(getAdapterPosition()));
             }
         }
 
         @Override
         public void onCheckedChanged(CompoundButton buttonView, boolean isChecked) {
-            if (isChecked) {
-                setSelected(getAdapterPosition());
-                notifyListenersOfContactChecked();
-            } else {
-                clearSelected(getAdapterPosition());
-                notifyListenersOfContactUnchecked();
+            // On checked changed is called even through programmatic changes, in order to avoid
+            // notifying listeners when not necessary, only executing method if state is changing
+            if (selectedContacts.get(getAdapterPosition()) != isChecked) {
+                if (isChecked) {
+                    setSelected(getAdapterPosition());
+                    notifyListenersOfContactChecked(contacts.get(getAdapterPosition()));
+                } else {
+                    clearSelected(getAdapterPosition());
+                    notifyListenersOfContactUnchecked(contacts.get(getAdapterPosition()));
+                }
             }
         }
     }

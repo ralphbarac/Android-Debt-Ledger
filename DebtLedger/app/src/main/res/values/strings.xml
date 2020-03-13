@@ -51,12 +51,15 @@
     <string name="action_confirm_selection">Confirm Selection</string>
 
     <!-- Strings related to groups -->
+    <string name="my_groups">My Groups</string>
     <string name="action_add_group">Add Group</string>
-    <string name="group_name">Group Name</string>
-    <string name="members">Members</string>
     <string name="you_owe">You Owe</string>
     <string name="you_owed">You\'re Owed</string>
-
+    <string name="title_add_group">Add Group</string>
+    <string name="title_edit_group">Edit Group</string>
+    <string name="prompt_group_name">Group Name</string>
+    <string name="heading_members">Members</string>
+	
     <!-- Strings related to database/query failures -->
     <string name="failure_contact_requests">Unable to get contact requests</string>
     <string name="failure_contacts">Unable to get contacts</string>

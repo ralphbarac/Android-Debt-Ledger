@@ -20,14 +20,14 @@ import cs4474.g9.debtledger.data.login.LoginRepository;
 import cs4474.g9.debtledger.data.model.UserAccount;
 import cs4474.g9.debtledger.logic.ColourGenerator;
 
-public class SelectContactActivity extends AppCompatActivity implements OnContactSelected {
+public class SelectWhoIsPayingActivity extends AppCompatActivity implements OnContactSelected {
 
     public static final String SELECTED_CONTACT = "selected_contact";
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
-        setContentView(R.layout.activity_select_contact);
+        setContentView(R.layout.activity_select_who_is_paying);
 
         final ImageView myAvatar = findViewById(R.id.my_avatar);
         final TextView myAvatarCharacter = findViewById(R.id.my_avatar_character);
