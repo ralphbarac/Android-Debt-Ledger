@@ -127,6 +127,8 @@ public class ContactsFragment extends Fragment implements OnRequestReply {
             case R.id.add_contact:
                 // TODO: Open Add Contact Dialog
                 Log.d("CONTACTS", "Add Contact icon clicked.");
+                AddContactDialog addContact = new AddContactDialog();
+                addContact.show(getActivity().getSupportFragmentManager(),"");
                 return true;
             default:
                 return super.onOptionsItemSelected(item);
