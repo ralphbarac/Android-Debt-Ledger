@@ -74,5 +74,18 @@ public class BalanceCalculator {
         return list;
     }
 
+    public List<Pair<UserAccount, Integer>> calculateBalances(List<UserAccount> contacts) {
+        // TODO: Implement, currently using dummy data
+        List<Pair<UserAccount, Integer>> all = calculateBalances();
+
+        List<Pair<UserAccount, Integer>> list = new ArrayList<>();
+        for (Pair<UserAccount, Integer> pair : all) {
+            if (contacts.contains(pair.first)) {
+                list.add(pair);
+            }
+        }
+
+        return list;
+    }
 
 }

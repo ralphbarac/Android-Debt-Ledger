@@ -1,5 +1,6 @@
 package cs4474.g9.debtledger.ui.groups;
 
+import android.content.Intent;
 import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
@@ -72,7 +73,7 @@ public class GroupListAdapter extends RecyclerView.Adapter<GroupListAdapter.Item
         notifyDataSetChanged();
     }
 
-    public static class Item extends RecyclerView.ViewHolder implements View.OnClickListener {
+    public class Item extends RecyclerView.ViewHolder implements View.OnClickListener {
         public ImageView groupAvatar;
         public TextView groupAvatarCharacter;
         public TextView groupName;
@@ -90,7 +91,9 @@ public class GroupListAdapter extends RecyclerView.Adapter<GroupListAdapter.Item
 
         public void onClick(View v) {
             Log.d("GROUP", "Group clicked.");
-            // TODO: Intent to view group
+            Intent toViewGroup = new Intent(v.getContext(), ViewGroupActivity.class);
+            toViewGroup.putExtra(ViewGroupActivity.GROUP, group_list.get(getAdapterPosition()));
+            v.getContext().startActivity(toViewGroup);
         }
     }
 }

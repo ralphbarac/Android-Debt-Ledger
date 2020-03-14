@@ -129,9 +129,7 @@ public class CreateEditGroupActivity extends AppCompatActivity implements OnMemb
         }
 
         boolean shouldFormBeSubmittable;
-        if (groupNameTitle.length() < 0) {
-            shouldFormBeSubmittable = false;
-        } else if (members.size() == 0) {
+        if (groupNameTitle.length() == 0 || members.size() == 0) {
             shouldFormBeSubmittable = false;
         } else {
             shouldFormBeSubmittable = true;
