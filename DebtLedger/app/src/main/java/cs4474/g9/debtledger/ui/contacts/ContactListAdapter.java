@@ -10,6 +10,7 @@ import android.view.ViewGroup;
 import android.widget.ImageView;
 import android.widget.TextView;
 
+import java.util.ArrayList;
 import java.util.List;
 import java.util.Locale;
 
@@ -22,11 +23,21 @@ import cs4474.g9.debtledger.logic.ColourGenerator;
 
 public class ContactListAdapter extends RecyclerView.Adapter<ContactListAdapter.Item> {
 
-    private List<Pair<UserAccount, Integer>> balances;
+    private List<Pair<UserAccount, Integer>> contactsWithBalances;
 
-    public ContactListAdapter(List<Pair<UserAccount, Integer>> balances) {
+    public ContactListAdapter(List<Pair<UserAccount, Integer>> contactsWithBalances) {
         super();
-        this.balances = balances;
+        this.contactsWithBalances = contactsWithBalances;
+    }
+
+    public ContactListAdapter() {
+        super();
+        this.contactsWithBalances = new ArrayList<>();
+    }
+
+    public void setContactsWithBalances(List<Pair<UserAccount, Integer>> contactsWithBalances) {
+        this.contactsWithBalances = contactsWithBalances;
+        notifyDataSetChanged();
     }
 
     @NonNull
@@ -39,8 +50,8 @@ public class ContactListAdapter extends RecyclerView.Adapter<ContactListAdapter.
 
     @Override
     public void onBindViewHolder(@NonNull Item holder, int position) {
-        UserAccount contact = balances.get(position).first;
-        Integer amount = balances.get(position).second;
+        UserAccount contact = contactsWithBalances.get(position).first;
+        Integer amount = contactsWithBalances.get(position).second;
 
         holder.contactAvatar.setColorFilter(ColourGenerator.generateFromName(contact.getFirstName(), contact.getLastName()));
         holder.contactAvatarCharacter.setText(contact.getFirstName().substring(0, 1));
@@ -59,12 +70,12 @@ public class ContactListAdapter extends RecyclerView.Adapter<ContactListAdapter.
 
     @Override
     public int getItemCount() {
-        return balances == null ? 0 : balances.size();
+        return contactsWithBalances == null ? 0 : contactsWithBalances.size();
     }
 
     public void addNewContact(UserAccount contact) {
         // TODO: Currently just adding contact to top of list
-        balances.add(0, Pair.create(contact, 0));
+        contactsWithBalances.add(0, Pair.create(contact, 0));
 //        notifyItemInserted(0);
         notifyDataSetChanged();
     }
@@ -89,7 +100,7 @@ public class ContactListAdapter extends RecyclerView.Adapter<ContactListAdapter.
         public void onClick(View v) {
             Log.d("CONTACTS", "Contact clicked.");
             Intent toViewContact = new Intent(v.getContext(), ViewContactActivity.class);
-            toViewContact.putExtra(ViewContactActivity.CONTACT, balances.get(getAdapterPosition()).first);
+            toViewContact.putExtra(ViewContactActivity.CONTACT, contactsWithBalances.get(getAdapterPosition()).first);
             v.getContext().startActivity(toViewContact);
         }
     }

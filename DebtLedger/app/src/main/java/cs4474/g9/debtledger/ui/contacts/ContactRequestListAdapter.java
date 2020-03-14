@@ -26,14 +26,19 @@ public class ContactRequestListAdapter extends RecyclerView.Adapter<ContactReque
     private List<UserAccount> contactRequests;
     private List<OnRequestReply> onRequestReplyListeners;
 
-    public ContactRequestListAdapter(List<UserAccount> contactRequests) {
+    public ContactRequestListAdapter() {
         super();
-        this.contactRequests = contactRequests;
+        this.contactRequests = new ArrayList<>();
         this.onRequestReplyListeners = new ArrayList<>();
     }
 
     public void addOnContactAcceptedListener(OnRequestReply listener) {
         this.onRequestReplyListeners.add(listener);
+    }
+
+    public void setContactRequests(List<UserAccount> contactRequests) {
+        this.contactRequests = contactRequests;
+        notifyDataSetChanged();
     }
 
     @NonNull
@@ -78,7 +83,7 @@ public class ContactRequestListAdapter extends RecyclerView.Adapter<ContactReque
 
     private void notifyListenersOfContactRejected(UserAccount contact) {
         for (OnRequestReply onRequestReplyListener : onRequestReplyListeners) {
-            onRequestReplyListener.onContactAccepted(contact);
+            onRequestReplyListener.onContactRejected(contact);
         }
     }
 

@@ -11,6 +11,7 @@ import android.widget.TextView;
 
 import com.google.android.material.dialog.MaterialAlertDialogBuilder;
 
+import java.util.ArrayList;
 import java.util.List;
 
 import androidx.annotation.NonNull;
@@ -24,9 +25,14 @@ public class ContactRequestedListAdapter extends RecyclerView.Adapter<ContactReq
 
     private List<UserAccount> contactsRequested;
 
-    public ContactRequestedListAdapter(List<UserAccount> contactsRequested) {
+    public ContactRequestedListAdapter() {
         super();
+        this.contactsRequested = new ArrayList<>();
+    }
+
+    public void setContactsRequested(List<UserAccount> contactsRequested) {
         this.contactsRequested = contactsRequested;
+        notifyDataSetChanged();
     }
 
     @NonNull
