@@ -12,6 +12,7 @@ import android.widget.ImageView;
 import android.widget.TextView;
 
 import java.util.List;
+import java.util.concurrent.ThreadLocalRandom;
 
 import androidx.appcompat.app.AppCompatActivity;
 import androidx.recyclerview.widget.LinearLayoutManager;
@@ -256,7 +257,7 @@ public class SelectWhoOwesActivity extends AppCompatActivity implements OnContac
             GroupManager manager = new GroupManager();
             // TODO: Remove sleep
             try {
-                Thread.sleep(3000);
+                Thread.sleep(ThreadLocalRandom.current().nextInt(250, 1500));
             } catch (InterruptedException e) {
                 e.printStackTrace();
             }
@@ -291,7 +292,7 @@ public class SelectWhoOwesActivity extends AppCompatActivity implements OnContac
             ContactManager manager = new ContactManager();
             // TODO: Remove sleep
             try {
-                Thread.sleep(2000);
+                Thread.sleep(ThreadLocalRandom.current().nextInt(250, 1500));
             } catch (InterruptedException e) {
                 e.printStackTrace();
             }

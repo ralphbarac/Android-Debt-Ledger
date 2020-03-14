@@ -8,6 +8,7 @@ import android.widget.ImageView;
 import android.widget.TextView;
 
 import java.util.List;
+import java.util.concurrent.ThreadLocalRandom;
 
 import androidx.appcompat.app.AppCompatActivity;
 import androidx.recyclerview.widget.LinearLayoutManager;
@@ -111,7 +112,7 @@ public class SelectWhoIsPayingActivity extends AppCompatActivity implements OnCo
             ContactManager manager = new ContactManager();
             // TODO: Remove sleep
             try {
-                Thread.sleep(3000);
+                Thread.sleep(ThreadLocalRandom.current().nextInt(250, 1500));
             } catch (InterruptedException e) {
                 e.printStackTrace();
             }

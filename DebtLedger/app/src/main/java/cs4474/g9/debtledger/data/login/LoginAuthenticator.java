@@ -1,6 +1,7 @@
 package cs4474.g9.debtledger.data.login;
 
 import java.io.IOException;
+import java.util.concurrent.ThreadLocalRandom;
 
 import cs4474.g9.debtledger.data.Result;
 import cs4474.g9.debtledger.data.model.UserAccount;
@@ -16,7 +17,7 @@ class LoginAuthenticator {
         try {
             // TODO: Authenticate
             // TODO: Remove sleep, here to simulate delay needed for call to backend
-            Thread.sleep(3000);
+            Thread.sleep(ThreadLocalRandom.current().nextInt(250, 1500));
             if (email.equals("zsirohey@uwo.ca") && password.equals("zain1234")) {
                 LoggedInUserHolder testUser = new LoggedInUserHolder(
                         "XSJKJSKDJKJS93JSKJK88",

@@ -10,6 +10,7 @@ import android.view.ViewGroup;
 import android.widget.ImageView;
 import android.widget.TextView;
 
+import java.util.ArrayList;
 import java.util.List;
 import java.util.Locale;
 
@@ -29,6 +30,17 @@ public class OutstandingBalanceListAdapter extends RecyclerView.Adapter<Outstand
         super();
         this.loggedInUser = loggedInUser;
         this.outstandingBalances = outstandingBalances;
+    }
+
+    public OutstandingBalanceListAdapter(UserAccount loggedInUser) {
+        super();
+        this.loggedInUser = loggedInUser;
+        this.outstandingBalances = new ArrayList<>();
+    }
+
+    public void setOutstandingBalances(List<Pair<UserAccount, Integer>> outstandingBalances) {
+        this.outstandingBalances = outstandingBalances;
+        notifyDataSetChanged();
     }
 
     @NonNull

@@ -78,9 +78,9 @@
         android:nestedScrollingEnabled="false"
 
         app:loadingMessage=""
-        app:failedToLoadMessage="Failed to load Contacts..."
+        app:failedToLoadMessage="Failed to load Contacts ):"
         app:failedToLoadAction="Retry"
-        app:emptyMessage="No contacts..."
+        app:emptyMessage="No Contacts ):"
         app:emptyAction="Add Contact" />
 
     <LinearLayout

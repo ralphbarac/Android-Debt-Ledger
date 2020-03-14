@@ -1,6 +1,5 @@
 package cs4474.g9.debtledger.ui.dashboard;
 
-import android.os.Bundle;
 import android.util.Pair;
 
 import java.util.ArrayList;
@@ -10,38 +9,55 @@ import androidx.fragment.app.Fragment;
 import androidx.fragment.app.FragmentManager;
 import androidx.fragment.app.FragmentStatePagerAdapter;
 import cs4474.g9.debtledger.data.model.UserAccount;
-import cs4474.g9.debtledger.logic.BalanceCalculator;
+import cs4474.g9.debtledger.ui.shared.OnActionButtonClickedListener;
 
 public class DashboardPageAdapter extends FragmentStatePagerAdapter {
 
-    public DashboardPageAdapter(FragmentManager fm) {
+    private List<DashboardPageFragment> dashboardPages = new ArrayList<>();
+
+    private List<Pair<UserAccount, Integer>> filteredPositiveBalances = null;
+    private List<Pair<UserAccount, Integer>> allBalances = null;
+    private List<Pair<UserAccount, Integer>> filteredNegativeBalances = null;
+
+    private boolean isInFailedToLoadState = false;
+
+    private OnActionButtonClickedListener actionButtonClickedListener;
+
+    public DashboardPageAdapter(FragmentManager fm, OnActionButtonClickedListener listener) {
         super(fm);
+        this.actionButtonClickedListener = listener;
+
+        // Add placeholders for each page
+        dashboardPages.add(null);
+        dashboardPages.add(null);
+        dashboardPages.add(null);
     }
 
     @Override
     public Fragment getItem(int position) {
-        Fragment fragment = new DashboardPageFragment();
-        Bundle args = new Bundle();
-        BalanceCalculator calculator = new BalanceCalculator();
-        List<Pair<UserAccount, Integer>> outstandingBalances = calculator.calculateOutstandingBalances();
+        DashboardPageFragment fragment = new DashboardPageFragment(actionButtonClickedListener);
+        dashboardPages.set(position, fragment);
 
-        List<Pair<UserAccount, Integer>> filteredBalances = new ArrayList<>();
-        for (int i = 0; i < outstandingBalances.size(); i++) {
-            if (position == 0) {
-                if (outstandingBalances.get(i).second > 0) {
-                    filteredBalances.add(outstandingBalances.get(i));
-                }
-            } else if (position == 2) {
-                if (outstandingBalances.get(i).second < 0) {
-                    filteredBalances.add(outstandingBalances.get(i));
-                }
-            } else {
-                filteredBalances.add(outstandingBalances.get(i));
+        // Depending on  position, if data is available, set corresponding data
+        if (position == 0) {
+            if (filteredPositiveBalances != null) {
+                fragment.setData(filteredPositiveBalances);
+            }
+        } else if (position == 1) {
+            if (allBalances != null) {
+                fragment.setData(allBalances);
+            }
+        } else if (position == 2) {
+            if (filteredNegativeBalances != null) {
+                fragment.setData(filteredNegativeBalances);
             }
         }
 
-        args.putSerializable(DashboardPageFragment.OUTSTANDING_BALANCES, new OutstandingBalancesWrapper(filteredBalances));
-        fragment.setArguments(args);
+        // If current state is failed to load, set corresponding state
+        if (isInFailedToLoadState) {
+            fragment.onFailToFinishLoading();
+        }
+
         return fragment;
     }
 
@@ -53,13 +69,57 @@ public class DashboardPageAdapter extends FragmentStatePagerAdapter {
     @Override
     public CharSequence getPageTitle(int position) {
         return "";
-//        if (position == 0) {
-//            return "OWED";
-//        } else if (position == 2) {
-//            return "OWE";
-//        } else {
-//            return "ALL";
-//        }
+    }
+
+    public void onBeginLoading() {
+        isInFailedToLoadState = false;
+
+        // Only if fragments are loaded (non-null), set on being loading
+        for (DashboardPageFragment dashboardPage : dashboardPages) {
+            if (dashboardPage != null) {
+                dashboardPage.onBeginLoading();
+            }
+        }
+    }
+
+    public void setData(List<Pair<UserAccount, Integer>> outstandingBalances) {
+        isInFailedToLoadState = false;
+
+        allBalances = outstandingBalances;
+        filteredPositiveBalances = new ArrayList<>();
+        filteredNegativeBalances = new ArrayList<>();
+
+        // Filter positive and negative balances respectively
+        for (int i = 0; i < outstandingBalances.size(); i++) {
+            if (outstandingBalances.get(i).second > 0) {
+                filteredPositiveBalances.add(outstandingBalances.get(i));
+            }
+            if (outstandingBalances.get(i).second < 0) {
+                filteredNegativeBalances.add(outstandingBalances.get(i));
+            }
+        }
+
+        // Only if fragments are loaded (non-null), setData to corresponding data
+        if (dashboardPages.get(0) != null) {
+            dashboardPages.get(0).setData(filteredPositiveBalances);
+        }
+        if (dashboardPages.get(1) != null) {
+            dashboardPages.get(1).setData(allBalances);
+        }
+        if (dashboardPages.get(2) != null) {
+            dashboardPages.get(2).setData(filteredNegativeBalances);
+        }
+    }
+
+    public void onFailToFinishLoading() {
+        isInFailedToLoadState = true;
+
+        // Only if fragments are loaded (non-null), set on fail to load
+        for (DashboardPageFragment dashboardPage : dashboardPages) {
+            if (dashboardPage != null) {
+                dashboardPage.onFailToFinishLoading();
+            }
+        }
     }
 
 }
