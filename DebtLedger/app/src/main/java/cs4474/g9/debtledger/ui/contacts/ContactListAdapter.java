@@ -1,5 +1,6 @@
 package cs4474.g9.debtledger.ui.contacts;
 
+import android.content.Intent;
 import android.graphics.Color;
 import android.util.Log;
 import android.util.Pair;
@@ -15,6 +16,7 @@ import java.util.Locale;
 import androidx.annotation.NonNull;
 import androidx.recyclerview.widget.RecyclerView;
 import cs4474.g9.debtledger.R;
+import cs4474.g9.debtledger.ViewContactActivity;
 import cs4474.g9.debtledger.data.model.UserAccount;
 import cs4474.g9.debtledger.logic.ColourGenerator;
 
@@ -67,7 +69,7 @@ public class ContactListAdapter extends RecyclerView.Adapter<ContactListAdapter.
         notifyDataSetChanged();
     }
 
-    public static class Item extends RecyclerView.ViewHolder implements View.OnClickListener {
+    public class Item extends RecyclerView.ViewHolder implements View.OnClickListener {
         public ImageView contactAvatar;
         public TextView contactAvatarCharacter;
         public TextView contactName;
@@ -86,8 +88,9 @@ public class ContactListAdapter extends RecyclerView.Adapter<ContactListAdapter.
         @Override
         public void onClick(View v) {
             Log.d("CONTACTS", "Contact clicked.");
-            // TODO: Intent to view contact
-            //Intent toContact = new Intent()
+            Intent toViewContact = new Intent(v.getContext(), ViewContactActivity.class);
+            toViewContact.putExtra(ViewContactActivity.CONTACT, balances.get(getAdapterPosition()).first);
+            v.getContext().startActivity(toViewContact);
         }
     }
 }

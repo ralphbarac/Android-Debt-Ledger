@@ -1,6 +1,7 @@
 package cs4474.g9.debtledger.ui.contacts;
 
 import android.content.DialogInterface;
+import android.content.Intent;
 import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
@@ -15,6 +16,7 @@ import java.util.List;
 import androidx.annotation.NonNull;
 import androidx.recyclerview.widget.RecyclerView;
 import cs4474.g9.debtledger.R;
+import cs4474.g9.debtledger.ViewContactActivity;
 import cs4474.g9.debtledger.data.model.UserAccount;
 import cs4474.g9.debtledger.logic.ColourGenerator;
 
@@ -101,8 +103,9 @@ public class ContactRequestedListAdapter extends RecyclerView.Adapter<ContactReq
         @Override
         public void onClick(View v) {
             Log.d("CONTACTS", "Requested Contact clicked.");
-            // TODO: Intent to view contact
-            //Intent toContact = new Intent()
+            Intent toViewContact = new Intent(v.getContext(), ViewContactActivity.class);
+            toViewContact.putExtra(ViewContactActivity.CONTACT, contactsRequested.get(getAdapterPosition()));
+            v.getContext().startActivity(toViewContact);
         }
     }
 }

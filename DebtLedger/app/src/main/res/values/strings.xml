@@ -48,6 +48,7 @@
     <string name="action_select_contact">Select Contact</string>
     <string name="action_select_contacts">Select Contact(s)</string>
     <string name="action_confirm_selection">Confirm Selection</string>
+    <string name="title_view_contact">Contact</string>
 
     <!-- Strings related to groups -->
     <string name="my_groups">My Groups</string>

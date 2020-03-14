@@ -70,7 +70,6 @@ public class SelectContactAdapter extends RecyclerView.Adapter<SelectContactAdap
         return contacts == null ? 0 : contacts.size();
     }
 
-    // TODO: Is it good practice for ViewHolder to be static?
     public class Item extends RecyclerView.ViewHolder implements View.OnClickListener {
         public ImageView contactAvatar;
         public TextView contactAvatarCharacter;
