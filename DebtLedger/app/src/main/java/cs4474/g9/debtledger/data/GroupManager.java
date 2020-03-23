@@ -24,8 +24,8 @@ public class GroupManager {
         group2list.add(new UserAccount("Will", "Smith", ""));
 
         List<Group> groupList = new ArrayList<>();
-        groupList.add(new Group(user, "Roomies", group1list));
-        groupList.add(new Group(user, "Pizza Hut Boys", group2list));
+        groupList.add(new Group("Roomies", group1list));
+        groupList.add(new Group("Pizza Hut Boys", group2list));
 
         return new Result.Success<>(groupList);
     }

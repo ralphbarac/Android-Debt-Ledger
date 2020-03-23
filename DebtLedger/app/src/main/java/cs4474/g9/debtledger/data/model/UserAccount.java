@@ -6,14 +6,11 @@ import androidx.annotation.Nullable;
 
 public class UserAccount implements Serializable {
 
-    private long id;
-
+    private String id;
     private String firstName;
     private String lastName;
     private String email;
     private String password;
-
-    // TODO: Add relationships on UserAccount
 
     public UserAccount(String firstName, String lastName, String email, String password) {
         this.firstName = firstName;
@@ -28,7 +25,7 @@ public class UserAccount implements Serializable {
         this.email = email;
     }
 
-    public long getId() {
+    public String getId() {
         return id;
     }
 

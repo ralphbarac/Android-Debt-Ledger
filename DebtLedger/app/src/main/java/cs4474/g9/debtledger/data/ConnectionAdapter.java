@@ -1,13 +1,15 @@
 package cs4474.g9.debtledger.data;
 
 import android.content.Context;
+import android.util.Log;
+
 import com.microsoft.windowsazure.mobileservices.*;
 
 import java.net.MalformedURLException;
 
 public class ConnectionAdapter
 {
-    private String mMobileBackendUrl = "https://m4474.azurewebsites.net";
+    private String mMobileBackendUrl = "https://4474.azurewebsites.net";
     private Context mContext;
     private MobileServiceClient mClient;
     private static ConnectionAdapter cInstance = null;
@@ -29,7 +31,7 @@ public class ConnectionAdapter
         if (cInstance == null) {
             cInstance = new ConnectionAdapter(context);
         } else {
-            throw new IllegalStateException("ConnectionAdapter is already initialized");
+            Log.d("CONNECTION", "ConnectionAdapter is already initialized");
         }
     }
 
