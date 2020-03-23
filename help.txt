@@ -32,7 +32,7 @@ Filters include:
 .orderBy() // specifies sorting, e.g. .orderBy("ID", QueryOrder.Ascending)
 
 Full example:
-List<User> results = userTable.select("FirstName").where().field("ID").eq(5);
+List<User> results = userTable.where().field("ID").eq(5).select("FirstName");
 returns the first name of the user with ID 5
 
 --Inserting data into the database
