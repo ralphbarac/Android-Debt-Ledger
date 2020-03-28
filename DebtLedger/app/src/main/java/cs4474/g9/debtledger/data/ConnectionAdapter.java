@@ -1,48 +1,63 @@
 package cs4474.g9.debtledger.data;
 
 import android.content.Context;
-import android.util.Log;
 
-import com.microsoft.windowsazure.mobileservices.*;
+import com.android.volley.Request;
+import com.android.volley.RequestQueue;
+import com.android.volley.toolbox.Volley;
 
-import java.net.MalformedURLException;
+public class ConnectionAdapter {
 
-public class ConnectionAdapter
-{
-    private String mMobileBackendUrl = "https://4474.azurewebsites.net";
-    private Context mContext;
-    private MobileServiceClient mClient;
-    private static ConnectionAdapter cInstance = null;
+    public static final String BASE_URL = "";
 
-    private ConnectionAdapter(Context context)
-    {
-        mContext = context;
-        try
-        {
-            mClient = new MobileServiceClient(mMobileBackendUrl, mContext);
-        }
-        catch (MalformedURLException e)
-        {
-            System.err.println("Error connecting to database");
+    private static ConnectionAdapter instance;
+    private RequestQueue requestQueue;
+    private Context context;
+
+    private ConnectionAdapter(Context context) {
+        this.context = context.getApplicationContext();
+        this.requestQueue = getRequestQueue();
+    }
+
+    public static synchronized void initialize(Context context) {
+        if (instance == null) {
+            instance = new ConnectionAdapter(context);
         }
     }
 
-    public static void Initialize(Context context) {
-        if (cInstance == null) {
-            cInstance = new ConnectionAdapter(context);
+    public static synchronized ConnectionAdapter getInstance() {
+        if (instance != null) {
+            return instance;
         } else {
-            Log.d("CONNECTION", "ConnectionAdapter is already initialized");
-        }
-    }
-
-    public static ConnectionAdapter getInstance() {
-        if (cInstance == null) {
             throw new IllegalStateException("ConnectionAdapter is not initialized");
         }
-        return cInstance;
     }
 
-    public MobileServiceClient getClient() {
-        return mClient;
+    public RequestQueue getRequestQueue() {
+        if (requestQueue == null) {
+            requestQueue = Volley.newRequestQueue(context);
+        }
+        return requestQueue;
     }
+
+    /**
+     * Adds given request with given tag to end of the request queue
+     *
+     * @param request request to be executed
+     * @param tag     custom integer related to each activity
+     */
+    public <T> void addToRequestQueue(Request<T> request, int tag) {
+        request.setTag(tag);
+        getRequestQueue().add(request);
+    }
+
+    /**
+     * Cancels all pending requests with given tag
+     *
+     * @param tag custom integer related to each activity
+     */
+    public void cancelAllRequests(int tag) {
+        getRequestQueue().cancelAll(tag);
+    }
+
 }

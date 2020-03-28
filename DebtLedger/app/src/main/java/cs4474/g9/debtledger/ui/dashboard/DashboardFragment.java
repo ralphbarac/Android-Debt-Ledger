@@ -110,7 +110,7 @@ public class DashboardFragment extends Fragment implements OnActionButtonClicked
         viewPager.setCurrentItem(1);
 
         getBalancesProcess = new GetBalancesProcess();
-        getBalancesProcess.execute(LoginRepository.getInstance(getContext()).getLoggedInUser());
+        getBalancesProcess.execute(LoginRepository.getInstance().getLoggedInUser());
     }
 
     @Override
@@ -125,7 +125,7 @@ public class DashboardFragment extends Fragment implements OnActionButtonClicked
     public void onFailedToLoadActionButtonClicked() {
         if (getBalancesProcess == null || getBalancesProcess.getStatus() == AsyncTask.Status.FINISHED) {
             getBalancesProcess = new GetBalancesProcess();
-            getBalancesProcess.execute(LoginRepository.getInstance(getContext()).getLoggedInUser());
+            getBalancesProcess.execute(LoginRepository.getInstance().getLoggedInUser());
         }
     }
 

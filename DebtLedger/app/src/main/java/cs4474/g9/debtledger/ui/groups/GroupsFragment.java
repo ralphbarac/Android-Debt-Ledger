@@ -34,7 +34,7 @@ public class GroupsFragment extends Fragment {
         setHasOptionsMenu(true);
 
         Result result;
-        UserAccount loggedInUser = LoginRepository.getInstance(getContext()).getLoggedInUser();
+        UserAccount loggedInUser = LoginRepository.getInstance().getLoggedInUser();
 
         List<Group> userGroups = new ArrayList<>();
         GroupManager groupManager = new GroupManager();

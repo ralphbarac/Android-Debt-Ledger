@@ -92,7 +92,7 @@ public class CreateTransactionActivity extends AppCompatActivity implements OnIn
         whoOwesInputView.setLayoutManager(new LinearLayoutManager(this));
 
         // Initializing who owes input adapter
-        whoOwesInputAdapter = new InputAmountAdapter(whoOwes, LoginRepository.getInstance(this).getLoggedInUser());
+        whoOwesInputAdapter = new InputAmountAdapter(whoOwes, LoginRepository.getInstance().getLoggedInUser());
         whoOwesInputAdapter.addOnInputChangedListener(this);
         whoOwesInputView.setAdapter(whoOwesInputAdapter);
 
@@ -250,7 +250,7 @@ public class CreateTransactionActivity extends AppCompatActivity implements OnIn
 
                     whoOwes = new ArrayList<>();
                     if (selectedSelf) {
-                        whoOwes.add(LoginRepository.getInstance(this).getLoggedInUser());
+                        whoOwes.add(LoginRepository.getInstance().getLoggedInUser());
                     }
                     whoOwes.addAll(selectedContacts);
                     updateWhoOwesSection();
@@ -270,7 +270,7 @@ public class CreateTransactionActivity extends AppCompatActivity implements OnIn
             whoIsPayingInputContainer.setVisibility(View.VISIBLE);
             whoIsPayingAvatar.setColorFilter(ColourGenerator.generateFromName(whoIsPaying.getFirstName(), whoIsPaying.getLastName()));
             whoIsPayingAvatarCharacter.setText(whoIsPaying.getFirstName().substring(0, 1));
-            if (whoIsPaying.equals(LoginRepository.getInstance(this).getLoggedInUser())) {
+            if (whoIsPaying.equals(LoginRepository.getInstance().getLoggedInUser())) {
                 whoIsPayingName.setText(getString(R.string.self_identifier));
             } else {
                 whoIsPayingName.setText(whoIsPaying.getFirstName() + " " + whoIsPaying.getLastName());
@@ -322,7 +322,7 @@ public class CreateTransactionActivity extends AppCompatActivity implements OnIn
     }
 
     private void submitTransaction() {
-        UserAccount loggedInUser = LoginRepository.getInstance(this).getLoggedInUser();
+        UserAccount loggedInUser = LoginRepository.getInstance().getLoggedInUser();
         if (!whoIsPaying.equals(loggedInUser) && !whoOwes.contains(loggedInUser)) {
             new MaterialAlertDialogBuilder(this)
                     .setTitle("You Aren't Involved!")

@@ -1,27 +1,33 @@
 package cs4474.g9.debtledger.data;
 
-import com.microsoft.windowsazure.mobileservices.MobileServiceClient;
-import com.microsoft.windowsazure.mobileservices.table.MobileServiceTable;
+import org.json.JSONException;
+import org.json.JSONObject;
 
 import cs4474.g9.debtledger.data.model.UserAccount;
 
 public class UserAccountManager {
 
-    public Result<UserAccount> createAccount(UserAccount user) {
-        try {
-            MobileServiceClient client = ConnectionAdapter.getInstance().getClient();
-            MobileServiceTable<UserAccount> userTable = client.getTable("users", UserAccount.class);
-            UserAccount result = userTable.insert(user).get();
-            return new Result.Success<>(result);
-        } catch (Exception e) {
-            e.printStackTrace();
-            return new Result.Error(e);
-        }
+    public static final String LOGIN_END_POINT = "/login";
+    public static final String LOGIN_WITH_TOKEN_END_POINT = "/login-token";
+    public static final String SIGNUP_END_POINT = "/create";
+
+    public static JSONObject createJsonFromUserAccount(UserAccount userAccount) throws JSONException {
+        JSONObject jsonUserAccount = new JSONObject();
+        jsonUserAccount.put("firstName", userAccount.getId());
+        jsonUserAccount.put("lastName", userAccount.getId());
+        jsonUserAccount.put("email", userAccount.getId());
+        jsonUserAccount.put("password", userAccount.getId());
+        return jsonUserAccount;
     }
 
-    public Result<UserAccount> updateAccount(UserAccount account) {
-        // TODO: Implement
-        return null;
+    public static UserAccount parseUserAccountFromJson(JSONObject jsonUserAccount) throws JSONException {
+        return new UserAccount(
+                jsonUserAccount.getString("id"),
+                jsonUserAccount.getString("firstName"),
+                jsonUserAccount.getString("lastName"),
+                jsonUserAccount.getString("email"),
+                jsonUserAccount.getString("password")
+        );
     }
 
 }

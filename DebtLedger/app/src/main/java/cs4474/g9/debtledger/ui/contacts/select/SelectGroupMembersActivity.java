@@ -38,7 +38,7 @@ public class SelectGroupMembersActivity extends AppCompatActivity implements OnC
         selectedContacts = wrapper.getGroupMembers();
         isMenuIconEnabled = !selectedContacts.isEmpty();
 
-        UserAccount loggedInUser = LoginRepository.getInstance(this).getLoggedInUser();
+        UserAccount loggedInUser = LoginRepository.getInstance().getLoggedInUser();
 
         ContactManager manager = new ContactManager();
         List<UserAccount> contacts = new ArrayList<>();

@@ -41,7 +41,7 @@ public class SelectWhoIsPayingActivity extends AppCompatActivity implements OnCo
         final TextView myAvatarCharacter = findViewById(R.id.my_avatar_character);
         final View myContactContainer = findViewById(R.id.my_contact_container);
 
-        final UserAccount loggedInUser = LoginRepository.getInstance(this).getLoggedInUser();
+        final UserAccount loggedInUser = LoginRepository.getInstance().getLoggedInUser();
         myAvatar.setColorFilter(ColourGenerator.generateFromName(loggedInUser.getFirstName(), loggedInUser.getLastName()));
         myAvatarCharacter.setText(loggedInUser.getFirstName().substring(0, 1));
         myContactContainer.setOnClickListener(new View.OnClickListener() {
@@ -85,7 +85,7 @@ public class SelectWhoIsPayingActivity extends AppCompatActivity implements OnCo
         // Retry getting contacts
         if (getContactsProcess == null || getContactsProcess.getStatus() == AsyncTask.Status.FINISHED) {
             getContactsProcess = new GetContactsProcess();
-            getContactsProcess.execute(LoginRepository.getInstance(this).getLoggedInUser());
+            getContactsProcess.execute(LoginRepository.getInstance().getLoggedInUser());
         }
     }
 

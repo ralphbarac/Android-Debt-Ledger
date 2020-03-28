@@ -46,7 +46,7 @@ public class DashboardPageFragment extends Fragment {
         outstandingBalancesView.setLayoutManager(new LinearLayoutManager(getContext()));
         outstandingBalancesView.addOnActionButtonClickedClickListener(actionButtonClickedListener);
 
-        outstandingBalancesAdapter = new OutstandingBalanceListAdapter(LoginRepository.getInstance(getContext()).getLoggedInUser());
+        outstandingBalancesAdapter = new OutstandingBalanceListAdapter(LoginRepository.getInstance().getLoggedInUser());
         outstandingBalancesView.setAdapter(outstandingBalancesAdapter);
 
         isCreated = true;

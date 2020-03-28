@@ -1,28 +1,35 @@
 package cs4474.g9.debtledger.ui.signup;
 
 import android.app.Activity;
+import android.content.Context;
 import android.content.Intent;
-import android.os.AsyncTask;
 import android.os.Bundle;
 import android.text.Editable;
 import android.text.TextWatcher;
 import android.view.KeyEvent;
 import android.view.View;
 import android.view.inputmethod.EditorInfo;
+import android.view.inputmethod.InputMethodManager;
 import android.widget.ProgressBar;
 import android.widget.TextView;
 import android.widget.Toast;
 
+import com.android.volley.Response;
+import com.android.volley.VolleyError;
+import com.android.volley.toolbox.JsonObjectRequest;
 import com.google.android.material.button.MaterialButton;
 import com.google.android.material.textfield.TextInputEditText;
 
+import org.json.JSONException;
+import org.json.JSONObject;
+
 import androidx.annotation.Nullable;
-import androidx.annotation.StringRes;
 import androidx.appcompat.app.AppCompatActivity;
 import androidx.lifecycle.Observer;
 import androidx.lifecycle.ViewModelProviders;
 import cs4474.g9.debtledger.R;
-import cs4474.g9.debtledger.data.Result;
+import cs4474.g9.debtledger.data.ConnectionAdapter;
+import cs4474.g9.debtledger.data.UserAccountManager;
 import cs4474.g9.debtledger.data.login.LoginRepository;
 import cs4474.g9.debtledger.data.model.UserAccount;
 import cs4474.g9.debtledger.ui.MainActivity;
@@ -31,8 +38,10 @@ import cs4474.g9.debtledger.ui.login.LoginActivity;
 public class SignupActivity extends AppCompatActivity {
 
     private SignupViewModel signupViewModel;
+    private LoginRepository loginRepository;
 
-    private AsyncTask<String, Void, Result> signupProcess;
+    private MaterialButton signupButton;
+    private ProgressBar loadingProgressBar;
 
     @Override
     public void onCreate(Bundle savedInstanceState) {
@@ -41,8 +50,8 @@ public class SignupActivity extends AppCompatActivity {
         setContentView(R.layout.activity_signup);
 
         // View model is used to manage and operate on data inputted through interface
-        final LoginRepository loginRepository = LoginRepository.getInstance(this);
-        SignupViewModelFactory factory = new SignupViewModelFactory(loginRepository);
+        loginRepository = LoginRepository.getInstance();
+        SignupViewModelFactory factory = new SignupViewModelFactory();
         signupViewModel = ViewModelProviders.of(this, factory).get(SignupViewModel.class);
 
         final TextInputEditText firstNameInput = findViewById(R.id.first_name);
@@ -50,8 +59,8 @@ public class SignupActivity extends AppCompatActivity {
         final TextInputEditText emailInput = findViewById(R.id.email);
         final TextInputEditText passwordInput = findViewById(R.id.password);
         final MaterialButton switchToLoginButton = findViewById(R.id.switch_to_login);
-        final MaterialButton signupButton = findViewById(R.id.signup);
-        final ProgressBar loadingProgressBar = findViewById(R.id.loading);
+        signupButton = findViewById(R.id.signup);
+        loadingProgressBar = findViewById(R.id.loading);
 
         // Listen for any changes to the signup form state, which will display errors and/or enable/disable button
         signupViewModel.getSignupFormState().observe(this, new Observer<SignupFormState>() {
@@ -69,30 +78,11 @@ public class SignupActivity extends AppCompatActivity {
                 if (signupFormState.getLastNameError() != null) {
                     lastNameInput.setError(getString(signupFormState.getLastNameError()));
                 }
-                if (signupFormState.getUsernameError() != null) {
-                    emailInput.setError(getString(signupFormState.getUsernameError()));
+                if (signupFormState.getEmailError() != null) {
+                    emailInput.setError(getString(signupFormState.getEmailError()));
                 }
                 if (signupFormState.getPasswordError() != null) {
                     passwordInput.setError(getString(signupFormState.getPasswordError()));
-                }
-            }
-        });
-
-        // Listen for any changes to signup result, at which point, user is informed of outcome
-        signupViewModel.getSignupResult().observe(this, new Observer<SignupResult>() {
-            @Override
-            public void onChanged(@Nullable SignupResult signupResult) {
-                if (signupResult == null) {
-                    return;
-                }
-                loadingProgressBar.setVisibility(View.INVISIBLE);
-                if (signupResult.getError() != null) {
-                    informUserOfFailedSignup(signupResult.getError());
-                }
-                if (signupResult.getSuccess() != null) {
-                    proceedToDashboard(signupResult.getSuccess());
-                    // TODO: If stay logged in...
-                    loginRepository.storeToken(SignupActivity.this);
                 }
             }
         });
@@ -128,16 +118,16 @@ public class SignupActivity extends AppCompatActivity {
             @Override
             public boolean onEditorAction(TextView v, int actionId, KeyEvent event) {
                 if (actionId == EditorInfo.IME_ACTION_DONE) {
-                    loadingProgressBar.setVisibility(View.VISIBLE);
-                    if (signupProcess == null || signupProcess.getStatus() == AsyncTask.Status.FINISHED) {
-                        signupProcess = new SignupProcess();
-                        signupProcess.execute(
-                                firstNameInput.getText().toString(),
-                                lastNameInput.getText().toString(),
-                                emailInput.getText().toString(),
-                                passwordInput.getText().toString()
-                        );
-                    }
+                    // Hide the keyboard
+                    ((InputMethodManager) getSystemService(Context.INPUT_METHOD_SERVICE))
+                            .hideSoftInputFromWindow(v.getWindowToken(), 0);
+
+                    makeSignupRequest(
+                            firstNameInput.getText().toString(),
+                            lastNameInput.getText().toString(),
+                            emailInput.getText().toString(),
+                            passwordInput.getText().toString()
+                    );
                 }
                 return false;
             }
@@ -158,18 +148,77 @@ public class SignupActivity extends AppCompatActivity {
         signupButton.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
-                loadingProgressBar.setVisibility(View.VISIBLE);
-                if (signupProcess == null || signupProcess.getStatus() == AsyncTask.Status.FINISHED) {
-                    signupProcess = new SignupProcess();
-                    signupProcess.execute(
-                            firstNameInput.getText().toString(),
-                            lastNameInput.getText().toString(),
-                            emailInput.getText().toString(),
-                            passwordInput.getText().toString()
-                    );
-                }
+                makeSignupRequest(
+                        firstNameInput.getText().toString(),
+                        lastNameInput.getText().toString(),
+                        emailInput.getText().toString(),
+                        passwordInput.getText().toString()
+                );
             }
         });
+    }
+
+    private void makeSignupRequest(String firstName, String lastName, String email, String password) {
+        signupButton.setEnabled(false);
+        loadingProgressBar.setVisibility(View.VISIBLE);
+
+        JSONObject requestBody;
+        try {
+            requestBody = UserAccountManager.createJsonFromUserAccount(
+                    new UserAccount(firstName, lastName, email, password)
+            );
+        } catch (JSONException e) {
+            throw new RuntimeException();
+        }
+
+        JsonObjectRequest request = new JsonObjectRequest(
+                ConnectionAdapter.BASE_URL + UserAccountManager.SIGNUP_END_POINT,
+                requestBody,
+                new Response.Listener<JSONObject>() {
+                    @Override
+                    public void onResponse(JSONObject response) {
+                        try {
+                            // On success, parse UserAccount, store in repository, and process to dashboard
+                            UserAccount loggedInUser = UserAccountManager.parseUserAccountFromJson(response);
+                            loginRepository.loginUser(loggedInUser, loggedInUser.getId());
+                            proceedToDashboard(loggedInUser);
+                        } catch (JSONException e) {
+                            // On parse error, display signup failed to user
+                            Toast.makeText(SignupActivity.this, R.string.signup_failed, Toast.LENGTH_SHORT).show();
+                            signupButton.setEnabled(true);
+                            loadingProgressBar.setVisibility(View.INVISIBLE);
+                        }
+                    }
+                },
+                new Response.ErrorListener() {
+                    @Override
+                    public void onErrorResponse(VolleyError error) {
+                        // On error, display signup failed to user
+                        Toast.makeText(SignupActivity.this, R.string.signup_failed, Toast.LENGTH_SHORT).show();
+                        signupButton.setEnabled(true);
+                        loadingProgressBar.setVisibility(View.INVISIBLE);
+                    }
+                }
+        );
+
+        // TODO: Remove, temporary to allow login
+        if (email.equals("zsirohey@uwo.ca") && password.equals("zain1234")) {
+            UserAccount loggedInUser = new UserAccount(
+                    "1000",
+                    "Zain",
+                    "Sirohey",
+                    "zsirohey@uwo.ca",
+                    "zain1234"
+            );
+            loginRepository.loginUser(loggedInUser, loggedInUser.getId());
+            proceedToDashboard(loggedInUser);
+        } else {
+            Toast.makeText(SignupActivity.this, R.string.signup_failed, Toast.LENGTH_SHORT).show();
+            signupButton.setEnabled(true);
+            loadingProgressBar.setVisibility(View.INVISIBLE);
+        }
+
+//        ConnectionAdapter.getInstance().addToRequestQueue(request, hashCode());
     }
 
     private void proceedToDashboard(UserAccount loggedInUser) {
@@ -182,41 +231,10 @@ public class SignupActivity extends AppCompatActivity {
         finish();
     }
 
-    private void informUserOfFailedSignup(@StringRes Integer errorString) {
-        Toast.makeText(this, errorString, Toast.LENGTH_SHORT).show();
-    }
-
     @Override
     protected void onDestroy() {
         super.onDestroy();
-        if (signupProcess != null) {
-            signupProcess.cancel(true);
-        }
+        ConnectionAdapter.getInstance().cancelAllRequests(hashCode());
     }
 
-
-    private final class SignupProcess extends AsyncTask<String, Void, Result> {
-
-        @Override
-        protected Result doInBackground(String... params) {
-            Result<UserAccount> result;
-            if (params.length == 4) {
-                String firstName = params[0];
-                String lastName = params[1];
-                String email = params[2];
-                String password = params[3];
-                result = signupViewModel.signup(firstName, lastName, email, password);
-            } else {
-                result = new Result.Error(new IllegalArgumentException());
-            }
-            return result;
-        }
-
-        @Override
-        protected void onPostExecute(Result result) {
-            super.onPostExecute(result);
-            signupViewModel.signupResultChanged(result);
-        }
-
-    }
 }

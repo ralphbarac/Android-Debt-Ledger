@@ -12,6 +12,14 @@ public class UserAccount implements Serializable {
     private String email;
     private String password;
 
+    public UserAccount(String id, String firstName, String lastName, String email, String password) {
+        this.id = id;
+        this.firstName = firstName;
+        this.lastName = lastName;
+        this.email = email;
+        this.password = password;
+    }
+
     public UserAccount(String firstName, String lastName, String email, String password) {
         this.firstName = firstName;
         this.lastName = lastName;

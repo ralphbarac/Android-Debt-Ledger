@@ -31,7 +31,7 @@ public class SettingsFragment extends Fragment {
         View root = inflater.inflate(R.layout.fragment_settings, container, false);
         setHasOptionsMenu(true);
 
-        final LoginRepository loginRepository = LoginRepository.getInstance(getContext());
+        final LoginRepository loginRepository = LoginRepository.getInstance();
         final UserAccount user = loginRepository.getLoggedInUser();
 
         // Set profile picture color
@@ -102,13 +102,13 @@ public class SettingsFragment extends Fragment {
     public boolean onOptionsItemSelected(MenuItem item) {
         switch (item.getItemId()) {
             case R.id.logout:
-                LoginRepository loginRepository = LoginRepository.getInstance(getContext());
+                LoginRepository loginRepository = LoginRepository.getInstance();
 
                 // Say bye
                 String goodbye = getString(R.string.goodbye) + loginRepository.getLoggedInUser().getFirstName();
                 Toast.makeText(getContext(), goodbye, Toast.LENGTH_LONG).show();
 
-                loginRepository.logout(getContext());
+                loginRepository.logoutUser();
 
                 Intent toLogin = new Intent(getActivity(), LoginActivity.class);
                 startActivity(toLogin);

@@ -68,7 +68,7 @@ public class SelectWhoOwesActivity extends AppCompatActivity implements OnContac
         final TextView myAvatarCharacter = findViewById(R.id.my_avatar_character);
         myCheckBox = findViewById(R.id.my_check_box);
 
-        final UserAccount loggedInUser = LoginRepository.getInstance(this).getLoggedInUser();
+        final UserAccount loggedInUser = LoginRepository.getInstance().getLoggedInUser();
         myAvatar.setColorFilter(ColourGenerator.generateFromName(loggedInUser.getFirstName(), loggedInUser.getLastName()));
         myAvatarCharacter.setText(loggedInUser.getFirstName().substring(0, 1));
 
@@ -104,7 +104,7 @@ public class SelectWhoOwesActivity extends AppCompatActivity implements OnContac
             public void onFailedToLoadActionButtonClicked() {
                 if (getGroupsProcess == null || getGroupsProcess.getStatus() == AsyncTask.Status.FINISHED) {
                     getGroupsProcess = new GetGroupsProcess();
-                    getGroupsProcess.execute(LoginRepository.getInstance(SelectWhoOwesActivity.this).getLoggedInUser());
+                    getGroupsProcess.execute(LoginRepository.getInstance().getLoggedInUser());
                 }
             }
 
@@ -130,7 +130,7 @@ public class SelectWhoOwesActivity extends AppCompatActivity implements OnContac
             public void onFailedToLoadActionButtonClicked() {
                 if (getContactsProcess == null || getContactsProcess.getStatus() == AsyncTask.Status.FINISHED) {
                     getContactsProcess = new GetContactsProcess();
-                    getContactsProcess.execute(LoginRepository.getInstance(SelectWhoOwesActivity.this).getLoggedInUser());
+                    getContactsProcess.execute(LoginRepository.getInstance().getLoggedInUser());
                 }
             }
 

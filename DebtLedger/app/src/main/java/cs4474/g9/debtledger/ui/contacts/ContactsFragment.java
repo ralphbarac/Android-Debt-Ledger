@@ -51,7 +51,7 @@ public class ContactsFragment extends Fragment implements OnRequestReply {
         View root = inflater.inflate(R.layout.fragment_contacts, container, false);
         setHasOptionsMenu(true);
 
-        UserAccount loggedInUser = LoginRepository.getInstance(getContext()).getLoggedInUser();
+        UserAccount loggedInUser = LoginRepository.getInstance().getLoggedInUser();
 
         // Get view references for requests to user list, and initialize list and adapter
         contactRequestsTitle = root.findViewById(R.id.request_to_me_title);
