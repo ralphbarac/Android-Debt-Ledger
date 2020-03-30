@@ -8,7 +8,7 @@ import androidx.annotation.Nullable;
 
 public class Group implements Serializable {
 
-    private String id;
+    private long id;
     private String owner;
     private String description;
     private List<UserAccount> groupMembers;
@@ -18,7 +18,7 @@ public class Group implements Serializable {
         this.groupMembers = groupMembers;
     }
 
-    public String getId() {
+    public long getId() {
         return id;
     }
 

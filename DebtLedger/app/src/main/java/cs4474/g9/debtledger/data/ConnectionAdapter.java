@@ -2,13 +2,25 @@ package cs4474.g9.debtledger.data;
 
 import android.content.Context;
 
+import com.android.volley.DefaultRetryPolicy;
 import com.android.volley.Request;
 import com.android.volley.RequestQueue;
+import com.android.volley.toolbox.HurlStack;
 import com.android.volley.toolbox.Volley;
+
+import java.io.InputStream;
+import java.security.KeyStore;
+
+import javax.net.ssl.SSLContext;
+import javax.net.ssl.SSLSocketFactory;
+import javax.net.ssl.TrustManagerFactory;
+
+import cs4474.g9.debtledger.R;
 
 public class ConnectionAdapter {
 
-    public static final String BASE_URL = "";
+    public static final String BASE_URL = "https://cs4474.heliohost.org";
+    private static final int TIMEOUT_MS = 30000; // 30s
 
     private static ConnectionAdapter instance;
     private RequestQueue requestQueue;
@@ -35,7 +47,24 @@ public class ConnectionAdapter {
 
     public RequestQueue getRequestQueue() {
         if (requestQueue == null) {
-            requestQueue = Volley.newRequestQueue(context);
+            try {
+                // Certificate is not trusted, so need to create SSL exception by creating custom SSLSocketFactory
+                // See http://blog.crazybob.org/2010/02/android-trusting-ssl-certificates.html
+                // and https://stackoverflow.com/questions/2642777/trusting-all-certificates-using-httpclient-over-https
+                TrustManagerFactory trustManagerFactory = TrustManagerFactory.getInstance(TrustManagerFactory.getDefaultAlgorithm());
+                KeyStore keyStore = KeyStore.getInstance("BKS");
+                InputStream stream = context.getResources().openRawResource(R.raw.cs4474_heliohost);
+                keyStore.load(stream, null);
+                stream.close();
+                trustManagerFactory.init(keyStore);
+                SSLContext sslContext = SSLContext.getInstance("TLS");
+                sslContext.init(null, trustManagerFactory.getTrustManagers(), null);
+                SSLSocketFactory sslSocketFactory = sslContext.getSocketFactory();
+
+                requestQueue = Volley.newRequestQueue(context, new HurlStack(null, sslSocketFactory));
+            } catch (Exception e) {
+                throw new RuntimeException(e);
+            }
         }
         return requestQueue;
     }
@@ -48,6 +77,11 @@ public class ConnectionAdapter {
      */
     public <T> void addToRequestQueue(Request<T> request, int tag) {
         request.setTag(tag);
+        request.setRetryPolicy(new DefaultRetryPolicy(
+                TIMEOUT_MS,
+                DefaultRetryPolicy.DEFAULT_MAX_RETRIES,
+                DefaultRetryPolicy.DEFAULT_BACKOFF_MULT)
+        );
         getRequestQueue().add(request);
     }
 

@@ -6,6 +6,7 @@ import android.content.Intent;
 import android.os.Bundle;
 import android.text.Editable;
 import android.text.TextWatcher;
+import android.util.Log;
 import android.view.KeyEvent;
 import android.view.View;
 import android.view.inputmethod.EditorInfo;
@@ -16,10 +17,10 @@ import android.widget.Toast;
 
 import com.android.volley.Response;
 import com.android.volley.VolleyError;
-import com.android.volley.toolbox.JsonObjectRequest;
 import com.google.android.material.button.MaterialButton;
 import com.google.android.material.textfield.TextInputEditText;
 
+import org.json.JSONArray;
 import org.json.JSONException;
 import org.json.JSONObject;
 
@@ -29,6 +30,7 @@ import androidx.lifecycle.Observer;
 import androidx.lifecycle.ViewModelProviders;
 import cs4474.g9.debtledger.R;
 import cs4474.g9.debtledger.data.ConnectionAdapter;
+import cs4474.g9.debtledger.data.RedirectableJsonArrayRequest;
 import cs4474.g9.debtledger.data.UserAccountManager;
 import cs4474.g9.debtledger.data.login.LoginRepository;
 import cs4474.g9.debtledger.data.model.UserAccount;
@@ -162,28 +164,60 @@ public class SignupActivity extends AppCompatActivity {
         signupButton.setEnabled(false);
         loadingProgressBar.setVisibility(View.VISIBLE);
 
-        JSONObject requestBody;
+        JSONObject input;
         try {
-            requestBody = UserAccountManager.createJsonFromUserAccount(
+            input = UserAccountManager.createJsonFromUserAccount(
                     new UserAccount(firstName, lastName, email, password)
             );
         } catch (JSONException e) {
             throw new RuntimeException();
         }
 
-        JsonObjectRequest request = new JsonObjectRequest(
-                ConnectionAdapter.BASE_URL + UserAccountManager.SIGNUP_END_POINT,
-                requestBody,
-                new Response.Listener<JSONObject>() {
+        RedirectableJsonArrayRequest request = new RedirectableJsonArrayRequest(
+                ConnectionAdapter.BASE_URL + UserAccountManager.SIGNUP_END_POINT + "/" + input.toString() + "/",
+                new Response.Listener<JSONArray>() {
                     @Override
-                    public void onResponse(JSONObject response) {
+                    public void onResponse(JSONArray response) {
+                        Log.d("SIGN-UP", response.toString());
+                        makeLoginRequest(email, password);
+                    }
+                },
+                new Response.ErrorListener() {
+                    @Override
+                    public void onErrorResponse(VolleyError error) {
+                        // On error, display signup failed to user
+                        Log.d("SIGN-UP", error.toString());
+                        Toast.makeText(SignupActivity.this, R.string.signup_failed, Toast.LENGTH_SHORT).show();
+                        signupButton.setEnabled(true);
+                        loadingProgressBar.setVisibility(View.INVISIBLE);
+                    }
+                }
+        );
+
+        ConnectionAdapter.getInstance().addToRequestQueue(request, hashCode());
+    }
+
+    private void makeLoginRequest(String email, String password) {
+        RedirectableJsonArrayRequest request = new RedirectableJsonArrayRequest(
+                ConnectionAdapter.BASE_URL + UserAccountManager.LOGIN_END_POINT + "/" + email + "/" + password + "/",
+                new Response.Listener<JSONArray>() {
+                    @Override
+                    public void onResponse(JSONArray response) {
+                        Log.d("SIGN-UP", response.toString());
+
                         try {
+                            // If user not found, display signup failed to user...
+                            if (response.getJSONObject(0).has("result") &&
+                                    response.getJSONObject(0).getString("result").equals("user not found")) {
+                                throw new Exception();
+                            }
+
                             // On success, parse UserAccount, store in repository, and process to dashboard
-                            UserAccount loggedInUser = UserAccountManager.parseUserAccountFromJson(response);
+                            UserAccount loggedInUser = UserAccountManager.parseUserAccountFromJson(response.getJSONObject(0));
                             loginRepository.loginUser(loggedInUser, loggedInUser.getId());
                             proceedToDashboard(loggedInUser);
-                        } catch (JSONException e) {
-                            // On parse error, display signup failed to user
+                        } catch (Exception e) {
+                            // On parse error or user not found, display signup failed to user
                             Toast.makeText(SignupActivity.this, R.string.signup_failed, Toast.LENGTH_SHORT).show();
                             signupButton.setEnabled(true);
                             loadingProgressBar.setVisibility(View.INVISIBLE);
@@ -194,6 +228,7 @@ public class SignupActivity extends AppCompatActivity {
                     @Override
                     public void onErrorResponse(VolleyError error) {
                         // On error, display signup failed to user
+                        Log.d("SIGN-UP", error.toString());
                         Toast.makeText(SignupActivity.this, R.string.signup_failed, Toast.LENGTH_SHORT).show();
                         signupButton.setEnabled(true);
                         loadingProgressBar.setVisibility(View.INVISIBLE);
@@ -201,24 +236,7 @@ public class SignupActivity extends AppCompatActivity {
                 }
         );
 
-        // TODO: Remove, temporary to allow login
-        if (email.equals("zsirohey@uwo.ca") && password.equals("zain1234")) {
-            UserAccount loggedInUser = new UserAccount(
-                    "1000",
-                    "Zain",
-                    "Sirohey",
-                    "zsirohey@uwo.ca",
-                    "zain1234"
-            );
-            loginRepository.loginUser(loggedInUser, loggedInUser.getId());
-            proceedToDashboard(loggedInUser);
-        } else {
-            Toast.makeText(SignupActivity.this, R.string.signup_failed, Toast.LENGTH_SHORT).show();
-            signupButton.setEnabled(true);
-            loadingProgressBar.setVisibility(View.INVISIBLE);
-        }
-
-//        ConnectionAdapter.getInstance().addToRequestQueue(request, hashCode());
+        ConnectionAdapter.getInstance().addToRequestQueue(request, hashCode());
     }
 
     private void proceedToDashboard(UserAccount loggedInUser) {

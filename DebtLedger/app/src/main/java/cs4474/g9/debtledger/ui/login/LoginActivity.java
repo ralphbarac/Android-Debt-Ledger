@@ -6,6 +6,7 @@ import android.content.Intent;
 import android.os.Bundle;
 import android.text.Editable;
 import android.text.TextWatcher;
+import android.util.Log;
 import android.view.KeyEvent;
 import android.view.View;
 import android.view.inputmethod.EditorInfo;
@@ -16,12 +17,10 @@ import android.widget.Toast;
 
 import com.android.volley.Response;
 import com.android.volley.VolleyError;
-import com.android.volley.toolbox.JsonObjectRequest;
 import com.google.android.material.button.MaterialButton;
 import com.google.android.material.textfield.TextInputEditText;
 
-import org.json.JSONException;
-import org.json.JSONObject;
+import org.json.JSONArray;
 
 import androidx.annotation.Nullable;
 import androidx.appcompat.app.AppCompatActivity;
@@ -29,6 +28,7 @@ import androidx.lifecycle.Observer;
 import androidx.lifecycle.ViewModelProviders;
 import cs4474.g9.debtledger.R;
 import cs4474.g9.debtledger.data.ConnectionAdapter;
+import cs4474.g9.debtledger.data.RedirectableJsonArrayRequest;
 import cs4474.g9.debtledger.data.UserAccountManager;
 import cs4474.g9.debtledger.data.login.LoginRepository;
 import cs4474.g9.debtledger.data.model.UserAccount;
@@ -145,31 +145,30 @@ public class LoginActivity extends AppCompatActivity {
         }
     }
 
-    private void makeLoginRequestWithToken(String token) {
-        JSONObject requestBody = new JSONObject();
-        try {
-            requestBody.put("id", token);
-        } catch (JSONException e) {
-            // Do nothing...
-            return;
-        }
-
+    private void makeLoginRequestWithToken(long token) {
         emailInput.setEnabled(false);
         passwordInput.setEnabled(false);
         loadingProgressBar.setVisibility(View.VISIBLE);
 
-        JsonObjectRequest request = new JsonObjectRequest(
-                ConnectionAdapter.BASE_URL + UserAccountManager.LOGIN_WITH_TOKEN_END_POINT,
-                requestBody,
-                new Response.Listener<JSONObject>() {
+        RedirectableJsonArrayRequest request = new RedirectableJsonArrayRequest(
+                ConnectionAdapter.BASE_URL + UserAccountManager.LOGIN_WITH_TOKEN_END_POINT + "/" + token + "/",
+                new Response.Listener<JSONArray>() {
                     @Override
-                    public void onResponse(JSONObject response) {
+                    public void onResponse(JSONArray response) {
+                        Log.d("LOGIN", response.toString());
+
                         try {
+                            // If user not found, reset form and do nothing...
+                            if (response.getJSONObject(0).has("result") &&
+                                    response.getJSONObject(0).getString("result").equals("user not found")) {
+                                throw new Exception();
+                            }
+
                             // On success, parse UserAccount, store in repository, and process to dashboard
-                            UserAccount loggedInUser = UserAccountManager.parseUserAccountFromJson(response);
+                            UserAccount loggedInUser = UserAccountManager.parseUserAccountFromJson(response.getJSONObject(0));
                             loginRepository.loginUser(loggedInUser, loggedInUser.getId());
                             proceedToDashboard(loggedInUser);
-                        } catch (JSONException e) {
+                        } catch (Exception e) {
                             // Reset form and do nothing...
                             emailInput.setEnabled(true);
                             passwordInput.setEnabled(true);
@@ -181,6 +180,7 @@ public class LoginActivity extends AppCompatActivity {
                     @Override
                     public void onErrorResponse(VolleyError error) {
                         // Reset form and do nothing...
+                        Log.d("LOGIN", error.toString());
                         emailInput.setEnabled(true);
                         passwordInput.setEnabled(true);
                         loadingProgressBar.setVisibility(View.INVISIBLE);
@@ -188,53 +188,33 @@ public class LoginActivity extends AppCompatActivity {
                 }
         );
 
-        // TODO: Remove, temporary to allow login
-        if (token.equals("1000")) {
-            UserAccount loggedInUser = new UserAccount(
-                    "1000",
-                    "Zain",
-                    "Sirohey",
-                    "zsirohey@uwo.ca",
-                    ""
-            );
-            loginRepository.loginUser(loggedInUser, loggedInUser.getId());
-            proceedToDashboard(loggedInUser);
-        } else {
-            // Reset form and do nothing...
-            emailInput.setEnabled(true);
-            passwordInput.setEnabled(true);
-            loadingProgressBar.setVisibility(View.INVISIBLE);
-        }
-
-//        ConnectionAdapter.getInstance().addToRequestQueue(request, hashCode());
-
+        ConnectionAdapter.getInstance().addToRequestQueue(request, hashCode());
     }
 
     private void makeLoginRequest(String email, String password) {
         loginButton.setEnabled(false);
         loadingProgressBar.setVisibility(View.VISIBLE);
 
-        JSONObject requestBody = new JSONObject();
-        try {
-            requestBody.put("email", email);
-            requestBody.put("password", password);
-        } catch (JSONException e) {
-            throw new RuntimeException();
-        }
-
-        JsonObjectRequest request = new JsonObjectRequest(
-                ConnectionAdapter.BASE_URL + UserAccountManager.LOGIN_END_POINT,
-                requestBody,
-                new Response.Listener<JSONObject>() {
+        RedirectableJsonArrayRequest request = new RedirectableJsonArrayRequest(
+                ConnectionAdapter.BASE_URL + UserAccountManager.LOGIN_END_POINT + "/" + email + "/" + password + "/",
+                new Response.Listener<JSONArray>() {
                     @Override
-                    public void onResponse(JSONObject response) {
+                    public void onResponse(JSONArray response) {
+                        Log.d("LOGIN", response.toString());
+
                         try {
+                            // If user not found, display login failed to user...
+                            if (response.getJSONObject(0).has("result") &&
+                                    response.getJSONObject(0).getString("result").equals("user not found")) {
+                                throw new Exception();
+                            }
+
                             // On success, parse UserAccount, store in repository, and process to dashboard
-                            UserAccount loggedInUser = UserAccountManager.parseUserAccountFromJson(response);
+                            UserAccount loggedInUser = UserAccountManager.parseUserAccountFromJson(response.getJSONObject(0));
                             loginRepository.loginUser(loggedInUser, loggedInUser.getId());
                             proceedToDashboard(loggedInUser);
-                        } catch (JSONException e) {
-                            // On parse error, display login failed to user
+                        } catch (Exception e) {
+                            // On parse error or user not found, display login failed to user
                             Toast.makeText(LoginActivity.this, R.string.login_failed, Toast.LENGTH_SHORT).show();
                             loginButton.setEnabled(true);
                             loadingProgressBar.setVisibility(View.INVISIBLE);
@@ -245,6 +225,7 @@ public class LoginActivity extends AppCompatActivity {
                     @Override
                     public void onErrorResponse(VolleyError error) {
                         // On error, display login failed to user
+                        Log.d("LOGIN", error.toString());
                         Toast.makeText(LoginActivity.this, R.string.login_failed, Toast.LENGTH_SHORT).show();
                         loginButton.setEnabled(true);
                         loadingProgressBar.setVisibility(View.INVISIBLE);
@@ -252,24 +233,7 @@ public class LoginActivity extends AppCompatActivity {
                 }
         );
 
-        // TODO: Remove, temporary to allow login
-        if (email.equals("zsirohey@uwo.ca") && password.equals("zain1234")) {
-            UserAccount loggedInUser = new UserAccount(
-                    "1000",
-                    "Zain",
-                    "Sirohey",
-                    "zsirohey@uwo.ca",
-                    "zain1234"
-            );
-            loginRepository.loginUser(loggedInUser, loggedInUser.getId());
-            proceedToDashboard(loggedInUser);
-        } else {
-            Toast.makeText(LoginActivity.this, R.string.login_failed, Toast.LENGTH_SHORT).show();
-            loginButton.setEnabled(true);
-            loadingProgressBar.setVisibility(View.INVISIBLE);
-        }
-
-//        ConnectionAdapter.getInstance().addToRequestQueue(request, hashCode());
+        ConnectionAdapter.getInstance().addToRequestQueue(request, hashCode());
     }
 
     private void proceedToDashboard(UserAccount loggedInUser) {

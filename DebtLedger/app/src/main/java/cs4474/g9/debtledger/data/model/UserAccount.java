@@ -6,18 +6,25 @@ import androidx.annotation.Nullable;
 
 public class UserAccount implements Serializable {
 
-    private String id;
+    private long id;
     private String firstName;
     private String lastName;
     private String email;
     private String password;
 
-    public UserAccount(String id, String firstName, String lastName, String email, String password) {
+    public UserAccount(long id, String firstName, String lastName, String email, String password) {
         this.id = id;
         this.firstName = firstName;
         this.lastName = lastName;
         this.email = email;
         this.password = password;
+    }
+
+    public UserAccount(long id, String firstName, String lastName, String email) {
+        this.id = id;
+        this.firstName = firstName;
+        this.lastName = lastName;
+        this.email = email;
     }
 
     public UserAccount(String firstName, String lastName, String email, String password) {
@@ -33,7 +40,7 @@ public class UserAccount implements Serializable {
         this.email = email;
     }
 
-    public String getId() {
+    public long getId() {
         return id;
     }
 

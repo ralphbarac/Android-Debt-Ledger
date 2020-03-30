@@ -17,7 +17,7 @@ public class LoginRepository {
     private Context context;
 
     private UserAccount loggedInUser = null;
-    private String token = "";
+    private long token = -1;
 
     // Singleton, so private constructor
     private LoginRepository(Context context) {
@@ -44,35 +44,35 @@ public class LoginRepository {
         return loggedInUser;
     }
 
-    public String getToken() {
+    public long getToken() {
         return token;
     }
 
     public boolean hasToken() {
-        return token != null && !token.isEmpty();
+        return token != -1;
     }
     
     public boolean isUserLoggedInAndAuthenticated() {
-        return token != null && !token.isEmpty() && loggedInUser != null;
+        return token != -1 && loggedInUser != null;
     }
 
     private void readToken() {
         SharedPreferences tokenStore = context.getSharedPreferences(TOKEN_STORE, Context.MODE_PRIVATE);
-        token = tokenStore.getString(TOKEN_KEY, "");
+        token = tokenStore.getLong(TOKEN_KEY, -1);
     }
 
     private void storeToken() {
         SharedPreferences tokenStore = context.getSharedPreferences(TOKEN_STORE, Context.MODE_PRIVATE);
-        tokenStore.edit().putString(TOKEN_KEY, token).apply();
+        tokenStore.edit().putLong(TOKEN_KEY, token).apply();
     }
 
     private void deleteToken() {
         SharedPreferences tokenStore = context.getSharedPreferences(TOKEN_STORE, Context.MODE_PRIVATE);
-        tokenStore.edit().putString(TOKEN_KEY, "").apply();
-        token = "";
+        tokenStore.edit().putLong(TOKEN_KEY, -1).apply();
+        token = -1;
     }
 
-    public void loginUser(UserAccount loggedInUser, String token) {
+    public void loginUser(UserAccount loggedInUser, long token) {
         this.loggedInUser = loggedInUser;
         this.token = token;
         storeToken();
@@ -80,7 +80,7 @@ public class LoginRepository {
 
     public void logoutUser() {
         loggedInUser = null;
-        token = "";
+        token = -1;
         deleteToken();
     }
 }

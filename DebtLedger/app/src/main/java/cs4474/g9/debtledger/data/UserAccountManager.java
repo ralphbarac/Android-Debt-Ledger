@@ -7,26 +7,25 @@ import cs4474.g9.debtledger.data.model.UserAccount;
 
 public class UserAccountManager {
 
-    public static final String LOGIN_END_POINT = "/login";
-    public static final String LOGIN_WITH_TOKEN_END_POINT = "/login-token";
-    public static final String SIGNUP_END_POINT = "/create";
+    public static final String LOGIN_END_POINT = "/user/login";
+    public static final String LOGIN_WITH_TOKEN_END_POINT = "/user/id";
+    public static final String SIGNUP_END_POINT = "/user/add";
 
     public static JSONObject createJsonFromUserAccount(UserAccount userAccount) throws JSONException {
         JSONObject jsonUserAccount = new JSONObject();
-        jsonUserAccount.put("firstName", userAccount.getId());
-        jsonUserAccount.put("lastName", userAccount.getId());
-        jsonUserAccount.put("email", userAccount.getId());
-        jsonUserAccount.put("password", userAccount.getId());
+        jsonUserAccount.put("first_name", userAccount.getFirstName());
+        jsonUserAccount.put("last_name", userAccount.getLastName());
+        jsonUserAccount.put("email", userAccount.getEmail());
+        jsonUserAccount.put("password", userAccount.getPassword());
         return jsonUserAccount;
     }
 
     public static UserAccount parseUserAccountFromJson(JSONObject jsonUserAccount) throws JSONException {
         return new UserAccount(
-                jsonUserAccount.getString("id"),
-                jsonUserAccount.getString("firstName"),
-                jsonUserAccount.getString("lastName"),
-                jsonUserAccount.getString("email"),
-                jsonUserAccount.getString("password")
+                jsonUserAccount.getInt("id"),
+                jsonUserAccount.getString("first_name"),
+                jsonUserAccount.getString("last_name"),
+                jsonUserAccount.getString("email")
         );
     }
 
