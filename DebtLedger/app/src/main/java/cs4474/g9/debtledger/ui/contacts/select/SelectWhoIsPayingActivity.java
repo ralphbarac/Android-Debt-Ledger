@@ -1,20 +1,25 @@
 package cs4474.g9.debtledger.ui.contacts.select;
 
 import android.content.Intent;
-import android.os.AsyncTask;
 import android.os.Bundle;
+import android.util.Log;
 import android.view.View;
 import android.widget.ImageView;
 import android.widget.TextView;
 
-import java.util.List;
-import java.util.concurrent.ThreadLocalRandom;
+import com.android.volley.Response;
+import com.android.volley.VolleyError;
+
+import org.json.JSONArray;
+
+import java.util.ArrayList;
 
 import androidx.appcompat.app.AppCompatActivity;
 import androidx.recyclerview.widget.LinearLayoutManager;
 import cs4474.g9.debtledger.R;
+import cs4474.g9.debtledger.data.ConnectionAdapter;
 import cs4474.g9.debtledger.data.ContactManager;
-import cs4474.g9.debtledger.data.Result;
+import cs4474.g9.debtledger.data.RedirectableJsonArrayRequest;
 import cs4474.g9.debtledger.data.login.LoginRepository;
 import cs4474.g9.debtledger.data.model.UserAccount;
 import cs4474.g9.debtledger.logic.ColourGenerator;
@@ -26,8 +31,6 @@ public class SelectWhoIsPayingActivity extends AppCompatActivity implements OnCo
 
     public static final String SELECTED_CONTACT = "selected_contact";
     public static final String ADD_NEW_CONTACT = "add_new_contact";
-
-    private AsyncTask<UserAccount, Void, Result> getContactsProcess;
 
     private LoadableRecyclerView selectContactView;
     private SelectContactAdapter selectContactAdapter;
@@ -60,8 +63,7 @@ public class SelectWhoIsPayingActivity extends AppCompatActivity implements OnCo
         selectContactAdapter.addOnContactSelectedListener(this);
         selectContactView.setAdapter(selectContactAdapter);
 
-        getContactsProcess = new GetContactsProcess();
-        getContactsProcess.execute(loggedInUser);
+        makeRequestForContacts(loggedInUser);
     }
 
     @Override
@@ -75,18 +77,15 @@ public class SelectWhoIsPayingActivity extends AppCompatActivity implements OnCo
     @Override
     protected void onDestroy() {
         super.onDestroy();
-        if (getContactsProcess != null) {
-            getContactsProcess.cancel(true);
-        }
+
+        // Cancel/terminate any requests that are still running or queued
+        ConnectionAdapter.getInstance().cancelAllRequests(hashCode());
     }
 
     @Override
     public void onFailedToLoadActionButtonClicked() {
         // Retry getting contacts
-        if (getContactsProcess == null || getContactsProcess.getStatus() == AsyncTask.Status.FINISHED) {
-            getContactsProcess = new GetContactsProcess();
-            getContactsProcess.execute(LoginRepository.getInstance().getLoggedInUser());
-        }
+        makeRequestForContacts(LoginRepository.getInstance().getLoggedInUser());
     }
 
     @Override
@@ -98,38 +97,42 @@ public class SelectWhoIsPayingActivity extends AppCompatActivity implements OnCo
         finish();
     }
 
-    private final class GetContactsProcess extends AsyncTask<UserAccount, Void, Result> {
+    private void makeRequestForContacts(UserAccount loggedInUser) {
+        selectContactView.onBeginLoading();
 
-        @Override
-        protected void onPreExecute() {
-            super.onPreExecute();
-            selectContactView.onBeginLoading();
-        }
+        RedirectableJsonArrayRequest request = new RedirectableJsonArrayRequest(
+                ConnectionAdapter.BASE_URL + ContactManager.LIST_END_POINT + "/" + loggedInUser.getId() + "/",
+                new Response.Listener<JSONArray>() {
+                    @Override
+                    public void onResponse(JSONArray response) {
+                        Log.d("CONTACTS", response.toString());
 
-        @Override
-        protected Result doInBackground(UserAccount... params) {
-            UserAccount loggedInUser = params[0];
-            ContactManager manager = new ContactManager();
-            // TODO: Remove sleep
-            try {
-                Thread.sleep(ThreadLocalRandom.current().nextInt(250, 1500));
-            } catch (InterruptedException e) {
-                e.printStackTrace();
-            }
-            return manager.getAllContactsOf(loggedInUser);
-        }
+                        try {
+                            if (response.getJSONObject(0).has("error")) {
+                                throw new Exception();
+                            } else if (response.getJSONObject(0).has("empty")) {
+                                selectContactAdapter.setContacts(new ArrayList<>());
+                                return;
+                            }
 
-        @Override
-        protected void onPostExecute(Result result) {
-            super.onPostExecute(result);
-            if (result instanceof Result.Success) {
-                List<UserAccount> contacts;
-                contacts = (List<UserAccount>) ((Result.Success) result).getData();
-                selectContactAdapter.setContacts(contacts);
-            } else {
-                selectContactView.onFailToFinishLoading();
-            }
-        }
+                            // On success
+                            selectContactAdapter.setContacts(ContactManager.parseContactsFromJson(response));
+                        } catch (Exception e) {
+                            // On parse error, set select contacts view to fail to finish loading mode
+                            selectContactView.onFailToFinishLoading();
+                        }
+                    }
+                },
+                new Response.ErrorListener() {
+                    @Override
+                    public void onErrorResponse(VolleyError error) {
+                        // On error, set select contacts view to fail to finish loading mode
+                        Log.d("CONTACTS", error.toString());
+                        selectContactView.onFailToFinishLoading();
+                    }
+                }
+        );
 
+        ConnectionAdapter.getInstance().addToRequestQueue(request, hashCode());
     }
 }

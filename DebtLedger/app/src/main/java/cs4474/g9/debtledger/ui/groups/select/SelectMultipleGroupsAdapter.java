@@ -84,7 +84,7 @@ public class SelectMultipleGroupsAdapter extends RecyclerView.Adapter<SelectMult
 
         // Build string containing summary of group member names
         List<UserAccount> groupMembers = group.getGroupMembers();
-        String groupMemberNames = groupMembers.get(0).getFirstName();
+        String groupMemberNames = groupMembers.size() > 0 ? groupMembers.get(0).getFirstName() : "No members";
         if (groupMembers.size() >= 2) {
             groupMemberNames = groupMemberNames + ", " + groupMembers.get(1).getFirstName();
         }

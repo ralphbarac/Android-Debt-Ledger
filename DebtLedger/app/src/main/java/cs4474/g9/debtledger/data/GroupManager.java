@@ -1,5 +1,9 @@
 package cs4474.g9.debtledger.data;
 
+import org.json.JSONArray;
+import org.json.JSONException;
+import org.json.JSONObject;
+
 import java.util.ArrayList;
 import java.util.List;
 
@@ -8,9 +12,27 @@ import cs4474.g9.debtledger.data.model.UserAccount;
 
 public class GroupManager {
 
-    public Result createGroup(Group group) {
-        // TODO: Implement
-        return null;
+    public static final String LIST_END_POINT = "/contact_group/grouplist";
+
+    public static Group parseGroupFromJson(JSONObject groupJson) throws JSONException {
+        JSONArray membersJson = new JSONArray(groupJson.getString("members"));
+        List<UserAccount> members = new ArrayList<>();
+        for (int i = 0; i < membersJson.length(); i++) {
+            members.add(UserAccountManager.parseUserAccountFromJson(membersJson.getJSONObject(i)));
+        }
+        return new Group(
+                groupJson.getInt("id"),
+                groupJson.getString("name"),
+                members
+        );
+    }
+
+    public static List<Group> parseGroupsFromJson(JSONArray groupsJson) throws JSONException {
+        List<Group> groups = new ArrayList<>();
+        for (int i = 0; i < groupsJson.length(); i++) {
+            groups.add(parseGroupFromJson(groupsJson.getJSONObject(i)));
+        }
+        return groups;
     }
 
     public Result<List<Group>> getGroupsOf(UserAccount user) {

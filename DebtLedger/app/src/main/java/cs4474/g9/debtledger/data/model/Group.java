@@ -9,12 +9,17 @@ import androidx.annotation.Nullable;
 public class Group implements Serializable {
 
     private long id;
-    private String owner;
-    private String description;
+    private String name;
     private List<UserAccount> groupMembers;
 
     public Group(String name, List<UserAccount> groupMembers) {
-        this.description = name;
+        this.name = name;
+        this.groupMembers = groupMembers;
+    }
+
+    public Group(long id, String name, List<UserAccount> groupMembers) {
+        this.id = id;
+        this.name = name;
         this.groupMembers = groupMembers;
     }
 
@@ -23,7 +28,7 @@ public class Group implements Serializable {
     }
 
     public String getGroupName() {
-        return description;
+        return name;
     }
 
     public List<UserAccount> getGroupMembers() {
@@ -35,7 +40,7 @@ public class Group implements Serializable {
         if (obj instanceof Group) {
             Group group = (Group) obj;
             // TODO: Use ids eventually...
-            return this.description.equals(group.getGroupName());
+            return this.name.equals(group.getGroupName());
         } else {
             return false;
         }

@@ -1,8 +1,8 @@
 package cs4474.g9.debtledger.ui.contacts.select;
 
 import android.content.Intent;
-import android.os.AsyncTask;
 import android.os.Bundle;
+import android.util.Log;
 import android.view.Menu;
 import android.view.MenuItem;
 import android.view.View;
@@ -11,15 +11,21 @@ import android.widget.CompoundButton;
 import android.widget.ImageView;
 import android.widget.TextView;
 
+import com.android.volley.Response;
+import com.android.volley.VolleyError;
+
+import org.json.JSONArray;
+
+import java.util.ArrayList;
 import java.util.List;
-import java.util.concurrent.ThreadLocalRandom;
 
 import androidx.appcompat.app.AppCompatActivity;
 import androidx.recyclerview.widget.LinearLayoutManager;
 import cs4474.g9.debtledger.R;
+import cs4474.g9.debtledger.data.ConnectionAdapter;
 import cs4474.g9.debtledger.data.ContactManager;
 import cs4474.g9.debtledger.data.GroupManager;
-import cs4474.g9.debtledger.data.Result;
+import cs4474.g9.debtledger.data.RedirectableJsonArrayRequest;
 import cs4474.g9.debtledger.data.login.LoginRepository;
 import cs4474.g9.debtledger.data.model.Group;
 import cs4474.g9.debtledger.data.model.UserAccount;
@@ -42,9 +48,6 @@ public class SelectWhoOwesActivity extends AppCompatActivity implements OnContac
     private List<UserAccount> selectedContacts;
 
     private boolean isMenuIconEnabled = false;
-
-    private AsyncTask<UserAccount, Void, Result> getContactsProcess;
-    private AsyncTask<UserAccount, Void, Result> getGroupsProcess;
 
     private LoadableRecyclerView selectMultipleContactsView;
     private SelectMultipleContactsAdapter multipleContactsAdapter;
@@ -102,10 +105,7 @@ public class SelectWhoOwesActivity extends AppCompatActivity implements OnContac
         selectMultipleGroupsView.addOnActionButtonClickedClickListener(new OnActionButtonClickedListener() {
             @Override
             public void onFailedToLoadActionButtonClicked() {
-                if (getGroupsProcess == null || getGroupsProcess.getStatus() == AsyncTask.Status.FINISHED) {
-                    getGroupsProcess = new GetGroupsProcess();
-                    getGroupsProcess.execute(LoginRepository.getInstance().getLoggedInUser());
-                }
+                makeRequestForGroups(loggedInUser);
             }
 
             @Override
@@ -128,10 +128,7 @@ public class SelectWhoOwesActivity extends AppCompatActivity implements OnContac
         selectMultipleContactsView.addOnActionButtonClickedClickListener(new OnActionButtonClickedListener() {
             @Override
             public void onFailedToLoadActionButtonClicked() {
-                if (getContactsProcess == null || getContactsProcess.getStatus() == AsyncTask.Status.FINISHED) {
-                    getContactsProcess = new GetContactsProcess();
-                    getContactsProcess.execute(LoginRepository.getInstance().getLoggedInUser());
-                }
+                makeRequestForContacts(loggedInUser);
             }
 
             @Override
@@ -150,11 +147,8 @@ public class SelectWhoOwesActivity extends AppCompatActivity implements OnContac
         multipleContactsAdapter.addOnContactCheckedListener(this);
         selectMultipleContactsView.setAdapter(multipleContactsAdapter);
 
-        getContactsProcess = new GetContactsProcess();
-        getContactsProcess.execute(loggedInUser);
-
-        getGroupsProcess = new GetGroupsProcess();
-        getGroupsProcess.execute(loggedInUser);
+        makeRequestForContacts(loggedInUser);
+        makeRequestForGroups(loggedInUser);
     }
 
     @Override
@@ -235,82 +229,87 @@ public class SelectWhoOwesActivity extends AppCompatActivity implements OnContac
     @Override
     protected void onDestroy() {
         super.onDestroy();
-        if (getContactsProcess != null) {
-            getContactsProcess.cancel(true);
-        }
-        if (getGroupsProcess != null) {
-            getGroupsProcess.cancel(true);
-        }
+
+        // Cancel/terminate any requests that are still running or queued
+        ConnectionAdapter.getInstance().cancelAllRequests(hashCode());
     }
 
-    private final class GetGroupsProcess extends AsyncTask<UserAccount, Void, Result> {
+    private void makeRequestForContacts(UserAccount loggedInUser) {
+        selectMultipleContactsView.onBeginLoading();
 
-        @Override
-        protected void onPreExecute() {
-            super.onPreExecute();
-            selectMultipleGroupsView.onBeginLoading();
-        }
+        RedirectableJsonArrayRequest request = new RedirectableJsonArrayRequest(
+                ConnectionAdapter.BASE_URL + ContactManager.LIST_END_POINT + "/" + loggedInUser.getId() + "/",
+                new Response.Listener<JSONArray>() {
+                    @Override
+                    public void onResponse(JSONArray response) {
+                        Log.d("CONTACTS", response.toString());
 
-        @Override
-        protected Result doInBackground(UserAccount... params) {
-            UserAccount loggedInUser = params[0];
-            GroupManager manager = new GroupManager();
-            // TODO: Remove sleep
-            try {
-                Thread.sleep(ThreadLocalRandom.current().nextInt(250, 1500));
-            } catch (InterruptedException e) {
-                e.printStackTrace();
-            }
-            return manager.getGroupsOf(loggedInUser);
-        }
+                        try {
+                            if (response.getJSONObject(0).has("error")) {
+                                throw new Exception();
+                            } else if (response.getJSONObject(0).has("empty")) {
+                                multipleContactsAdapter.setContacts(new ArrayList<>(), selectedContacts);
+                                return;
+                            }
 
-        @Override
-        protected void onPostExecute(Result result) {
-            super.onPostExecute(result);
-            if (result instanceof Result.Success) {
-                List<Group> groups;
-                groups = (List<Group>) ((Result.Success) result).getData();
-                multipleGroupsAdapter.setGroups(groups, selectedGroups);
-            } else {
-                selectMultipleGroupsView.onFailToFinishLoading();
-            }
-        }
+                            // On success
+                            multipleContactsAdapter.setContacts(ContactManager.parseContactsFromJson(response), selectedContacts);
+                        } catch (Exception e) {
+                            // On parse error, set select contacts view to fail to finish loading mode
+                            selectMultipleContactsView.onFailToFinishLoading();
+                        }
+                    }
+                },
+                new Response.ErrorListener() {
+                    @Override
+                    public void onErrorResponse(VolleyError error) {
+                        // On error, set select contacts view to fail to finish loading mode
+                        Log.d("CONTACTS", error.toString());
+                        selectMultipleContactsView.onFailToFinishLoading();
+                    }
+                }
+        );
 
+        ConnectionAdapter.getInstance().addToRequestQueue(request, hashCode());
     }
 
-    private final class GetContactsProcess extends AsyncTask<UserAccount, Void, Result> {
+    private void makeRequestForGroups(UserAccount loggedInUser) {
+        selectMultipleGroupsView.onBeginLoading();
 
-        @Override
-        protected void onPreExecute() {
-            super.onPreExecute();
-            selectMultipleContactsView.onBeginLoading();
-        }
+        RedirectableJsonArrayRequest request = new RedirectableJsonArrayRequest(
+                ConnectionAdapter.BASE_URL + GroupManager.LIST_END_POINT + "/" + loggedInUser.getId() + "/",
+                new Response.Listener<JSONArray>() {
+                    @Override
+                    public void onResponse(JSONArray response) {
+                        Log.d("GROUPS", response.toString());
 
-        @Override
-        protected Result doInBackground(UserAccount... params) {
-            UserAccount loggedInUser = params[0];
-            ContactManager manager = new ContactManager();
-            // TODO: Remove sleep
-            try {
-                Thread.sleep(ThreadLocalRandom.current().nextInt(250, 1500));
-            } catch (InterruptedException e) {
-                e.printStackTrace();
-            }
-            return manager.getAllContactsOf(loggedInUser);
-        }
+                        try {
+                            if (response.getJSONObject(0).has("error")) {
+                                throw new Exception();
+                            } else if (response.getJSONObject(0).has("empty")) {
+                                multipleGroupsAdapter.setGroups(new ArrayList<>(), selectedGroups);
+                                return;
+                            }
 
-        @Override
-        protected void onPostExecute(Result result) {
-            super.onPostExecute(result);
-            if (result instanceof Result.Success) {
-                List<UserAccount> contacts;
-                contacts = (List<UserAccount>) ((Result.Success) result).getData();
-                multipleContactsAdapter.setContacts(contacts, selectedContacts);
-            } else {
-                selectMultipleContactsView.onFailToFinishLoading();
-            }
-        }
+                            // On success
+                            multipleGroupsAdapter.setGroups(GroupManager.parseGroupsFromJson(response), selectedGroups);
+                        } catch (Exception e) {
+                            // On parse error, set select groups view to fail to finish loading mode
+                            selectMultipleGroupsView.onFailToFinishLoading();
+                        }
+                    }
+                },
+                new Response.ErrorListener() {
+                    @Override
+                    public void onErrorResponse(VolleyError error) {
+                        // On error, set select groups view to fail to finish loading mode
+                        Log.d("GROUPS", error.toString());
+                        selectMultipleGroupsView.onFailToFinishLoading();
+                    }
+                }
+        );
 
+        ConnectionAdapter.getInstance().addToRequestQueue(request, hashCode());
     }
 
 }
