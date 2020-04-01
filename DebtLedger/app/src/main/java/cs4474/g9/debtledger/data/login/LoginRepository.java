@@ -58,7 +58,13 @@ public class LoginRepository {
 
     private void readToken() {
         SharedPreferences tokenStore = context.getSharedPreferences(TOKEN_STORE, Context.MODE_PRIVATE);
-        token = tokenStore.getLong(TOKEN_KEY, -1);
+        // The type of the token has been changed from String to Long, existing preferences will
+        // attempt to convert Long to String, catch this exception and delete the old token if it happens
+        try {
+            token = tokenStore.getLong(TOKEN_KEY, -1);
+        } catch (ClassCastException e) {
+            deleteToken();
+        }
     }
 
     private void storeToken() {

@@ -24,7 +24,7 @@ public class RedirectableJsonArrayRequest extends JsonArrayRequest {
     @Override
     public void deliverError(VolleyError error) {
         // In case of status 301 or 302 (redirect), send new request with redirect location
-        final int status = error.networkResponse.statusCode;
+        final int status = error.networkResponse != null ? error.networkResponse.statusCode : -1;
         if (status == HttpURLConnection.HTTP_MOVED_PERM || status == HttpURLConnection.HTTP_MOVED_TEMP) {
             final String location = error.networkResponse.headers.get("Location");
             final RedirectableJsonArrayRequest request = new RedirectableJsonArrayRequest(
