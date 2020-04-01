@@ -70,7 +70,7 @@ public class MainActivity extends AppCompatActivity {
 
     public void updateContactsNotificationBadge() {
         ContactRequestManager contactRequestManager = new ContactRequestManager();
-        UserAccount loggedInUser = LoginRepository.getInstance(this).getLoggedInUser();
+        UserAccount loggedInUser = LoginRepository.getInstance().getLoggedInUser();
         Result result = contactRequestManager.getCountOfContactRequestsFor(loggedInUser);
         int numContactRequests = result instanceof Result.Success
                 ? (int) ((Result.Success) result).getData()

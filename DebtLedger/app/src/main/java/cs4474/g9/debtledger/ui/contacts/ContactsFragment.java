@@ -1,9 +1,7 @@
 package cs4474.g9.debtledger.ui.contacts;
 
-import android.os.AsyncTask;
 import android.os.Bundle;
 import android.util.Log;
-import android.util.Pair;
 import android.view.LayoutInflater;
 import android.view.Menu;
 import android.view.MenuInflater;
@@ -13,17 +11,23 @@ import android.view.ViewGroup;
 import android.widget.TextView;
 import android.widget.Toast;
 
-import java.util.List;
-import java.util.concurrent.ThreadLocalRandom;
+import com.android.volley.Response;
+import com.android.volley.VolleyError;
+
+import org.json.JSONArray;
+
+import java.util.ArrayList;
 
 import androidx.annotation.NonNull;
 import androidx.fragment.app.Fragment;
 import androidx.recyclerview.widget.LinearLayoutManager;
 import androidx.recyclerview.widget.RecyclerView;
 import cs4474.g9.debtledger.R;
+import cs4474.g9.debtledger.data.ConnectionAdapter;
 import cs4474.g9.debtledger.data.ContactRequestManager;
-import cs4474.g9.debtledger.data.Result;
+import cs4474.g9.debtledger.data.RedirectableJsonArrayRequest;
 import cs4474.g9.debtledger.data.login.LoginRepository;
+import cs4474.g9.debtledger.data.model.TransactionManager;
 import cs4474.g9.debtledger.data.model.UserAccount;
 import cs4474.g9.debtledger.logic.BalanceCalculator;
 import cs4474.g9.debtledger.ui.MainActivity;
@@ -42,16 +46,11 @@ public class ContactsFragment extends Fragment implements OnRequestReply {
     private LoadableRecyclerView contactsView;
     private ContactListAdapter contactsAdapter;
 
-    private AsyncTask<UserAccount, Void, Result> getContactsWithBalancesProcess;
-    private AsyncTask<UserAccount, Void, Result> getContactRequestsProcess;
-    private AsyncTask<UserAccount, Void, Result> getContactsRequestedProcess;
-
-
     public View onCreateView(@NonNull LayoutInflater inflater, ViewGroup container, Bundle savedInstanceState) {
         View root = inflater.inflate(R.layout.fragment_contacts, container, false);
         setHasOptionsMenu(true);
 
-        UserAccount loggedInUser = LoginRepository.getInstance(getContext()).getLoggedInUser();
+        UserAccount loggedInUser = LoginRepository.getInstance().getLoggedInUser();
 
         // Get view references for requests to user list, and initialize list and adapter
         contactRequestsTitle = root.findViewById(R.id.request_to_me_title);
@@ -102,16 +101,13 @@ public class ContactsFragment extends Fragment implements OnRequestReply {
         contactsView.setAdapter(contactsAdapter);
 
         // Make call to backend to get contacts
-        getContactsWithBalancesProcess = new GetContactsWithBalancesProcess();
-        getContactsWithBalancesProcess.execute(loggedInUser);
+        makeRequestForContactsWithBalances(loggedInUser);
 
         // Make call to backend to get contacts requested by user
-        getContactsRequestedProcess = new GetContactsRequested();
-        getContactsRequestedProcess.execute(loggedInUser);
+        makeRequestForPendingContactsRequested(loggedInUser);
 
         // Make call to backend to get contact requests
-        getContactRequestsProcess = new GetContactRequests();
-        getContactRequestsProcess.execute(loggedInUser);
+        makeRequestForPendingContactRequests(loggedInUser);
 
         return root;
     }
@@ -157,108 +153,118 @@ public class ContactsFragment extends Fragment implements OnRequestReply {
     public void onDestroy() {
         super.onDestroy();
 
-        // Cancel/terminate any processes that are still running
-        if (getContactsWithBalancesProcess != null) {
-            getContactsWithBalancesProcess.cancel(true);
-        }
-        if (getContactRequestsProcess != null) {
-            getContactsRequestedProcess.cancel(true);
-        }
-        if (getContactsRequestedProcess != null) {
-            getContactsRequestedProcess.cancel(true);
-        }
+        // Cancel/terminate any requests that are still running or queued
+        ConnectionAdapter.getInstance().getRequestQueue().cancelAll(hashCode());
     }
 
-    private final class GetContactsWithBalancesProcess extends AsyncTask<UserAccount, Void, Result> {
+    private void makeRequestForContactsWithBalances(UserAccount loggedInUser) {
+        contactsView.onBeginLoading();
 
-        @Override
-        protected void onPreExecute() {
-            super.onPreExecute();
-            contactsView.onBeginLoading();
-        }
+        RedirectableJsonArrayRequest request = new RedirectableJsonArrayRequest(
+                ConnectionAdapter.BASE_URL + TransactionManager.BALANCES_END_POINT + "/" + loggedInUser.getId() + "/",
+                new Response.Listener<JSONArray>() {
+                    @Override
+                    public void onResponse(JSONArray response) {
+                        Log.d("CONTACTS", response.toString());
 
-        @Override
-        protected Result doInBackground(UserAccount... params) {
-            UserAccount loggedInUser = params[0];
-            BalanceCalculator calculator = new BalanceCalculator();
-            // TODO: Remove sleep
-            try {
-                Thread.sleep(ThreadLocalRandom.current().nextInt(250, 1500));
-            } catch (InterruptedException e) {
-                e.printStackTrace();
-            }
-            return new Result.Success(calculator.calculateBalances());
-        }
+                        try {
+                            if (response.getJSONObject(0).has("error")) {
+                                throw new Exception();
+                            } else if (response.getJSONObject(0).has("empty")) {
+                                contactsAdapter.setContactsWithBalances(new ArrayList<>());
+                                return;
+                            }
 
-        @Override
-        protected void onPostExecute(Result result) {
-            super.onPostExecute(result);
-            if (result instanceof Result.Success) {
-                List<Pair<UserAccount, Integer>> contactsWithBalances;
-                contactsWithBalances = (List<Pair<UserAccount, Integer>>) ((Result.Success) result).getData();
-                contactsAdapter.setContactsWithBalances(contactsWithBalances);
-            } else {
-                contactsView.onFailToFinishLoading();
-            }
-        }
+                            // On success
+                            contactsAdapter.setContactsWithBalances(BalanceCalculator.parseBalancesFromJson(response));
+                        } catch (Exception e) {
+                            // On parse error, set contacts view to fail to finish loading mode
+                            contactsView.onFailToFinishLoading();
+                        }
+                    }
+                },
+                new Response.ErrorListener() {
+                    @Override
+                    public void onErrorResponse(VolleyError error) {
+                        // On error, set contacts view to fail to finish loading mode
+                        Log.d("CONTACTS", error.toString());
+                        contactsView.onFailToFinishLoading();
+                    }
+                }
+        );
 
+        ConnectionAdapter.getInstance().addToRequestQueue(request, hashCode());
     }
 
-    private final class GetContactRequests extends AsyncTask<UserAccount, Void, Result> {
+    private void makeRequestForPendingContactRequests(UserAccount loggedInUser) {
+        RedirectableJsonArrayRequest request = new RedirectableJsonArrayRequest(
+                ConnectionAdapter.BASE_URL + ContactRequestManager.PENDING_END_POINT + "/" + loggedInUser.getId() + "/",
+                new Response.Listener<JSONArray>() {
+                    @Override
+                    public void onResponse(JSONArray response) {
+                        Log.d("CONTACTS", response.toString());
 
-        @Override
-        protected Result doInBackground(UserAccount... params) {
-            UserAccount loggedInUser = params[0];
-            ContactRequestManager requestManager = new ContactRequestManager();
-            // TODO: Remove sleep
-            try {
-                Thread.sleep(ThreadLocalRandom.current().nextInt(250, 1500));
-            } catch (InterruptedException e) {
-                e.printStackTrace();
-            }
-            return requestManager.getAllContactRequestsFor(loggedInUser);
-        }
+                        try {
+                            if (response.getJSONObject(0).has("error")) {
+                                throw new Exception();
+                            } else if (response.getJSONObject(0).has("empty")) {
+                                return;
+                            }
 
-        @Override
-        protected void onPostExecute(Result result) {
-            super.onPostExecute(result);
-            if (result instanceof Result.Success) {
-                List<UserAccount> requestsForUser;
-                requestsForUser = (List<UserAccount>) ((Result.Success) result).getData();
-                contactRequestsAdapter.setContactRequests(requestsForUser);
-            } else {
-                Toast.makeText(getContext(), R.string.failure_contact_requests, Toast.LENGTH_SHORT).show();
-            }
-        }
+                            // On success
+                            contactRequestsAdapter.setContactRequests(ContactRequestManager.parseContactRequestsFromJson(response));
+                        } catch (Exception e) {
+                            // On parse error, set contacts view to fail to finish loading mode
+                            Toast.makeText(getContext(), R.string.failure_contact_requests, Toast.LENGTH_SHORT).show();
+                        }
+                    }
+                },
+                new Response.ErrorListener() {
+                    @Override
+                    public void onErrorResponse(VolleyError error) {
+                        // On error, set contacts view to fail to finish loading mode
+                        Log.d("CONTACTS", error.toString());
+                        Toast.makeText(getContext(), R.string.failure_contact_requests, Toast.LENGTH_SHORT).show();
+                    }
+                }
+        );
 
+        ConnectionAdapter.getInstance().addToRequestQueue(request, hashCode());
     }
 
-    private final class GetContactsRequested extends AsyncTask<UserAccount, Void, Result> {
+    private void makeRequestForPendingContactsRequested(UserAccount loggedInUser) {
+        RedirectableJsonArrayRequest request = new RedirectableJsonArrayRequest(
+                ConnectionAdapter.BASE_URL + ContactRequestManager.PENDING_FROM_USER_END_POINT + "/" + loggedInUser.getId() + "/",
+                new Response.Listener<JSONArray>() {
+                    @Override
+                    public void onResponse(JSONArray response) {
+                        Log.d("CONTACTS", response.toString());
 
-        @Override
-        protected Result doInBackground(UserAccount... params) {
-            UserAccount loggedInUser = params[0];
-            ContactRequestManager requestManager = new ContactRequestManager();
-            // TODO: Remove sleep
-            try {
-                Thread.sleep(ThreadLocalRandom.current().nextInt(250, 1500));
-            } catch (InterruptedException e) {
-                e.printStackTrace();
-            }
-            return requestManager.getAllContectRequestsBy(loggedInUser);
-        }
+                        try {
+                            if (response.getJSONObject(0).has("error")) {
+                                throw new Exception();
+                            } else if (response.getJSONObject(0).has("empty")) {
+                                return;
+                            }
 
-        @Override
-        protected void onPostExecute(Result result) {
-            super.onPostExecute(result);
-            if (result instanceof Result.Success) {
-                List<UserAccount> requestsByUser;
-                requestsByUser = (List<UserAccount>) ((Result.Success) result).getData();
-                contactsRequestedAdapter.setContactsRequested(requestsByUser);
-            } else {
-                Toast.makeText(getContext(), R.string.failure_contact_requests, Toast.LENGTH_SHORT).show();
-            }
-        }
+                            // On success
+                            contactsRequestedAdapter.setContactsRequested(ContactRequestManager.parseContactRequestsFromJson(response));
+                        } catch (Exception e) {
+                            // On parse error, set contacts view to fail to finish loading mode
+                            Toast.makeText(getContext(), R.string.failure_contact_requests, Toast.LENGTH_SHORT).show();
+                        }
+                    }
+                },
+                new Response.ErrorListener() {
+                    @Override
+                    public void onErrorResponse(VolleyError error) {
+                        // On error, set contacts view to fail to finish loading mode
+                        Log.d("CONTACTS", error.toString());
+                        Toast.makeText(getContext(), R.string.failure_contact_requests, Toast.LENGTH_SHORT).show();
+                    }
+                }
+        );
 
+        ConnectionAdapter.getInstance().addToRequestQueue(request, hashCode());
     }
 }

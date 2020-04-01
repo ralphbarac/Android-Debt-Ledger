@@ -2,26 +2,30 @@ package cs4474.g9.debtledger.ui.dashboard;
 
 import android.content.Intent;
 import android.graphics.Color;
-import android.os.AsyncTask;
 import android.os.Bundle;
-import android.util.Pair;
+import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
 import android.widget.ImageView;
 
+import com.android.volley.Response;
+import com.android.volley.VolleyError;
 import com.google.android.material.tabs.TabLayout;
 
-import java.util.List;
-import java.util.concurrent.ThreadLocalRandom;
+import org.json.JSONArray;
+
+import java.util.ArrayList;
 
 import androidx.annotation.NonNull;
 import androidx.annotation.Nullable;
 import androidx.fragment.app.Fragment;
 import androidx.viewpager.widget.ViewPager;
 import cs4474.g9.debtledger.R;
-import cs4474.g9.debtledger.data.Result;
+import cs4474.g9.debtledger.data.ConnectionAdapter;
+import cs4474.g9.debtledger.data.RedirectableJsonArrayRequest;
 import cs4474.g9.debtledger.data.login.LoginRepository;
+import cs4474.g9.debtledger.data.model.TransactionManager;
 import cs4474.g9.debtledger.data.model.UserAccount;
 import cs4474.g9.debtledger.logic.BalanceCalculator;
 import cs4474.g9.debtledger.ui.shared.OnActionButtonClickedListener;
@@ -35,8 +39,6 @@ public class DashboardFragment extends Fragment implements OnActionButtonClicked
     private final int SOLID = 255;
 
     private DashboardPageAdapter pageAdapter;
-
-    private AsyncTask<UserAccount, Void, Result> getBalancesProcess;
 
     public View onCreateView(@NonNull LayoutInflater inflater, ViewGroup container, Bundle savedInstanceState) {
         return inflater.inflate(R.layout.fragment_dashboard, container, false);
@@ -109,24 +111,20 @@ public class DashboardFragment extends Fragment implements OnActionButtonClicked
         // Initial selected tab should be with "All" Outstanding balances, which appears in the middle, or at position 1
         viewPager.setCurrentItem(1);
 
-        getBalancesProcess = new GetBalancesProcess();
-        getBalancesProcess.execute(LoginRepository.getInstance(getContext()).getLoggedInUser());
+        makeRequestForContacts(LoginRepository.getInstance().getLoggedInUser());
     }
 
     @Override
     public void onDestroy() {
         super.onDestroy();
-        if (getBalancesProcess != null) {
-            getBalancesProcess.cancel(true);
-        }
+
+        // Cancel/terminate any requests that are still running or queued
+        ConnectionAdapter.getInstance().cancelAllRequests(hashCode());
     }
 
     @Override
     public void onFailedToLoadActionButtonClicked() {
-        if (getBalancesProcess == null || getBalancesProcess.getStatus() == AsyncTask.Status.FINISHED) {
-            getBalancesProcess = new GetBalancesProcess();
-            getBalancesProcess.execute(LoginRepository.getInstance(getContext()).getLoggedInUser());
-        }
+        makeRequestForContacts(LoginRepository.getInstance().getLoggedInUser());
     }
 
     @Override
@@ -134,40 +132,43 @@ public class DashboardFragment extends Fragment implements OnActionButtonClicked
         // No button, so this should be impossible :)
     }
 
-    private final class GetBalancesProcess extends AsyncTask<UserAccount, Void, Result> {
+    private void makeRequestForContacts(UserAccount loggedInUser) {
+        pageAdapter.onBeginLoading();
 
-        @Override
-        protected void onPreExecute() {
-            super.onPreExecute();
-            pageAdapter.onBeginLoading();
-        }
+        RedirectableJsonArrayRequest request = new RedirectableJsonArrayRequest(
+                ConnectionAdapter.BASE_URL + TransactionManager.BALANCES_END_POINT + "/" + loggedInUser.getId() + "/",
+                new Response.Listener<JSONArray>() {
+                    @Override
+                    public void onResponse(JSONArray response) {
+                        Log.d("DASHBOARD", response.toString());
 
-        @Override
-        protected Result doInBackground(UserAccount... params) {
-            UserAccount loggedInUser = params[0];
-            BalanceCalculator calculator = new BalanceCalculator();
-            List<Pair<UserAccount, Integer>> outstandingBalances = calculator.calculateOutstandingBalances();
-            // TODO: Remove sleep
-            try {
-                Thread.sleep(ThreadLocalRandom.current().nextInt(250, 1500));
-            } catch (InterruptedException e) {
-                e.printStackTrace();
-            }
-            return new Result.Success<>(outstandingBalances);
-        }
+                        try {
+                            if (response.getJSONObject(0).has("error")) {
+                                throw new Exception();
+                            } else if (response.getJSONObject(0).has("empty")) {
+                                pageAdapter.setData(new ArrayList<>());
+                                return;
+                            }
 
-        @Override
-        protected void onPostExecute(Result result) {
-            super.onPostExecute(result);
-            if (result instanceof Result.Success) {
-                List<Pair<UserAccount, Integer>> outstandingBalances;
-                outstandingBalances = (List<Pair<UserAccount, Integer>>) ((Result.Success) result).getData();
-                pageAdapter.setData(outstandingBalances);
+                            // On success
+                            pageAdapter.setData(BalanceCalculator.parseOutstandingBalancesFromJson(response));
+                        } catch (Exception e) {
+                            // On parse error, set dashboard pages as fail to finish loading mode
+                            pageAdapter.onFailToFinishLoading();
+                        }
+                    }
+                },
+                new Response.ErrorListener() {
+                    @Override
+                    public void onErrorResponse(VolleyError error) {
+                        // On error, set dashboard pages as fail to finish loading mode
+                        Log.d("DASHBOARD", error.toString());
+                        pageAdapter.onFailToFinishLoading();
+                    }
+                }
+        );
 
-            } else {
-                pageAdapter.onFailToFinishLoading();
-            }
-        }
-
+        ConnectionAdapter.getInstance().addToRequestQueue(request, hashCode());
     }
+
 }
