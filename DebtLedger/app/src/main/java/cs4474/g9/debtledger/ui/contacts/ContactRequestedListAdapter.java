@@ -8,8 +8,13 @@ import android.view.View;
 import android.view.ViewGroup;
 import android.widget.ImageView;
 import android.widget.TextView;
+import android.widget.Toast;
 
+import com.android.volley.Response;
+import com.android.volley.VolleyError;
 import com.google.android.material.dialog.MaterialAlertDialogBuilder;
+
+import org.json.JSONArray;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -18,6 +23,10 @@ import androidx.annotation.NonNull;
 import androidx.recyclerview.widget.RecyclerView;
 import cs4474.g9.debtledger.R;
 import cs4474.g9.debtledger.ViewContactActivity;
+import cs4474.g9.debtledger.data.ConnectionAdapter;
+import cs4474.g9.debtledger.data.ContactRequestManager;
+import cs4474.g9.debtledger.data.RedirectableJsonArrayRequest;
+import cs4474.g9.debtledger.data.login.LoginRepository;
 import cs4474.g9.debtledger.data.model.UserAccount;
 import cs4474.g9.debtledger.logic.ColourGenerator;
 
@@ -95,8 +104,10 @@ public class ContactRequestedListAdapter extends RecyclerView.Adapter<ContactReq
                             .setNegativeButton("Yes", new DialogInterface.OnClickListener() {
                                 @Override
                                 public void onClick(DialogInterface dialog, int which) {
-                                    // TODO: Delete contact request from database
-                                    removeRequestedContact(getAdapterPosition());
+                                    makeRequestToDeleteContactRequest(
+                                            LoginRepository.getInstance().getLoggedInUser(),
+                                            contactRequest
+                                    );
                                 }
                             })
                             .show();
@@ -112,6 +123,39 @@ public class ContactRequestedListAdapter extends RecyclerView.Adapter<ContactReq
             Intent toViewContact = new Intent(v.getContext(), ViewContactActivity.class);
             toViewContact.putExtra(ViewContactActivity.CONTACT, contactsRequested.get(getAdapterPosition()));
             v.getContext().startActivity(toViewContact);
+        }
+
+        private void makeRequestToDeleteContactRequest(UserAccount loggedInUser, UserAccount contactRequest) {
+            RedirectableJsonArrayRequest request = new RedirectableJsonArrayRequest(
+                    ConnectionAdapter.BASE_URL + ContactRequestManager.DELETE_END_POINT + "/"  + loggedInUser.getId() + "/" + contactRequest.getId() + "/",
+                    new Response.Listener<JSONArray>() {
+                        @Override
+                        public void onResponse(JSONArray response) {
+                            Log.d("CONTACTS", response.toString());
+
+                            try {
+                                if (response.getJSONObject(0).has("error")) {
+                                    throw new Exception();
+                                } else {
+                                    // On success
+                                    removeRequestedContact(getAdapterPosition());
+                                }
+                            } catch (Exception e) {
+                                // On parse error, display failed to cancel contact request message
+                                Toast.makeText(cancel.getContext(), R.string.failure_cancel_contact_request, Toast.LENGTH_SHORT).show();
+                            }
+                        }
+                    },
+                    new Response.ErrorListener() {
+                        @Override
+                        public void onErrorResponse(VolleyError error) {
+                            // On error, display failed to cancel contact request message
+                            Toast.makeText(cancel.getContext(), R.string.failure_cancel_contact_request, Toast.LENGTH_SHORT).show();
+                        }
+                    }
+            );
+
+            ConnectionAdapter.getInstance().addToRequestQueue(request, hashCode());
         }
     }
 }

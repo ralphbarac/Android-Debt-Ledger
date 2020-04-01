@@ -2,8 +2,14 @@ package cs4474.g9.debtledger.ui;
 
 import android.content.Intent;
 import android.os.Bundle;
+import android.util.Log;
+import android.widget.Toast;
 
+import com.android.volley.Response;
+import com.android.volley.VolleyError;
 import com.google.android.material.bottomnavigation.BottomNavigationView;
+
+import org.json.JSONArray;
 
 import androidx.annotation.Nullable;
 import androidx.appcompat.app.AppCompatActivity;
@@ -12,10 +18,10 @@ import androidx.navigation.Navigation;
 import androidx.navigation.ui.AppBarConfiguration;
 import androidx.navigation.ui.NavigationUI;
 import cs4474.g9.debtledger.R;
+import cs4474.g9.debtledger.data.ConnectionAdapter;
 import cs4474.g9.debtledger.data.ContactRequestManager;
-import cs4474.g9.debtledger.data.Result;
+import cs4474.g9.debtledger.data.RedirectableJsonArrayRequest;
 import cs4474.g9.debtledger.data.login.LoginRepository;
-import cs4474.g9.debtledger.data.model.UserAccount;
 
 public class MainActivity extends AppCompatActivity {
 
@@ -69,17 +75,49 @@ public class MainActivity extends AppCompatActivity {
     }
 
     public void updateContactsNotificationBadge() {
-        ContactRequestManager contactRequestManager = new ContactRequestManager();
-        UserAccount loggedInUser = LoginRepository.getInstance().getLoggedInUser();
-        Result result = contactRequestManager.getCountOfContactRequestsFor(loggedInUser);
-        int numContactRequests = result instanceof Result.Success
-                ? (int) ((Result.Success) result).getData()
-                : 0;
-        if (numContactRequests > 0) {
-            bottomNavigationView.getOrCreateBadge(R.id.navigation_contacts).setNumber(numContactRequests);
-        } else {
-            bottomNavigationView.removeBadge(R.id.navigation_contacts);
-        }
+        RedirectableJsonArrayRequest request = new RedirectableJsonArrayRequest(
+                ConnectionAdapter.BASE_URL + ContactRequestManager.PENDING_END_POINT + "/" + LoginRepository.getInstance().getLoggedInUser().getId() + "/",
+                new Response.Listener<JSONArray>() {
+                    @Override
+                    public void onResponse(JSONArray response) {
+                        Log.d("CONTACTS", response.toString());
+
+                        try {
+                            int numContactRequests;
+                            if (response.getJSONObject(0).has("error")) {
+                                throw new Exception();
+                            } else if (response.getJSONObject(0).has("empty")) {
+                                numContactRequests = 0;
+                            } else {
+                                numContactRequests = response.length();
+                            }
+
+                            if (numContactRequests > 0) {
+                                bottomNavigationView.getOrCreateBadge(R.id.navigation_contacts).setNumber(numContactRequests);
+                            } else {
+                                bottomNavigationView.removeBadge(R.id.navigation_contacts);
+                            }
+                        } catch (Exception e) {
+                            // On parse error, display failed to load contact requests message
+                            Toast.makeText(MainActivity.this, R.string.failure_contact_requests, Toast.LENGTH_SHORT).show();
+                        }
+                    }
+                },
+                new Response.ErrorListener() {
+                    @Override
+                    public void onErrorResponse(VolleyError error) {
+                        // On error, display failed to load contact requests message
+                        Log.d("CONTACTS", error.toString());
+                        Toast.makeText(MainActivity.this, R.string.failure_contact_requests, Toast.LENGTH_SHORT).show();
+                    }
+                }
+        );
+
+        ConnectionAdapter.getInstance().addToRequestQueue(request, hashCode());
     }
 
+    @Override
+    protected void onDestroy() {
+        super.onDestroy();
+    }
 }
