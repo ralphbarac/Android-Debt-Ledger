@@ -31,6 +31,8 @@ import cs4474.g9.debtledger.logic.BalanceCalculator;
 import cs4474.g9.debtledger.ui.shared.OnActionButtonClickedListener;
 import cs4474.g9.debtledger.ui.transaction.CreateTransactionActivity;
 
+import static android.app.Activity.RESULT_OK;
+
 public class DashboardFragment extends Fragment implements OnActionButtonClickedListener {
 
     public static final int FROM_DASHBOARD = 0;
@@ -112,6 +114,17 @@ public class DashboardFragment extends Fragment implements OnActionButtonClicked
         viewPager.setCurrentItem(1);
 
         makeRequestForContacts(LoginRepository.getInstance().getLoggedInUser());
+    }
+
+    @Override
+    public void onActivityResult(int requestCode, int resultCode, @Nullable Intent data) {
+        super.onActivityResult(requestCode, resultCode, data);
+
+        if (requestCode == FROM_DASHBOARD) {
+            if (resultCode ==  RESULT_OK) {
+                makeRequestForContacts(LoginRepository.getInstance().getLoggedInUser());
+            }
+        }
     }
 
     @Override
