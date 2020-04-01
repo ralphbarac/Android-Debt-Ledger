@@ -179,40 +179,14 @@ public class SignupActivity extends AppCompatActivity {
                     @Override
                     public void onResponse(JSONArray response) {
                         Log.d("SIGN-UP", response.toString());
-                        makeLoginRequest(email, password);
-                    }
-                },
-                new Response.ErrorListener() {
-                    @Override
-                    public void onErrorResponse(VolleyError error) {
-                        // On error, display signup failed to user
-                        Log.d("SIGN-UP", error.toString());
-                        Toast.makeText(SignupActivity.this, R.string.signup_failed, Toast.LENGTH_SHORT).show();
-                        signupButton.setEnabled(true);
-                        loadingProgressBar.setVisibility(View.INVISIBLE);
-                    }
-                }
-        );
-
-        ConnectionAdapter.getInstance().addToRequestQueue(request, hashCode());
-    }
-
-    private void makeLoginRequest(String email, String password) {
-        RedirectableJsonArrayRequest request = new RedirectableJsonArrayRequest(
-                ConnectionAdapter.BASE_URL + UserAccountManager.LOGIN_END_POINT + "/" + email + "/" + password + "/",
-                new Response.Listener<JSONArray>() {
-                    @Override
-                    public void onResponse(JSONArray response) {
-                        Log.d("SIGN-UP", response.toString());
 
                         try {
-                            // If user not found, display signup failed to user...
-                            if (response.getJSONObject(0).has("result") &&
-                                    response.getJSONObject(0).getString("result").equals("user not found")) {
+                            // If error, display signup failed to user...
+                            if (response.getJSONObject(0).has("error")) {
                                 throw new Exception();
                             }
 
-                            // On success, parse UserAccount, store in repository, and process to dashboard
+                            // On success, parse UserAccount, store in repository, and proceed to dashboard
                             UserAccount loggedInUser = UserAccountManager.parseUserAccountFromJson(response.getJSONObject(0));
                             loginRepository.loginUser(loggedInUser, loggedInUser.getId());
                             proceedToDashboard(loggedInUser);

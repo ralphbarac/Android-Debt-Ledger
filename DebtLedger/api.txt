@@ -76,7 +76,7 @@ Accept a request:
 -Note: also creates associated contact table entries for both user and friend
 
 Deny request:
--Format: cs4474.heliohost.org/contact_request/accept/<user id>/<friend id>/
+-Format: cs4474.heliohost.org/contact_request/deny/<user id>/<friend id>/
 -Output: JSON array with user id, contact id, request status (which is always 'denied' at this point)
 
 --Contact Groups
