@@ -64,6 +64,9 @@
                 case "pending":
                     $contactRequestRestHandler->pending($_GET["user"]);
                     break;
+                case "pendingfrom":
+                    $contactRequestRestHandler->pendingFromuser($_GET["user"]);
+                    break;
                 case "add":
                     $contactRequestRestHandler->add($_GET["user"], $_GET["contact"]);
                     break;
@@ -107,6 +110,8 @@
                 case "add":
                     $transactionRestHandler->add($_GET["info"]);
                     break;
+                case "balances":
+                    $transactionRestHandler->computeBalances($_GET["id"]);
                 case "":
                     break;
             }

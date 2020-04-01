@@ -1,11 +1,11 @@
 <?php
     #require_once("SimpleRestHandler.php");
 
-    class ContactGroupMemberRestHandler extends SimpleRestHandler
+    class ContactGroupMemberRestHandler
     {
         public function memberList($id)
         {
-            $connection = new mysqli("localhost", "cs4474_client", "egbX2W0Ucz", "cs4474_project");
+            $connection = new mysqli("cs4474-debt-ledger.chv9hyuyepg2.us-east-2.rds.amazonaws.com", "admin", "I6leZnstPdI7SSqameT4", "debt_ledger");
             $query = "SELECT id, first_name, last_name, email FROM user WHERE id IN (SELECT user from contact_group_member WHERE group_id=".$id.")";
 
             if($result = $connection->query($query))
@@ -32,18 +32,26 @@
 
         public function add($group, $user)
         {
-            $connection = new mysqli("localhost", "cs4474_client", "egbX2W0Ucz", "cs4474_project");
-            $query = "INSERT INTO contact_group_member (user, contact) VALUES (group_id=".$group.", user=".$user.")";
+            $connection = new mysqli("cs4474-debt-ledger.chv9hyuyepg2.us-east-2.rds.amazonaws.com", "admin", "I6leZnstPdI7SSqameT4", "debt_ledger");
+            $query = "INSERT INTO contact_group_member (group_id, user) VALUES (".$group.", ".$user.")";
 
             if($result = $connection->query($query))
             {
-                if($result->affected_rows > 0)
+                if($connection->affected_rows > 0)
                 {
-                    $query = "SELECT * FROM contact_group_member WHERE group_id=".$group.", user=".$user;
-                    while($row = $result->fetch_assoc())
+                    $query = "SELECT * FROM contact_group_member WHERE group_id=".$group." AND user=".$user;
+
+                    if($result = $connection->query($query))
                     {
-                        $response[] = $row;
+                        while($row = $result->fetch_assoc())
+                        {
+                            $response[] = $row;
+                        }
                     }
+                    else {
+                        $response[] = array("result" => $connection->error);
+                    }
+    
                 }
                 else
                 {
@@ -60,14 +68,14 @@
             $connection->close();
         }
 
-        public function delete($group, $user)
+        public function remove($group, $user)
         {
-            $connection = new mysqli("localhost", "cs4474_client", "egbX2W0Ucz", "cs4474_project");
-            $query = "DELETE FROM contact_group_member WHERE group_id=".$group.", user=".$user;
+            $connection = new mysqli("cs4474-debt-ledger.chv9hyuyepg2.us-east-2.rds.amazonaws.com", "admin", "I6leZnstPdI7SSqameT4", "debt_ledger");
+            $query = "DELETE FROM contact_group_member WHERE group_id=".$group." AND user=".$user;
             
             if($result = $connection->query($query))
             {
-                if($result->affected_rows > 0)
+                if($connection->affected_rows > 0)
                 {
                     $response[] = array("result" => "member removed");
                 }

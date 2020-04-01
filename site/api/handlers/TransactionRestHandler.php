@@ -1,11 +1,11 @@
 <?php
     #require_once("SimpleRestHandler.php");
 
-    class TransactionRestHandler extends SimpleRestHandler
+    class TransactionRestHandler
     {
         public function id($id)
         {
-            $connection = new mysqli("localhost", "cs4474_client", "egbX2W0Ucz", "cs4474_project");
+            $connection = new mysqli("cs4474-debt-ledger.chv9hyuyepg2.us-east-2.rds.amazonaws.com", "admin", "I6leZnstPdI7SSqameT4", "debt_ledger");
             $query = "SELECT * FROM transaction WHERE id=".$id;
 
             if($result = $connection->query($query))
@@ -28,7 +28,7 @@
 
         public function debtor($id)
         {
-            $connection = new mysqli("localhost", "cs4474_client", "egbX2W0Ucz", "cs4474_project");
+            $connection = new mysqli("cs4474-debt-ledger.chv9hyuyepg2.us-east-2.rds.amazonaws.com", "admin", "I6leZnstPdI7SSqameT4", "debt_ledger");
             $query = "SELECT * FROM transaction WHERE debtor=".$id;
 
             if($result = $connection->query($query))
@@ -51,7 +51,7 @@
 
         public function creditor($id)
         {
-            $connection = new mysqli("localhost", "cs4474_client", "egbX2W0Ucz", "cs4474_project");
+            $connection = new mysqli("cs4474-debt-ledger.chv9hyuyepg2.us-east-2.rds.amazonaws.com", "admin", "I6leZnstPdI7SSqameT4", "debt_ledger");
             $query = "SELECT * FROM transaction WHERE creditor=".$id;
 
             if($result = $connection->query($query))
@@ -74,7 +74,7 @@
 
         public function add($input)
         {
-            $connection = new mysqli("localhost", "cs4474_client", "egbX2W0Ucz", "cs4474_project");
+            $connection = new mysqli("cs4474-debt-ledger.chv9hyuyepg2.us-east-2.rds.amazonaws.com", "admin", "I6leZnstPdI7SSqameT4", "debt_ledger");
             $info = json_decode($input);
             
             if(isset($info->description))
@@ -88,7 +88,7 @@
             
             if($result = $connection->query($query))
             {
-                if($result->affected_rows > 0)
+                if($connection->affected_rows > 0)
                 {
                     $query = "SELECT * FROM transaction WHERE id=".$result->insert_id;
                     while($row = $result->fetch_assoc())
@@ -104,6 +104,36 @@
 
             echo json_encode($response);
             $result->close();
+            $connection->close();
+        }
+
+        public function computeBalances($id) {
+            $connection = new mysqli("cs4474-debt-ledger.chv9hyuyepg2.us-east-2.rds.amazonaws.com", "admin", "I6leZnstPdI7SSqameT4", "debt_ledger");
+            $query = "SELECT id, first_name, last_name, email, SUM(balances.balance) AS balance FROM
+                        (SELECT contact.contact, debts.balance FROM contact LEFT JOIN (SELECT creditor AS contact, SUM(amount*-1) AS balance FROM transaction WHERE debtor = ".$id." GROUP BY creditor) AS debts ON contact.contact = debts.contact WHERE user = ".$id."
+                        UNION
+                        SELECT contact.contact, credits.balance FROM contact LEFT JOIN (SELECT debtor AS contact, SUM(amount) AS balance FROM transaction WHERE creditor = ".$id." GROUP BY debtor) AS credits ON contact.contact = credits.contact WHERE user = ".$id.") AS balances INNER JOIN user ON balances.contact = user.id
+                        GROUP BY balances.contact;";
+
+            if($result = $connection->query($query))
+            {
+                while($row = $result->fetch_assoc())
+                {
+                    $response[] = $row;
+                }
+                $result->close();
+
+                if($response === NULL)
+                {
+                    $response[] = array("empty" => "no contacts found"); 
+                }
+            }
+            else
+            {
+                $response[] = array("result" => $connection->error);
+            }
+
+            echo json_encode($response);
             $connection->close();
         }
         

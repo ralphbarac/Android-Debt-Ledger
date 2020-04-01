@@ -1,12 +1,12 @@
 <?php
     #require_once("SimpleRestHandler.php");
 
-    class ContactRestHandler extends SimpleRestHandler
+    class ContactRestHandler
     {
         public function id($id)
         {
-            $connection = new mysqli("localhost", "cs4474_client", "egbX2W0Ucz", "cs4474_project");
-            $query = "SELECT id, first_name, last_name FROM user WHERE id IN (SELECT contact from contact WHERE user=".$id.")";
+            $connection = new mysqli("cs4474-debt-ledger.chv9hyuyepg2.us-east-2.rds.amazonaws.com", "admin", "I6leZnstPdI7SSqameT4", "debt_ledger");
+            $query = "SELECT id, first_name, last_name, email FROM user WHERE id IN (SELECT contact from contact WHERE user=".$id.")";
 
             if($result = $connection->query($query))
             {
@@ -19,6 +19,8 @@
                 {
                     $response[] = array("result" => "no contacts found"); 
                 }
+            } else {
+                 $response[] = array("result" => $connection->error); 
             }
 
             echo json_encode($response);
@@ -29,7 +31,7 @@
         /*
         public function add($user, $contact)
         {
-            $connection = new mysqli("localhost", "cs4474_client", "egbX2W0Ucz", "cs4474_project");
+            $connection = new mysqli("cs4474-debt-ledger.chv9hyuyepg2.us-east-2.rds.amazonaws.com", "admin", "I6leZnstPdI7SSqameT4", "debt_ledger");
             $query = "INSERT INTO contact (user, contact) VALUES user=".$user.", contact=".$contact;
             $query2 = "INSERT INTO contact (user, contact) VALUES user=".$contact.", contact=".$user;
 
@@ -53,13 +55,13 @@
 
         public function delete($user, $contact)
         {
-            $connection = new mysqli("localhost", "cs4474_client", "egbX2W0Ucz", "cs4474_project");
+            $connection = new mysqli("cs4474-debt-ledger.chv9hyuyepg2.us-east-2.rds.amazonaws.com", "admin", "I6leZnstPdI7SSqameT4", "debt_ledger");
             $query = "DELETE FROM contact WHERE user=".$user." AND contact=".$contact;
             $query2 = "DELETE FROM contact WHERE user=".$contact." AND contact=".$user;
 
             if(($result = $connection->query($query)) && ($result2 = $connection->query($query2)))
             {
-                if(($result->affected_rows > 0) && ($result2->affected_rows > 0))
+                if($connection->affected_rows > 0)
                 {
                     $response[] = array("result" => "contacts deleted");
                 }

@@ -1,11 +1,11 @@
 <?php
     #require_once("SimpleRestHandler.php");
 
-    class ContactGroupRestHandler extends SimpleRestHandler
+    class ContactGroupRestHandler
     {
         public function groupList($user)
         {
-            $connection = new mysqli("localhost", "cs4474_client", "egbX2W0Ucz", "cs4474_project");
+            $connection = new mysqli("cs4474-debt-ledger.chv9hyuyepg2.us-east-2.rds.amazonaws.com", "admin", "I6leZnstPdI7SSqameT4", "debt_ledger");
             $query = "SELECT * FROM contact_group WHERE owner=".$user;
 
             if($result = $connection->query($query))
@@ -28,7 +28,7 @@
 
         public function group($id)
         {
-            $connection = new mysqli("localhost", "cs4474_client", "egbX2W0Ucz", "cs4474_project");
+            $connection = new mysqli("cs4474-debt-ledger.chv9hyuyepg2.us-east-2.rds.amazonaws.com", "admin", "I6leZnstPdI7SSqameT4", "debt_ledger");
             $query = "SELECT * FROM contact_group WHERE id=".$id;
 
             if($result = $connection->query($query))
@@ -51,13 +51,13 @@
 
         public function add($input)
         {
-            $connection = new mysqli("localhost", "cs4474_client", "egbX2W0Ucz", "cs4474_project");
+            $connection = new mysqli("cs4474-debt-ledger.chv9hyuyepg2.us-east-2.rds.amazonaws.com", "admin", "I6leZnstPdI7SSqameT4", "debt_ledger");
             $info = json_decode($input);
             $query = "INSERT INTO contact_group (name, owner) VALUES ('".$info->name."', ".$info->owner.")";
 
             if($result = $connection->query($query))
             {
-                if($result->affected_rows > 0)
+                if($connection->affected_rows > 0)
                 {
                     $query = "SELECT * FROM contact_group WHERE id=".$result->insert_id;
                     while($row = $result->fetch_assoc())
@@ -78,12 +78,12 @@
 
         public function delete($id)
         {
-            $connection = new mysqli("localhost", "cs4474_client", "egbX2W0Ucz", "cs4474_project");
+            $connection = new mysqli("cs4474-debt-ledger.chv9hyuyepg2.us-east-2.rds.amazonaws.com", "admin", "I6leZnstPdI7SSqameT4", "debt_ledger");
             $query = "DELETE FROM contact_group WHERE id=".$id;
 
             if($result = $connection->query($query))
             {
-                if($result->affected_rows > 0)
+                if($connection->affected_rows > 0)
                 {
                     $response[] = array("result" => "group deleted");
                 }
