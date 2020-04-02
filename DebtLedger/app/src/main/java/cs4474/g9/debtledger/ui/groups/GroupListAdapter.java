@@ -20,11 +20,16 @@ import cs4474.g9.debtledger.logic.ColourGenerator;
 
 public class GroupListAdapter extends RecyclerView.Adapter<GroupListAdapter.Item> {
 
-    private List<Group> group_list;
+    private List<Group> groups;
 
-    public GroupListAdapter(List<Group> group_list) {
+    public GroupListAdapter() {
         super();
-        this.group_list = group_list;
+        this.groups = new ArrayList<>();
+    }
+
+    public void setGroups(List<Group> groups) {
+        this.groups = groups;
+        notifyDataSetChanged();
     }
 
     @NonNull
@@ -37,39 +42,32 @@ public class GroupListAdapter extends RecyclerView.Adapter<GroupListAdapter.Item
 
     @Override
     public void onBindViewHolder(@NonNull Item holder, int position) {
-        Group group = group_list.get(position);
-        String group_name = group.getGroupName();
-        List<UserAccount> group_members = group.getGroupMembers();
-        List<String> group_first_names = new ArrayList<>();
-        int memberCount = group_members.size();
-        // Add all the first names of the group members to a list
-        for (int i = 0; i < memberCount; ++i) {
-            group_first_names.add(group_members.get(i).getFirstName());
+        Group group = groups.get(position);
+
+        // Build string containing summary of group member names
+        List<UserAccount> groupMembers = group.getGroupMembers();
+        String groupMemberNames = groupMembers.size() > 0 ? groupMembers.get(0).getFirstName() : "No members";
+        if (groupMembers.size() >= 2) {
+            groupMemberNames = groupMemberNames + ", " + groupMembers.get(1).getFirstName();
+        }
+        if (groupMembers.size() >= 3) {
+            groupMemberNames = groupMemberNames + ", +" + (groupMembers.size() - 2) + " others";
         }
 
-        String firstNameString = "";
-        // If there are more than 2 members we need to summarize
-        if (memberCount > 2) {
-            int overflowCount = memberCount - 2;
-            firstNameString = firstNameString.concat(group_first_names.get(0) + ", " + group_first_names.get(1) + ", +" + overflowCount + " others");
-        } else {
-            firstNameString = firstNameString.concat(group_first_names.get(0) + ", " + group_first_names.get(1));
-        }
-
-        holder.groupAvatar.setColorFilter(ColourGenerator.generateFromGroupName(group_name));
-        holder.groupAvatarCharacter.setText(group_name.substring(0, 1));
-        holder.groupName.setText(group_name);
-        holder.groupMemberNames.setText(firstNameString);
+        holder.groupAvatar.setColorFilter(ColourGenerator.generateFromGroupName(group.getGroupName()));
+        holder.groupAvatarCharacter.setText(group.getGroupName().substring(0, 1));
+        holder.groupName.setText(group.getGroupName());
+        holder.groupMemberNames.setText(groupMemberNames);
     }
 
     @Override
     public int getItemCount() {
-        return group_list == null ? 0 : group_list.size();
+        return groups == null ? 0 : groups.size();
     }
 
     public void addNewGroup(Group group) {
         //TODO: Currently just adds to top of list
-        group_list.add(group);
+        groups.add(group);
         notifyDataSetChanged();
     }
 
@@ -92,7 +90,7 @@ public class GroupListAdapter extends RecyclerView.Adapter<GroupListAdapter.Item
         public void onClick(View v) {
             Log.d("GROUP", "Group clicked.");
             Intent toViewGroup = new Intent(v.getContext(), ViewGroupActivity.class);
-            toViewGroup.putExtra(ViewGroupActivity.GROUP, group_list.get(getAdapterPosition()));
+            toViewGroup.putExtra(ViewGroupActivity.GROUP, groups.get(getAdapterPosition()));
             v.getContext().startActivity(toViewGroup);
         }
     }

@@ -9,51 +9,53 @@ import android.view.MenuInflater;
 import android.view.MenuItem;
 import android.view.View;
 import android.view.ViewGroup;
-import android.widget.Toast;
+
+import com.android.volley.Response;
+import com.android.volley.VolleyError;
+
+import org.json.JSONArray;
 
 import java.util.ArrayList;
-import java.util.List;
 
 import androidx.annotation.NonNull;
+import androidx.annotation.Nullable;
 import androidx.fragment.app.Fragment;
 import androidx.recyclerview.widget.LinearLayoutManager;
-import androidx.recyclerview.widget.RecyclerView;
 import cs4474.g9.debtledger.R;
+import cs4474.g9.debtledger.data.ConnectionAdapter;
 import cs4474.g9.debtledger.data.GroupManager;
-import cs4474.g9.debtledger.data.Result;
+import cs4474.g9.debtledger.data.RedirectableJsonArrayRequest;
 import cs4474.g9.debtledger.data.login.LoginRepository;
-import cs4474.g9.debtledger.data.model.Group;
 import cs4474.g9.debtledger.data.model.UserAccount;
+import cs4474.g9.debtledger.ui.shared.LoadableRecyclerView;
+import cs4474.g9.debtledger.ui.shared.OnActionButtonClickedListener;
 
-public class GroupsFragment extends Fragment {
+public class GroupsFragment extends Fragment implements OnActionButtonClickedListener {
 
-    private RecyclerView groupView;
+    private LoadableRecyclerView groupsView;
+    private GroupListAdapter groupsAdapter;
 
     public View onCreateView(@NonNull LayoutInflater inflater, ViewGroup container, Bundle savedInstanceState) {
         View root = inflater.inflate(R.layout.fragment_groups, container, false);
         setHasOptionsMenu(true);
 
-        Result result;
-        UserAccount loggedInUser = LoginRepository.getInstance().getLoggedInUser();
+        groupsView = root.findViewById(R.id.groups_list);
+        groupsView.setHasFixedSize(true);
+        groupsView.setLayoutManager(new LinearLayoutManager(getContext()));
+        groupsView.addOnActionButtonClickedClickListener(this);
 
-        List<Group> userGroups = new ArrayList<>();
-        GroupManager groupManager = new GroupManager();
-        result = groupManager.getGroupsOf(loggedInUser);
-        if(result instanceof Result.Success) {
-            userGroups = (List<Group>) ((Result.Success) result).getData();
-        }
-        else {
-            Toast.makeText(getContext(), "Unable to get groups", Toast.LENGTH_SHORT).show();
-        }
-
-        groupView = root.findViewById(R.id.group_list);
-        groupView.setHasFixedSize(true);
-        groupView.setLayoutManager(new LinearLayoutManager(getContext()));
-
-        GroupListAdapter groupListAdapter = new GroupListAdapter(userGroups);
-        groupView.setAdapter(groupListAdapter);
+        groupsAdapter = new GroupListAdapter();
+        groupsView.setAdapter(groupsAdapter);
 
         return root;
+    }
+
+    @Override
+    public void onViewCreated(@NonNull View view, @Nullable Bundle savedInstanceState) {
+        super.onViewCreated(view, savedInstanceState);
+
+        UserAccount loggedInUser = LoginRepository.getInstance().getLoggedInUser();
+        makeRequestForGroups(loggedInUser);
     }
 
     @Override
@@ -65,7 +67,6 @@ public class GroupsFragment extends Fragment {
     public boolean onOptionsItemSelected(MenuItem item) {
         switch (item.getItemId()) {
             case R.id.add_group:
-                // TODO: Open Add Group Activity
                 Intent toAddGroup = new Intent(getActivity(), CreateEditGroupActivity.class);
                 toAddGroup.putExtra(CreateEditGroupActivity.MODE, CreateEditGroupActivity.CREATE_MODE);
                 startActivity(toAddGroup);
@@ -74,5 +75,64 @@ public class GroupsFragment extends Fragment {
             default:
                 return super.onOptionsItemSelected(item);
         }
+    }
+
+    @Override
+    public void onDestroy() {
+        super.onDestroy();
+
+        // Cancel/terminate any requests that are still running or queued
+        ConnectionAdapter.getInstance().cancelAllRequests(hashCode());
+    }
+
+    @Override
+    public void onFailedToLoadActionButtonClicked() {
+        makeRequestForGroups(LoginRepository.getInstance().getLoggedInUser());
+    }
+
+    @Override
+    public void onEmptyActionButtonClicked() {
+        Intent toAddGroup = new Intent(getActivity(), CreateEditGroupActivity.class);
+        toAddGroup.putExtra(CreateEditGroupActivity.MODE, CreateEditGroupActivity.CREATE_MODE);
+        startActivity(toAddGroup);
+    }
+
+    private void makeRequestForGroups(UserAccount loggedInUser) {
+        groupsView.onBeginLoading();
+
+        RedirectableJsonArrayRequest request = new RedirectableJsonArrayRequest(
+                ConnectionAdapter.BASE_URL + GroupManager.LIST_END_POINT + "/" + loggedInUser.getId() + "/",
+                new Response.Listener<JSONArray>() {
+                    @Override
+                    public void onResponse(JSONArray response) {
+                        Log.d("GROUPS", response.toString());
+
+                        try {
+                            if (response.getJSONObject(0).has("error")) {
+                                throw new Exception();
+                            } else if (response.getJSONObject(0).has("empty")) {
+                                groupsAdapter.setGroups(new ArrayList<>());
+                                return;
+                            }
+
+                            // On success
+                            groupsAdapter.setGroups(GroupManager.parseGroupsFromJson(response));
+                        } catch (Exception e) {
+                            // On parse error, set groups view to fail to finish loading mode
+                            groupsView.onFailToFinishLoading();
+                        }
+                    }
+                },
+                new Response.ErrorListener() {
+                    @Override
+                    public void onErrorResponse(VolleyError error) {
+                        // On error, set groups view to fail to finish loading mode
+                        Log.d("GROUPS", error.toString());
+                        groupsView.onFailToFinishLoading();
+                    }
+                }
+        );
+
+        ConnectionAdapter.getInstance().addToRequestQueue(request, hashCode());
     }
 }
