@@ -151,7 +151,7 @@
                 }
                 else
                 {
-                    $response[] = array("error" => $connection->error);
+                    $response[] = array("failure" => "transactions not added");
                 }
             } else {
                 $response[] = array("error" => $connection->error);
