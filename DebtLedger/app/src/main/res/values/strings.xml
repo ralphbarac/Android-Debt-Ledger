@@ -65,6 +65,10 @@
 
     <!-- Strings related to database/query failures -->
     <string name="failure_contact_requests">Unable to get contact requests</string>
+    <string name="failure_deny_contact_request">Unable to deny contact request</string>
+    <string name="failure_accept_contact_request">Unable to accept contact request</string>
+    <string name="failure_cancel_contact_request">Unable to cancel contact request</string>
     <string name="failure_contacts">Unable to get contacts</string>
+    <string name="failure_add_transactions">Unable to add debts</string>
 
 </resources>

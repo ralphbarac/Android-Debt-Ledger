@@ -73,13 +73,6 @@ public class ContactListAdapter extends RecyclerView.Adapter<ContactListAdapter.
         return contactsWithBalances == null ? 0 : contactsWithBalances.size();
     }
 
-    public void addNewContact(UserAccount contact) {
-        // TODO: Currently just adding contact to top of list
-        contactsWithBalances.add(0, Pair.create(contact, 0));
-//        notifyItemInserted(0);
-        notifyDataSetChanged();
-    }
-
     public class Item extends RecyclerView.ViewHolder implements View.OnClickListener {
         public ImageView contactAvatar;
         public TextView contactAvatarCharacter;

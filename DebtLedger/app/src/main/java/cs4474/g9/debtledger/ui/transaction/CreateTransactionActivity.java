@@ -10,12 +10,19 @@ import android.view.MenuItem;
 import android.view.View;
 import android.widget.ImageView;
 import android.widget.TextView;
+import android.widget.Toast;
 
+import com.android.volley.Response;
+import com.android.volley.VolleyError;
 import com.google.android.material.button.MaterialButton;
 import com.google.android.material.dialog.MaterialAlertDialogBuilder;
 import com.google.android.material.textfield.TextInputEditText;
 
+import org.json.JSONArray;
+import org.json.JSONException;
+
 import java.io.Serializable;
+import java.math.BigDecimal;
 import java.util.ArrayList;
 import java.util.List;
 
@@ -26,8 +33,12 @@ import androidx.lifecycle.ViewModelProviders;
 import androidx.recyclerview.widget.LinearLayoutManager;
 import androidx.recyclerview.widget.RecyclerView;
 import cs4474.g9.debtledger.R;
+import cs4474.g9.debtledger.data.ConnectionAdapter;
+import cs4474.g9.debtledger.data.RedirectableJsonArrayRequest;
 import cs4474.g9.debtledger.data.login.LoginRepository;
 import cs4474.g9.debtledger.data.model.Group;
+import cs4474.g9.debtledger.data.model.Transaction;
+import cs4474.g9.debtledger.data.model.TransactionManager;
 import cs4474.g9.debtledger.data.model.UserAccount;
 import cs4474.g9.debtledger.logic.ColourGenerator;
 import cs4474.g9.debtledger.ui.contacts.select.SelectWhoIsPayingActivity;
@@ -50,6 +61,7 @@ public class CreateTransactionActivity extends AppCompatActivity implements OnIn
     private List<UserAccount> selectedContacts = new ArrayList<>();
     private List<String> amountsOwed = new ArrayList<>();
 
+    private TextInputEditText descriptionInput;
     private TextView amountTitle;
 
     private View whoIsPayingInputContainer;
@@ -76,6 +88,7 @@ public class CreateTransactionActivity extends AppCompatActivity implements OnIn
         getSupportActionBar().setHomeAsUpIndicator(R.drawable.ic_close_white_24dp);
         getSupportActionBar().setDisplayHomeAsUpEnabled(true);
 
+        descriptionInput = findViewById(R.id.description);
         amountTitle = findViewById(R.id.amount_title);
 
         // Who is paying view references
@@ -265,6 +278,14 @@ public class CreateTransactionActivity extends AppCompatActivity implements OnIn
         }
     }
 
+    @Override
+    protected void onDestroy() {
+        super.onDestroy();
+
+        // Cancel/terminate any requests that are still running or queued
+        ConnectionAdapter.getInstance().cancelAllRequests(hashCode());
+    }
+
     private void updateWhoIsPayingSection() {
         if (whoIsPaying != null) {
             whoIsPayingInputContainer.setVisibility(View.VISIBLE);
@@ -330,8 +351,68 @@ public class CreateTransactionActivity extends AppCompatActivity implements OnIn
                     .setPositiveButton("Ok", null)
                     .show();
         } else {
-            // TODO: Submit Transaction
+            // TODO: Ensure creditor has each debtor as contacts
+            List<Transaction> transactions = new ArrayList<>();
+            UserAccount creditor = whoIsPaying;
+            for (int i = 0; i < whoOwes.size(); i++) {
+                UserAccount debtor = whoOwes.get(i);
+                if (!creditor.equals(debtor)) {
+                    transactions.add(
+                            new Transaction(
+                                    debtor.getId(),
+                                    creditor.getId(),
+                                    descriptionInput.getText().toString(),
+                                    new BigDecimal(amountsOwed.get(i))
+                            )
+                    );
+                }
+            }
+
+            makeAddTransactionsRequest(transactions);
         }
+    }
+
+    private void makeAddTransactionsRequest(List<Transaction> transactions) {
+        JSONArray input;
+        try {
+            input = TransactionManager.createJsonArrayFromTransactions(transactions);
+        } catch (JSONException e) {
+            throw new RuntimeException();
+        }
+
+        RedirectableJsonArrayRequest request = new RedirectableJsonArrayRequest(
+                ConnectionAdapter.BASE_URL + TransactionManager.ADD_MULTIPLE_END_POINT + "/" + input.toString() + "/",
+                new Response.Listener<JSONArray>() {
+                    @Override
+                    public void onResponse(JSONArray response) {
+                        Log.d("TRANSACTIONS", response.toString());
+
+                        try {
+                            // If error, display add transactions failed...
+                            if (response.getJSONObject(0).has("error")) {
+                                throw new Exception();
+                            }
+
+                            // On success, return to dashboard
+                            setResult(RESULT_OK);
+                            finish();
+                        } catch (Exception e) {
+                            // On parse error, display add transactions failed to user
+                            Toast.makeText(CreateTransactionActivity.this, R.string.failure_add_transactions, Toast.LENGTH_SHORT).show();
+                        }
+                    }
+                },
+                new Response.ErrorListener() {
+                    @Override
+                    public void onErrorResponse(VolleyError error) {
+                        // On error, display add transactions failed to user
+                        Log.d("TRANSACTIONS", error.toString());
+                        Toast.makeText(CreateTransactionActivity.this, R.string.failure_add_transactions, Toast.LENGTH_SHORT).show();
+                    }
+                }
+        );
+
+        ConnectionAdapter.getInstance().addToRequestQueue(request, hashCode());
     }
 
 }

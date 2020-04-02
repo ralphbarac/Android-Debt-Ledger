@@ -133,7 +133,7 @@ public class ContactsFragment extends Fragment implements OnRequestReply {
 
     @Override
     public void onContactAccepted(UserAccount contact) {
-        contactsAdapter.addNewContact(contact);
+        makeRequestForContactsWithBalances(LoginRepository.getInstance().getLoggedInUser());
 
         // Update notification badge
         if (getActivity() instanceof MainActivity) {
@@ -214,7 +214,7 @@ public class ContactsFragment extends Fragment implements OnRequestReply {
                             // On success
                             contactRequestsAdapter.setContactRequests(ContactRequestManager.parseContactRequestsFromJson(response));
                         } catch (Exception e) {
-                            // On parse error, set contacts view to fail to finish loading mode
+                            // On parse error, display failed to load contact requests message
                             Toast.makeText(getContext(), R.string.failure_contact_requests, Toast.LENGTH_SHORT).show();
                         }
                     }
@@ -222,7 +222,7 @@ public class ContactsFragment extends Fragment implements OnRequestReply {
                 new Response.ErrorListener() {
                     @Override
                     public void onErrorResponse(VolleyError error) {
-                        // On error, set contacts view to fail to finish loading mode
+                        // On error, display failed to load contact requests message
                         Log.d("CONTACTS", error.toString());
                         Toast.makeText(getContext(), R.string.failure_contact_requests, Toast.LENGTH_SHORT).show();
                     }
@@ -250,7 +250,7 @@ public class ContactsFragment extends Fragment implements OnRequestReply {
                             // On success
                             contactsRequestedAdapter.setContactsRequested(ContactRequestManager.parseContactRequestsFromJson(response));
                         } catch (Exception e) {
-                            // On parse error, set contacts view to fail to finish loading mode
+                            // On parse error, display failed to load contact requests message
                             Toast.makeText(getContext(), R.string.failure_contact_requests, Toast.LENGTH_SHORT).show();
                         }
                     }
@@ -258,7 +258,7 @@ public class ContactsFragment extends Fragment implements OnRequestReply {
                 new Response.ErrorListener() {
                     @Override
                     public void onErrorResponse(VolleyError error) {
-                        // On error, set contacts view to fail to finish loading mode
+                        // On error, display failed to load contact requests message
                         Log.d("CONTACTS", error.toString());
                         Toast.makeText(getContext(), R.string.failure_contact_requests, Toast.LENGTH_SHORT).show();
                     }
