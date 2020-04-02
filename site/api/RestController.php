@@ -70,6 +70,9 @@
                 case "add":
                     $contactRequestRestHandler->add($_GET["user"], $_GET["contact"]);
                     break;
+                case "delete":
+                     $contactRequestRestHandler->delete($_GET["user"], $_GET["contact"]);
+                    break;
                 case "accept":
                     $contactRequestRestHandler->accept($_GET["user"], $_GET["contact"]);
                     break;
@@ -109,6 +112,9 @@
                     break;
                 case "add":
                     $transactionRestHandler->add($_GET["info"]);
+                    break;
+                 case "addmultiple":
+                    $transactionRestHandler->addMultiple($_GET["info"]);
                     break;
                 case "balances":
                     $transactionRestHandler->computeBalances($_GET["id"]);

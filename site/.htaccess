@@ -16,6 +16,7 @@ RedirectMatch ^/contact_group/delete/([0-9]+)/$ http://ec2-18-191-166-106.us-eas
 RedirectMatch ^/contact_request/pending/([0-9]+)/?$ http://ec2-18-191-166-106.us-east-2.compute.amazonaws.com/api/RestController.php?type=contact_request&view=pending&user=$1
 RedirectMatch ^/contact_request/pendingfrom/([0-9]+)/?$ http://ec2-18-191-166-106.us-east-2.compute.amazonaws.com/api/RestController.php?type=contact_request&view=pendingfrom&user=$1
 RedirectMatch ^/contact_request/add/([0-9]+)/([0-9]+)/?$ http://ec2-18-191-166-106.us-east-2.compute.amazonaws.com/api/RestController.php?type=contact_request&view=add&user=$1&contact=$2
+RedirectMatch ^/contact_request/delete/([0-9]+)/([0-9]+)/?$ http://ec2-18-191-166-106.us-east-2.compute.amazonaws.com/api/RestController.php?type=contact_request&view=delete&user=$1&contact=$2
 RedirectMatch ^/contact_request/accept/([0-9]+)/([0-9]+)/?$ http://ec2-18-191-166-106.us-east-2.compute.amazonaws.com/api/RestController.php?type=contact_request&view=accept&user=$1&contact=$2
 RedirectMatch ^/contact_request/deny/([0-9]+)/([0-9]+)/?$ http://ec2-18-191-166-106.us-east-2.compute.amazonaws.com/api/RestController.php?type=contact_request&view=deny&user=$1&contact=$2
 
@@ -29,6 +30,7 @@ RedirectMatch ^/transaction/id/([0-9]+)/?$ http://ec2-18-191-166-106.us-east-2.c
 RedirectMatch ^/transaction/debtor/([0-9]+)/?$ http://ec2-18-191-166-106.us-east-2.compute.amazonaws.com/api/RestController.php?type=transaction&view=debtor&id=$1
 RedirectMatch ^/transaction/creditor/([0-9]+)/?$ http://ec2-18-191-166-106.us-east-2.compute.amazonaws.com/api/RestController.php?type=transaction&view=creditor&id=$1
 RedirectMatch ^/transaction/add/([^/]+)/?$ http://ec2-18-191-166-106.us-east-2.compute.amazonaws.com/api/RestController.php?type=transaction&view=add&info=$1
+RedirectMatch ^/transaction/addmultiple/([^/]+)/?$ http://ec2-18-191-166-106.us-east-2.compute.amazonaws.com/api/RestController.php?type=transaction&view=addmultiple&info=$1
 RedirectMatch ^/transaction/balances/([0-9]+)/?$ http://ec2-18-191-166-106.us-east-2.compute.amazonaws.com/api/RestController.php?type=transaction&view=balances&id=$1
 
 

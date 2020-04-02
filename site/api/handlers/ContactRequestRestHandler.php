@@ -1,5 +1,4 @@
 <?php
-    #require_once("SimpleRestHandler.php");
 
     class ContactRequestRestHandler
     {
@@ -14,15 +13,19 @@
                 {
                     $response[] = $row;
                 }
+                $result->close();
                 
-                if($response === NULL)
+                if(!isset($response) || $response === NULL)
                 {
-                    $response[] = array("result" => "no requests found"); 
+                    $response[] = array("empty" => "no requests found");
                 }
+            }
+            else
+            {
+                $response[] = array("error" => $connection->error);
             }
 
             echo json_encode($response);
-            $result->close();
             $connection->close();
         }
 
@@ -37,15 +40,19 @@
                 {
                     $response[] = $row;
                 }
+                $result->close();
                 
-                if($response === NULL)
+                if(!isset($response) || $response === NULL)
                 {
-                    $response[] = array("result" => "no requests found"); 
+                    $response[] = array("empty" => "no requests found"); 
                 }
+            }
+            else
+            {
+                $response[] = array("error" => $connection->error);
             }
 
             echo json_encode($response);
-            $result->close();
             $connection->close();
         }
         
@@ -56,9 +63,9 @@
 
             if($result = $connection->query($query))
             {
-                if($result->affected_rows > 0)
+                if($connection->affected_rows > 0)
                 {
-                    $query = "SELECT * FROM contact_request WHERE user=".$user.", contact=".$contact;
+                    $query = "SELECT * FROM contact_request WHERE user=".$user." AND contact=".$contact;
                     
                     if($result = $connection->query($query))
                     {
@@ -66,24 +73,49 @@
                         {
                             $response[] = $row;
                         }
+                        $result->close();
                     }
                     else
                     {
-                        $response[] = array("result" => $connection->error);
+                        $response[] = array("error" => $connection->error);
                     }
                 }
                 else
                 {
-                    $response[] = array("result" => $connection->error);
+                    $response[] = array("failure" => "contact request not added");
                 }
             }
             else
             {
-                $response[] = array("result" => $connection->error);
+                $response[] = array("error" => $connection->error);
             }
 
             echo json_encode($response);
-            $result->close();
+            $connection->close();
+        }
+
+        public function delete($user, $contact)
+        {
+            $connection = new mysqli("cs4474-debt-ledger.chv9hyuyepg2.us-east-2.rds.amazonaws.com", "admin", "I6leZnstPdI7SSqameT4", "debt_ledger");
+            $query = "DELETE FROM contact_request WHERE user=".$user." AND contact=".$contact;
+
+            if($result = $connection->query($query))
+            {
+                if($connection->affected_rows > 0)
+                {
+                    $response[] = array("success" => "contact request deleted");
+                }
+                else
+                {
+                    $response[] = array("failure" => "contact request not deleted");
+                }
+            }
+            else
+            {
+                $response[] = array("error" => $connection->error);
+            }
+
+            echo json_encode($response);
             $connection->close();
         }
 
@@ -109,29 +141,29 @@
                             {
                                 $response[] = $row;
                             }
+                            $result->close();
                         }
                         else
                         {
-                            $response[] = array("result" => $connection->error);
+                            $response[] = array("error" => $connection->error);
                         }
                     }
                     else
                     {
-                        $response[] = array("result" => $connection->error);
+                        $response[] = array("error" => $connection->error);
                     }
                 }
                 else
                 {
-                    $response[] = array("result" => "request not found");
+                    $response[] = array("failure" => "request not found");
                 }
             }
             else
             {
-                $response[] = array("result" => $connection->error);
+                $response[] = array("error" => $connection->error);
             }
 
             echo json_encode($response);
-            $result->close();
             $connection->close();
         }
 
@@ -142,75 +174,22 @@
 
             if($result = $connection->query($query))
             {
-                if($result->affected_rows > 0)
+                if($connection->affected_rows > 0)
                 {
-                    $response[] = $row;
+                    $response[] = array("success" => "request denied");
                 }
                 else
                 {
-                    $response[] = array("result" => "request not found");
+                    $response[] = array("failure" => "request not found");
                 }
             }
             else
             {
-                $response[] = array("result" => $connection->error);
+                $response[] = array("error" => $connection->error);
             }
 
             echo json_encode($response);
-            $result->close();
             $connection->close();
         }
-
-        /*
-        public function reply($rawdata)
-        {
-            $requestContentType = $_SERVER['HTTP_ACCEPT'];
-            $this->setHttpHeaders($requestContentType, $statusCode);
-                    
-            if(strpos($requestContentType,'application/json') !== false)
-            {
-                $response = $this->encodeJson($rawData);
-                echo $response;
-            }
-            else if(strpos($requestContentType,'text/html') !== false)
-            {
-                $response = $this->encodeHtml($rawData);
-                echo $response;
-            }
-            else if(strpos($requestContentType,'application/xml') !== false)
-            {
-                $response = $this->encodeXml($rawData);
-                echo $response;
-            }
-        }
-        
-        public function encodeHtml($responseData)
-        {
-            $htmlResponse = "<table border='1'>";
-            foreach($responseData as $key=>$value)
-            {
-                $htmlResponse .= "<tr><td>". $key. "</td><td>". $value. "</td></tr>";
-            }
-            $htmlResponse .= "</table>";
-            return $htmlResponse;		
-        }
-        
-        public function encodeJson($responseData)
-        {
-            $jsonResponse = json_encode($responseData);
-            return $jsonResponse;		
-        }
-        
-        public function encodeXml($responseData)
-        {
-            // creating object of SimpleXMLElement
-            $xml = new SimpleXMLElement('<?xml version="1.0"?><mobile></mobile>');
-            foreach($responseData as $key=>$value)
-            {
-                $xml->addChild($key, $value);
-            }
-            return $xml->asXML();
-        }
-        */
     }
 ?>

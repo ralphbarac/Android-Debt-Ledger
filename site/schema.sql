@@ -46,7 +46,7 @@ CREATE TABLE transaction (
   debtor int(3) NOT NULL,
   creditor int(3) NOT NULL,
   description varchar(50) DEFAULT NULL,
-  amount decimal(5,2) NOT NULL,
+  amount decimal(12,2) NOT NULL,
   date timestamp NOT NULL DEFAULT CURRENT_TIMESTAMP,
   PRIMARY KEY (id),
   FOREIGN KEY (debtor) REFERENCES user(id),

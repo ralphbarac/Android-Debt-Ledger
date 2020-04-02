@@ -1,12 +1,11 @@
 <?php
-    #require_once("SimpleRestHandler.php");
 
     class ContactGroupRestHandler
     {
         public function groupList($user)
         {
             $connection = new mysqli("cs4474-debt-ledger.chv9hyuyepg2.us-east-2.rds.amazonaws.com", "admin", "I6leZnstPdI7SSqameT4", "debt_ledger");
-            $query = "SELECT * FROM contact_group WHERE owner=".$user;
+            $query = "SELECT contact_group.id, name, JSON_ARRAYAGG(JSON_OBJECT('id', user.id, 'first_name', user.first_name, 'last_name', user.last_name, 'email', user.email)) AS members FROM contact_group INNER JOIN contact_group_member ON contact_group.id = contact_group_member.group_id INNER JOIN user ON contact_group_member.user = user.id WHERE owner = ".$user." GROUP BY contact_group.id";
 
             if($result = $connection->query($query))
             {
@@ -14,15 +13,19 @@
                 {
                     $response[] = $row;
                 }
+                $result->close();
                 
-                if($response === NULL)
+                if(!isset($response) || $response === NULL)
                 {
-                    $response[] = array("result" => "no groups found");
+                    $response[] = array("empty" => "no groups found");
                 }
+            }
+            else
+            {
+                $response[] = array("error" => $connection->error);
             }
 
             echo json_encode($response);
-            $result->close();
             $connection->close();
         }
 
@@ -37,15 +40,20 @@
                 {
                     $response[] = $row;
                 }
+                $result->close();
+
                 
-                if($response === NULL)
+                if(!isset($response) || $response === NULL)
                 {
-                    $response[] = array("result" => "group not found"); 
+                    $response[] = array("missing" => "group not found"); 
                 }
+            }
+            else
+            {
+                $response[] = array("error" => $connection->error);
             }
 
             echo json_encode($response);
-            $result->close();
             $connection->close();
         }
 
@@ -60,19 +68,32 @@
                 if($connection->affected_rows > 0)
                 {
                     $query = "SELECT * FROM contact_group WHERE id=".$result->insert_id;
-                    while($row = $result->fetch_assoc())
+
+                    if($result = $connection->query($query))
                     {
-                        $response[] = $row;
+                        while($row = $result->fetch_assoc())
+                        {
+                            $response[] = $row;
+                        }
+                        $result->close();
                     }
+                    else
+                    {
+                        $response[] = array("error" => $connection->error);
+                    }
+
                 }
                 else
                 {
-                    $response[] = array("result" => $connection->error);
+                    $response[] = array("failure" => "group not added");
                 }
+            }
+            else
+            {
+                $response[] = array("error" => $connection->error);
             }
 
             echo json_encode($response);
-            $result->close();
             $connection->close();
         }
 
@@ -85,69 +106,20 @@
             {
                 if($connection->affected_rows > 0)
                 {
-                    $response[] = array("result" => "group deleted");
+                    $response[] = array("success" => "group deleted");
                 }
                 else
                 {
-                    $response[] = array("result" => $connection->error);
+                    $response[] = array("failure" => "group not deleted");
                 }
+            }
+            else
+            {
+                $response[] = array("error" => $connection->error);
             }
 
             echo json_encode($response);
-            $result->close();
             $connection->close();
         }
-
-        /*
-        public function reply($rawdata)
-        {
-            $requestContentType = $_SERVER['HTTP_ACCEPT'];
-            $this->setHttpHeaders($requestContentType, $statusCode);
-                    
-            if(strpos($requestContentType,'application/json') !== false)
-            {
-                $response = $this->encodeJson($rawData);
-                echo $response;
-            }
-            else if(strpos($requestContentType,'text/html') !== false)
-            {
-                $response = $this->encodeHtml($rawData);
-                echo $response;
-            }
-            else if(strpos($requestContentType,'application/xml') !== false)
-            {
-                $response = $this->encodeXml($rawData);
-                echo $response;
-            }
-        }
-        
-        public function encodeHtml($responseData)
-        {
-            $htmlResponse = "<table border='1'>";
-            foreach($responseData as $key=>$value)
-            {
-                $htmlResponse .= "<tr><td>". $key. "</td><td>". $value. "</td></tr>";
-            }
-            $htmlResponse .= "</table>";
-            return $htmlResponse;		
-        }
-        
-        public function encodeJson($responseData)
-        {
-            $jsonResponse = json_encode($responseData);
-            return $jsonResponse;		
-        }
-        
-        public function encodeXml($responseData)
-        {
-            // creating object of SimpleXMLElement
-            $xml = new SimpleXMLElement('<?xml version="1.0"?><mobile></mobile>');
-            foreach($responseData as $key=>$value)
-            {
-                $xml->addChild($key, $value);
-            }
-            return $xml->asXML();
-        }
-        */
     }
 ?>
