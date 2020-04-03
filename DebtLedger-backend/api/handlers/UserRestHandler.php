@@ -5,6 +5,9 @@
         public function login($email, $pass)
         {
             $connection = new mysqli("cs4474-debt-ledger.chv9hyuyepg2.us-east-2.rds.amazonaws.com", "admin", "I6leZnstPdI7SSqameT4", "debt_ledger");
+            // Escape any single quotes
+            $email = str_replace("'", "''", $email);
+            $pass = str_replace("'", "''", $pass);
             $query = "SELECT * FROM user WHERE email='".$email."' AND password='".$pass."'";
 
             if($result = $connection->query($query))
@@ -59,6 +62,8 @@
         public function getUserByEmail($email)
         {
             $connection = new mysqli("cs4474-debt-ledger.chv9hyuyepg2.us-east-2.rds.amazonaws.com", "admin", "I6leZnstPdI7SSqameT4", "debt_ledger");
+            // Escape any single quotes
+            $email = str_replace("'", "''", $email);
             $query = "SELECT id, first_name, last_name, email FROM user WHERE email='".$email."'";
 
             if($result = $connection->query($query))
@@ -87,6 +92,11 @@
         {
             $connection = new mysqli("cs4474-debt-ledger.chv9hyuyepg2.us-east-2.rds.amazonaws.com", "admin", "I6leZnstPdI7SSqameT4", "debt_ledger");
             $info = json_decode($input);
+            // Escape any single quotes
+            $info->first_name = str_replace("'", "''", $info->first_name);
+            $info->last_name = str_replace("'", "''", $info->last_name);
+            $info->email = str_replace("'", "''", $info->email);
+            $info->password = str_replace("'", "''", $info->password);
             $query = "INSERT INTO user (first_name, last_name, email, password) VALUES ('".$info->first_name."', '".$info->last_name."', '".$info->email."', '".$info->password."')";
 
             if($result = $connection->query($query))
@@ -133,7 +143,11 @@
         {
             $connection = new mysqli("cs4474-debt-ledger.chv9hyuyepg2.us-east-2.rds.amazonaws.com", "admin", "I6leZnstPdI7SSqameT4", "debt_ledger");
             $info = json_decode($input);
-            $query = "UPDATE user SET first_name='".$info->first_name."', last_name='".$info->last_name."', email='".$info->email."', password='".$info->password."' WHERE id=".$info->id;
+            // Escape any single quotes
+            $info->first_name = str_replace("'", "''", $info->first_name);
+            $info->last_name = str_replace("'", "''", $info->last_name);
+            $info->email = str_replace("'", "''", $info->email);
+            $query = "UPDATE user SET first_name='".$info->first_name."', last_name='".$info->last_name."', email='".$info->email."' WHERE id=".$info->id;
 
             if($result = $connection->query($query))
             {

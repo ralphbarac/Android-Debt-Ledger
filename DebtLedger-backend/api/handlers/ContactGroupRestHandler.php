@@ -61,6 +61,8 @@
         {
             $connection = new mysqli("cs4474-debt-ledger.chv9hyuyepg2.us-east-2.rds.amazonaws.com", "admin", "I6leZnstPdI7SSqameT4", "debt_ledger");
             $info = json_decode($input);
+            // Escape any single quotes
+            $info->name = str_replace("'", "''", $info->name);
             $query = "INSERT INTO contact_group (name, owner) VALUES ('".$info->name."', ".$info->owner.")";
 
             if($result = $connection->query($query))
@@ -100,6 +102,8 @@
         public function update($id, $name)
         {
             $connection = new mysqli("cs4474-debt-ledger.chv9hyuyepg2.us-east-2.rds.amazonaws.com", "admin", "I6leZnstPdI7SSqameT4", "debt_ledger");
+            // Escape any single quotes
+            $name = str_replace("'", "''", $name);
             $query = "UPDATE contact_group SET name='".$name."' WHERE id=".$id;
 
             if($result = $connection->query($query))

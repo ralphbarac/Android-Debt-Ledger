@@ -24,7 +24,7 @@
   - If user not added, returns JSON Array containing JSON Object with field "failure": "user not added"
 
 - Update user: /user/update/`<input>`/
-  - `<input>` is a JSON array containing id, first_name, last_name, email, password
+  - `<input>` is a JSON Object containing id, first_name, last_name, email
   - If user updated, returns JSON Array containing JSON Object with user fields (except password)
   - If user not updated, returns JSON Array containing JSON Object with field "failure": "user not updated"
 

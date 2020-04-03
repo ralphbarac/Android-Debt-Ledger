@@ -31,6 +31,7 @@
                 android:layout_height="wrap_content"
                 android:inputType="text"
                 android:selectAllOnFocus="true"
+                android:maxLength="50"
                 android:imeOptions="actionDone" />
 
         </com.google.android.material.textfield.TextInputLayout>
