@@ -83,6 +83,33 @@
             $connection->close();
         }
 
+        public function getWithContact($user, $contact)
+        {
+            $connection = new mysqli("cs4474-debt-ledger.chv9hyuyepg2.us-east-2.rds.amazonaws.com", "admin", "I6leZnstPdI7SSqameT4", "debt_ledger");
+            $query = "SELECT * FROM transaction WHERE creditor=".$user." OR creditor=".$contact." ORDER BY date DESC";
+
+            if($result = $connection->query($query))
+            {
+                while($row = $result->fetch_assoc())
+                {
+                    $response[] = $row;
+                }
+                $result->close();
+                
+                if(!isset($response) || $response === NULL)
+                {
+                    $response[] = array("empty" => "no transactions found"); 
+                }
+            }
+            else
+            {
+                $response[] = array("error" => $connection->error);
+            }
+
+            echo json_encode($response);
+            $connection->close();
+        }
+
         public function add($input)
         {
             $connection = new mysqli("cs4474-debt-ledger.chv9hyuyepg2.us-east-2.rds.amazonaws.com", "admin", "I6leZnstPdI7SSqameT4", "debt_ledger");
@@ -153,7 +180,9 @@
                 {
                     $response[] = array("failure" => "transactions not added");
                 }
-            } else {
+            }
+            else 
+            {
                 $response[] = array("error" => $connection->error);
             }
 

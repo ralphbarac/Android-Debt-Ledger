@@ -45,6 +45,10 @@
   - If transactions found, returns JSON Array containing JSON Objects with transaction fields
   - If transactions not found, returns JSON Array containing JSON Object with field "empty": "no transactions found"
 
+- Get transactions with contact: /transaction/contact/`<user id>`/`<contact id>`/
+  - If transactions found, return JSON Array containing JSON Objects with transaction fields
+  - If transactions not found, returns JSON Array containing JSON Object with field "empty": "no transactions found"
+
 - Add transaction: /transaction/add/`<input>`/
   - `<input>` is a JSON Object containing debtor (id), creditor (id), description (optional), and amount
   - If transaction added, returns JSON Array containing JSON Object with transaction fields
@@ -93,8 +97,8 @@
   - If contact request not denied, returns JSON Array containing JSON Object with field "failure": "request not found"
 
 - Delete a request: /contact_request/delete/`<user id>`/`<contact id>`/
-  - If contact request deleted, returns JSON Array containing JSON Object with field "success": "request denied"
-  - If contact request not deleted, returns JSON Array containing JSON Object with field "failure": "request not found"
+  - If contact request deleted, returns JSON Array containing JSON Object with field "success": "contact request deleted"
+  - If contact request not deleted, returns JSON Array containing JSON Object with field "failure": "contact request not deleted"
 
 ## Contact Groups
 
@@ -106,12 +110,16 @@
   - If group found, returns JSON Array containing JSON Object with group fields
   - If group not found, returns JSON Array containing JSON Object with field "missing": "group not found"
 
-- Add a group: /contact_group/add/`<input>`/
+- Add group: /contact_group/add/`<input>`/
   - `<input>` is a JSON Object containing owner (id) and name
   - If group added, returns JSON Array containing JSON Object with group fields
   - If group not added, returns JSON Array containing JSON Object with field "failure": "group not added"
 
-- Delete a group: /contact_group/delete/`<id>`/
+- Update user: /contact_group/update/`<id>`/`<name>`/
+  - If group updated, returns JSON Array containing JSON Object with field "success": "group updated"
+  - If group not updated, returns JSON Array containing JSON Object with field "failure": "group not updated"
+
+- Delete group: /contact_group/delete/`<id>`/
   - If group deleted, returns JSON Array containing JSON Object with field "success": "group deleted"
   - If group not deleted, returns JSON Array containing JSON Object with field "failure": "group not deleted"
 
@@ -120,6 +128,11 @@
 - Get list of all members of a group: /contact_group_member/memberlist/`<id>`/
   - If members found, returns JSON Array containing JSON Objects with id, first_name, last_name, and email
   - If members not found, returns JSON Array containing JSON Object with field "empty": "no members found"
+
+- Set members: /contact_group_member/set/`<input>`/
+  - `<input>` is a JSON Object containing group_id and members, where members is a JSON Array containing members (id) (e.g. {"group_id":1,"members":[2, 3, 6]})
+  - If member added, returns JSON Array containing JSON Object with field "success": "members added"
+  - If member not added, returns JSON Array containing JSON Object with field "failure": "members not added"
 
 - Add a member: /contact_group_member/add/`<group id>`/`<user id>`/
   - If member added, returns JSON Array containing JSON Object contact group member fields

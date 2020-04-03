@@ -97,6 +97,32 @@
             $connection->close();
         }
 
+        public function update($id, $name)
+        {
+            $connection = new mysqli("cs4474-debt-ledger.chv9hyuyepg2.us-east-2.rds.amazonaws.com", "admin", "I6leZnstPdI7SSqameT4", "debt_ledger");
+            $query = "UPDATE contact_group SET name='".$name."' WHERE id=".$id;
+
+            if($result = $connection->query($query))
+            {
+                if($connection->affected_rows > 0)
+                {
+                    
+                     $response[] = array("success" => "group updated");
+                }
+                else
+                {
+                    $response[] = array("failure" => "group not updated");
+                }
+            }
+            else
+            {
+                $response[] = array("error" => $connection->error);
+            }
+
+            echo json_encode($response);
+            $connection->close();
+        }
+
         public function delete($id)
         {
             $connection = new mysqli("cs4474-debt-ledger.chv9hyuyepg2.us-east-2.rds.amazonaws.com", "admin", "I6leZnstPdI7SSqameT4", "debt_ledger");

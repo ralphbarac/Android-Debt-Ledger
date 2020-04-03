@@ -27,6 +27,9 @@
                 case "memberlist":
                     $contactGroupMemberRestHandler->memberList($_GET["id"]);
                     break;
+                case "set":
+                    $contactGroupMemberRestHandler->setMembers($_GET["input"]);
+                    break;
                 case "add":
                     $contactGroupMemberRestHandler->add($_GET["id"], $_GET["user"]);
                     break;
@@ -49,6 +52,9 @@
                     break;
                 case "add":
                     $contactGroupRestHandler->add($_GET["info"]);
+                    break;
+                case "update":
+                    $contactGroupRestHandler->update($_GET["id"], $_GET["name"]);
                     break;
                 case "delete":
                     $contactGroupRestHandler->delete($_GET["id"]);
@@ -109,6 +115,9 @@
                     break;
                 case "creditor":
                     $transactionRestHandler->creditor($_GET["id"]);
+                    break;
+                case "contact":
+                    $transactionRestHandler->getWithContact($_GET["user"], $_GET["contact"]);
                     break;
                 case "add":
                     $transactionRestHandler->add($_GET["info"]);

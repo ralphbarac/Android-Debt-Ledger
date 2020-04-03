@@ -3,6 +3,7 @@ Options +FollowSymlinks
 
 #contact_group_member
 RedirectMatch ^/contact_group_member/memberlist/([0-9]+)/?$ http://ec2-18-191-166-106.us-east-2.compute.amazonaws.com/api/RestController.php?type=contact_group_member&view=memberlist&id=$1
+RedirectMatch ^/contact_group_member/set/([^/]+)/?$ http://ec2-18-191-166-106.us-east-2.compute.amazonaws.com/api/RestController.php?type=contact_group_member&view=set&input=$1
 RedirectMatch ^/contact_group_member/add/([0-9]+)/([0-9]+)/?$ http://ec2-18-191-166-106.us-east-2.compute.amazonaws.com/api/RestController.php?type=contact_group_member&view=add&id=$1&user=$2
 RedirectMatch ^/contact_group_member/remove/([0-9]+)/([0-9]+)/?$ http://ec2-18-191-166-106.us-east-2.compute.amazonaws.com/api/RestController.php?type=contact_group_member&view=remove&id=$1&user=$2
 
@@ -10,6 +11,7 @@ RedirectMatch ^/contact_group_member/remove/([0-9]+)/([0-9]+)/?$ http://ec2-18-1
 RedirectMatch ^/contact_group/grouplist/([0-9]+)/$ http://ec2-18-191-166-106.us-east-2.compute.amazonaws.com/api/RestController.php?type=contact_group&view=grouplist&user=$1
 RedirectMatch ^/contact_group/group/([0-9]+)/$ http://ec2-18-191-166-106.us-east-2.compute.amazonaws.com/api/RestController.php?type=contact_group&view=group&id=$1
 RedirectMatch ^/contact_group/add/([^/]+)/$ http://ec2-18-191-166-106.us-east-2.compute.amazonaws.com/api/RestController.php?type=contact_group&view=add&info=$1
+RedirectMatch ^/contact_group/update/([^/]+)/([^/]+)/$ http://ec2-18-191-166-106.us-east-2.compute.amazonaws.com/api/RestController.php?type=contact_group&view=update&id=$1&name=$2
 RedirectMatch ^/contact_group/delete/([0-9]+)/$ http://ec2-18-191-166-106.us-east-2.compute.amazonaws.com/api/RestController.php?type=contact_group&view=delete&id=$1
 
 #contact_request
@@ -29,6 +31,7 @@ RedirectMatch ^/contact/delete/([0-9]+)/([0-9]+)/?$ http://ec2-18-191-166-106.us
 RedirectMatch ^/transaction/id/([0-9]+)/?$ http://ec2-18-191-166-106.us-east-2.compute.amazonaws.com/api/RestController.php?type=transaction&view=id&id=$1
 RedirectMatch ^/transaction/debtor/([0-9]+)/?$ http://ec2-18-191-166-106.us-east-2.compute.amazonaws.com/api/RestController.php?type=transaction&view=debtor&id=$1
 RedirectMatch ^/transaction/creditor/([0-9]+)/?$ http://ec2-18-191-166-106.us-east-2.compute.amazonaws.com/api/RestController.php?type=transaction&view=creditor&id=$1
+RedirectMatch ^/transaction/contact/([0-9]+)/([0-9]+)/?$ http://ec2-18-191-166-106.us-east-2.compute.amazonaws.com/api/RestController.php?type=transaction&view=contact&user=$1&contact=$2
 RedirectMatch ^/transaction/add/([^/]+)/?$ http://ec2-18-191-166-106.us-east-2.compute.amazonaws.com/api/RestController.php?type=transaction&view=add&info=$1
 RedirectMatch ^/transaction/addmultiple/([^/]+)/?$ http://ec2-18-191-166-106.us-east-2.compute.amazonaws.com/api/RestController.php?type=transaction&view=addmultiple&info=$1
 RedirectMatch ^/transaction/balances/([0-9]+)/?$ http://ec2-18-191-166-106.us-east-2.compute.amazonaws.com/api/RestController.php?type=transaction&view=balances&id=$1
