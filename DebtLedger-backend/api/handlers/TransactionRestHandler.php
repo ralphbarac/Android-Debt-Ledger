@@ -117,6 +117,7 @@
             
             if(isset($info->description))
             {
+                $info->description = str_replace("'", "''", $info->description);
                 $query = "INSERT INTO transaction (debtor, creditor, description, amount) VALUES (".$info->debtor.", ".$info->creditor.", '".$info->description."', ".$info->amount.")";
             }
             else
@@ -166,6 +167,8 @@
             $query = "INSERT INTO transaction (debtor, creditor, description, amount) VALUES";
 
             foreach($transactions as $t) {
+                // Escape any single quotes
+                $t->description = str_replace("'", "''", $t->description);
                 $query .= " (".$t->debtor.", ".$t->creditor.", '".$t->description."', ".$t->amount."),";
             }
             $query = substr($query, 0, -1);
