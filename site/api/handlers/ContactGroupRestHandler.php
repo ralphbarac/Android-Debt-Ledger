@@ -67,7 +67,7 @@
             {
                 if($connection->affected_rows > 0)
                 {
-                    $query = "SELECT * FROM contact_group WHERE id=".$result->insert_id;
+                    $query = "SELECT * FROM contact_group WHERE id=".$connection->insert_id;
 
                     if($result = $connection->query($query))
                     {

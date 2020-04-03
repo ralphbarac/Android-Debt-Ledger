@@ -37,7 +37,7 @@ CREATE TABLE contact_group_member (
   group_id int(3) NOT NULL,
   user int(3) NOT NULL,
   PRIMARY KEY (group_id, user),
-  FOREIGN KEY (group_id) REFERENCES contact_group(id),
+  FOREIGN KEY (group_id) REFERENCES contact_group(id) ON DELETE CASCADE,
   FOREIGN KEY (user) REFERENCES user(id)
 );
 
