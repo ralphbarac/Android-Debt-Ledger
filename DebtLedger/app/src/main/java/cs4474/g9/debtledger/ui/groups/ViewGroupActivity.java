@@ -11,6 +11,9 @@ import android.view.Menu;
 import android.view.MenuItem;
 import android.widget.ImageView;
 import android.widget.TextView;
+import android.util.Log;
+import android.app.AlertDialog;
+import android.content.DialogInterface;
 
 import java.util.List;
 import java.util.Locale;
@@ -19,7 +22,19 @@ import androidx.appcompat.app.AppCompatActivity;
 import androidx.core.content.ContextCompat;
 import androidx.recyclerview.widget.LinearLayoutManager;
 import androidx.recyclerview.widget.RecyclerView;
+
+import com.android.volley.Response;
+import com.android.volley.VolleyError;
+
+import org.json.JSONArray;
+import org.json.JSONException;
+import org.json.JSONObject;
+
 import cs4474.g9.debtledger.R;
+import cs4474.g9.debtledger.data.ConnectionAdapter;
+import cs4474.g9.debtledger.data.RedirectableJsonArrayRequest;
+import cs4474.g9.debtledger.data.UserAccountManager;
+import cs4474.g9.debtledger.data.login.LoginRepository;
 import cs4474.g9.debtledger.data.model.Group;
 import cs4474.g9.debtledger.data.model.UserAccount;
 import cs4474.g9.debtledger.logic.BalanceCalculator;
@@ -122,12 +137,73 @@ public class ViewGroupActivity extends AppCompatActivity {
                 toEditGroup.putExtra(CreateEditGroupActivity.GROUP, group);
                 startActivity(toEditGroup);
             case R.id.delete_group:
-                // TODO: Confirmation to delete group, then delete group
+                confirmDeletion();
                 return true;
             default:
                 return super.onOptionsItemSelected(item);
         }
     }
+
+    private void confirmDeletion()
+    {
+        // Create confirmation dialogue box
+        AlertDialog.Builder builder = new AlertDialog.Builder(this);
+        builder.setCancelable(true);
+        builder.setTitle("Delete Group");
+        builder.setMessage("Are you sure you want to delete this group?");
+        builder.setPositiveButton("Confirm",
+                new DialogInterface.OnClickListener() {
+                    @Override
+                    public void onClick(DialogInterface dialog, int which) {
+                        deleteGroup();
+                    }
+                });
+        builder.setNegativeButton(android.R.string.cancel, new DialogInterface.OnClickListener() {
+            @Override
+            public void onClick(DialogInterface dialog, int which) {
+            }
+        });
+
+        AlertDialog dialog = builder.create();
+        dialog.show();
+
+    }
+
+    private void deleteGroup()
+    {
+        RedirectableJsonArrayRequest request = new RedirectableJsonArrayRequest(
+                ConnectionAdapter.BASE_URL + "/contact_group/delete/" + group.getId() + "/",
+                new Response.Listener<JSONArray>() {
+                    @Override
+                    public void onResponse(JSONArray response) {
+
+                        try {
+                            if (response.getJSONObject(0).has("error")) {
+                                Log.d("DELETE GROUP ERROR", response.toString());
+                                throw new Exception();
+                            } else if (response.getJSONObject(0).has("failure")) {
+                                Log.d("DELETE GROUP FAILURE", response.toString());
+                                throw new Exception();
+                            }
+                        } catch (Exception e) {
+                            // failed to delete group from database
+                            Log.d("DELETE GROUP", e.toString());
+                        }
+                    }
+                },
+                new Response.ErrorListener() {
+                    @Override
+                    public void onErrorResponse(VolleyError error) {
+                        // failed to update user name
+                        Log.d("DELETE GROUP", error.toString());
+                    }
+                }
+        );
+
+        ConnectionAdapter.getInstance().addToRequestQueue(request, hashCode());
+        finish();
+    }
+
 
     @Override
     public boolean onSupportNavigateUp() {

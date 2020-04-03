@@ -112,7 +112,6 @@ public class SettingsFragment extends Fragment {
     public void onStop() {
         super.onStop();
 
-
         if(nameChanged) {
 
             UserAccount user = LoginRepository.getInstance().getLoggedInUser();
