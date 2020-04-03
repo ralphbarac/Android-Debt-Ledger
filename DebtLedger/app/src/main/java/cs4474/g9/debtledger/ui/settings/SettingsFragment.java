@@ -25,7 +25,7 @@ import androidx.fragment.app.Fragment;
 
 import org.json.JSONException;
 import org.json.JSONObject;
-import org.json.simple.JSONObject;
+import org.json.JSONArray;
 import cs4474.g9.debtledger.data.ConnectionAdapter;
 import cs4474.g9.debtledger.data.RedirectableJsonArrayRequest;
 import cs4474.g9.debtledger.R;
@@ -110,35 +110,38 @@ public class SettingsFragment extends Fragment {
 
     @Override
     public void onStop() {
-        super.onStop();  // Always call the superclass method first
-        if(nameChanged)
-        {
+        super.onStop();
+
+
+        if(nameChanged) {
+
             UserAccount user = LoginRepository.getInstance().getLoggedInUser();
             JSONObject input;
             try {
                 input = UserAccountManager.createJsonFromUserAccount(user);
+                input.put("id", user.getId());
+
             } catch (JSONException e) {
                 throw new RuntimeException();
             }
 
             RedirectableJsonArrayRequest request = new RedirectableJsonArrayRequest(
-                    ConnectionAdapter.BASE_URL + "/user/update/" + ,
+                    ConnectionAdapter.BASE_URL + "/user/update/" + input,
                     new Response.Listener<JSONArray>() {
                         @Override
                         public void onResponse(JSONArray response) {
 
                             try {
                                 if (response.getJSONObject(0).has("error")) {
+                                    Log.d("SETTINGS ERROR", response.toString());
                                     throw new Exception();
                                 } else if (response.getJSONObject(0).has("failure")) {
+                                    Log.d("SETTINGS FAILURE", response.toString());
                                     throw new Exception();
-                                } else {
-                                    numContactRequests = response.length();
                                 }
                             } catch (Exception e) {
                                 // failed to update user name
                                 Log.d("SETTINGS", e.toString());
-
                             }
                         }
                     },
