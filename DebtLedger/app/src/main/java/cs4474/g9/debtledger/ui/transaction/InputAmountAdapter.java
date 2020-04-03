@@ -73,14 +73,14 @@ public class InputAmountAdapter extends RecyclerView.Adapter<InputAmountAdapter.
         notifyDataSetChanged();
     }
 
-    public void splitAmount(int amount) {
+    public void splitAmount(long amount) {
         if (amounts.size() == 0) return;
 
-        int wholeShare = amount / amounts.size();
-        int remainder = amount % amounts.size();
+        long wholeShare = amount / amounts.size();
+        long remainder = amount % amounts.size();
 
         for (int i = 0; i < amounts.size(); i++) {
-            int share = wholeShare + (i < remainder ? 1 : 0);
+            long share = wholeShare + (i < remainder ? 1 : 0);
             amounts.set(i, String.format(Locale.CANADA, "%.2f", share / 100.0));
         }
         notifyDataSetChanged();

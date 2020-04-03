@@ -43,12 +43,12 @@ public class ViewGroupActivity extends AppCompatActivity {
         List<UserAccount> members = group.getGroupMembers();
 
         BalanceCalculator calculator = new BalanceCalculator();
-        List<Pair<UserAccount, Integer>> memberBalances = calculator.calculateBalances(members);
+        List<Pair<UserAccount, Long>> memberBalances = calculator.calculateBalances(members);
 
         // Computing amount that user owes and amount user is owed
-        int youOwe = 0;
-        int youreOwed = 0;
-        for (Pair<UserAccount, Integer> memberBalance : memberBalances) {
+        long youOwe = 0;
+        long youreOwed = 0;
+        for (Pair<UserAccount, Long> memberBalance : memberBalances) {
             if (memberBalance.second < 0) {
                 youOwe = youOwe + memberBalance.second;
             } else {

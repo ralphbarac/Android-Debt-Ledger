@@ -24,9 +24,9 @@ import cs4474.g9.debtledger.logic.ColourGenerator;
 public class OutstandingBalanceListAdapter extends RecyclerView.Adapter<OutstandingBalanceListAdapter.Item> {
 
     private UserAccount loggedInUser;
-    private List<Pair<UserAccount, Integer>> outstandingBalances;
+    private List<Pair<UserAccount, Long>> outstandingBalances;
 
-    public OutstandingBalanceListAdapter(UserAccount loggedInUser, List<Pair<UserAccount, Integer>> outstandingBalances) {
+    public OutstandingBalanceListAdapter(UserAccount loggedInUser, List<Pair<UserAccount, Long>> outstandingBalances) {
         super();
         this.loggedInUser = loggedInUser;
         this.outstandingBalances = outstandingBalances;
@@ -38,7 +38,7 @@ public class OutstandingBalanceListAdapter extends RecyclerView.Adapter<Outstand
         this.outstandingBalances = new ArrayList<>();
     }
 
-    public void setOutstandingBalances(List<Pair<UserAccount, Integer>> outstandingBalances) {
+    public void setOutstandingBalances(List<Pair<UserAccount, Long>> outstandingBalances) {
         this.outstandingBalances = outstandingBalances;
         notifyDataSetChanged();
     }
@@ -54,7 +54,7 @@ public class OutstandingBalanceListAdapter extends RecyclerView.Adapter<Outstand
     @Override
     public void onBindViewHolder(@NonNull Item holder, int position) {
         UserAccount user = outstandingBalances.get(position).first;
-        Integer amount = outstandingBalances.get(position).second;
+        Long amount = outstandingBalances.get(position).second;
 
         holder.myAvatar.setColorFilter(ColourGenerator.generateFromName(loggedInUser.getFirstName(), loggedInUser.getLastName()));
         holder.myAvatarCharacter.setText(loggedInUser.getFirstName().substring(0, 1));

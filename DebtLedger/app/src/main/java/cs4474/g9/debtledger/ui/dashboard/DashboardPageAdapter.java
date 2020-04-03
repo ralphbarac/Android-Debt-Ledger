@@ -15,9 +15,9 @@ public class DashboardPageAdapter extends FragmentStatePagerAdapter {
 
     private List<DashboardPageFragment> dashboardPages = new ArrayList<>();
 
-    private List<Pair<UserAccount, Integer>> filteredPositiveBalances = null;
-    private List<Pair<UserAccount, Integer>> allBalances = null;
-    private List<Pair<UserAccount, Integer>> filteredNegativeBalances = null;
+    private List<Pair<UserAccount, Long>> filteredPositiveBalances = null;
+    private List<Pair<UserAccount, Long>> allBalances = null;
+    private List<Pair<UserAccount, Long>> filteredNegativeBalances = null;
 
     private boolean isInFailedToLoadState = false;
 
@@ -82,7 +82,7 @@ public class DashboardPageAdapter extends FragmentStatePagerAdapter {
         }
     }
 
-    public void setData(List<Pair<UserAccount, Integer>> outstandingBalances) {
+    public void setData(List<Pair<UserAccount, Long>> outstandingBalances) {
         isInFailedToLoadState = false;
 
         allBalances = outstandingBalances;

@@ -5,6 +5,11 @@ import android.graphics.Color;
 public class ColourGenerator {
 
     public static int generateFromName(String firstName, String lastName) {
+        // A special easter egg
+        if (firstName.equals("Mary") && lastName.equals("Sirohey")) {
+            return Color.rgb(184, 26, 181);
+        }
+
         // TODO: Improve and limit colour generation
         float[] hsv = new float[3];
         hsv[0] = (firstName.hashCode() + lastName.hashCode()) % 360;

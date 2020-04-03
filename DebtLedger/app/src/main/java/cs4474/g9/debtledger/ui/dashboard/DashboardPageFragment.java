@@ -21,7 +21,7 @@ import cs4474.g9.debtledger.ui.shared.OnActionButtonClickedListener;
 
 public class DashboardPageFragment extends Fragment {
 
-    private List<Pair<UserAccount, Integer>> outstandingBalances;
+    private List<Pair<UserAccount, Long>> outstandingBalances;
 
     private TextView balanceTextView;
     private LoadableRecyclerView outstandingBalancesView;
@@ -73,7 +73,7 @@ public class DashboardPageFragment extends Fragment {
         }
     }
 
-    public void setData(List<Pair<UserAccount, Integer>> outstandingBalances) {
+    public void setData(List<Pair<UserAccount, Long>> outstandingBalances) {
         this.isInFailedToLoadState = false;
         this.outstandingBalances = outstandingBalances;
 
@@ -81,7 +81,7 @@ public class DashboardPageFragment extends Fragment {
         if (isCreated) {
             outstandingBalancesAdapter.setOutstandingBalances(outstandingBalances);
 
-            Integer total = 0;
+            long total = 0;
             for (int i = 0; i < outstandingBalances.size(); i++) {
                 total += outstandingBalances.get(i).second;
             }

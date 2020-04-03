@@ -117,7 +117,7 @@ public class CreateTransactionActivity extends AppCompatActivity implements OnIn
             @Override
             public void onClick(View v) {
                 Log.d("CREATE-TRANSACTION", "Split button clicked.");
-                int amountPaid = TransactionViewModel.isAmountValid(CreateTransactionActivity.this.amountPaid)
+                long amountPaid = TransactionViewModel.isAmountValid(CreateTransactionActivity.this.amountPaid)
                         ? TransactionViewModel.parseAmountValue(CreateTransactionActivity.this.amountPaid)
                         : 0;
                 whoOwesInputAdapter.splitAmount(amountPaid);

@@ -23,9 +23,9 @@ import cs4474.g9.debtledger.logic.ColourGenerator;
 
 public class ContactListAdapter extends RecyclerView.Adapter<ContactListAdapter.Item> {
 
-    private List<Pair<UserAccount, Integer>> contactsWithBalances;
+    private List<Pair<UserAccount, Long>> contactsWithBalances;
 
-    public ContactListAdapter(List<Pair<UserAccount, Integer>> contactsWithBalances) {
+    public ContactListAdapter(List<Pair<UserAccount, Long>> contactsWithBalances) {
         super();
         this.contactsWithBalances = contactsWithBalances;
     }
@@ -35,7 +35,7 @@ public class ContactListAdapter extends RecyclerView.Adapter<ContactListAdapter.
         this.contactsWithBalances = new ArrayList<>();
     }
 
-    public void setContactsWithBalances(List<Pair<UserAccount, Integer>> contactsWithBalances) {
+    public void setContactsWithBalances(List<Pair<UserAccount, Long>> contactsWithBalances) {
         this.contactsWithBalances = contactsWithBalances;
         notifyDataSetChanged();
     }
@@ -51,7 +51,7 @@ public class ContactListAdapter extends RecyclerView.Adapter<ContactListAdapter.
     @Override
     public void onBindViewHolder(@NonNull Item holder, int position) {
         UserAccount contact = contactsWithBalances.get(position).first;
-        Integer amount = contactsWithBalances.get(position).second;
+        Long amount = contactsWithBalances.get(position).second;
 
         holder.contactAvatar.setColorFilter(ColourGenerator.generateFromName(contact.getFirstName(), contact.getLastName()));
         holder.contactAvatarCharacter.setText(contact.getFirstName().substring(0, 1));

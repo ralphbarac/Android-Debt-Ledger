@@ -26,8 +26,8 @@ public class TransactionViewModel extends ViewModel {
 
     public void transactionDataChanged(UserAccount whoIsPaying, String amountPaid, List<UserAccount> whoOwes, List<String> amountsOwed) {
         boolean isDataComplete = true;
-        int amountPaidValue = 0;
-        List<Integer> amountOwedValues = new ArrayList<>(whoOwes == null ? 0 : whoOwes.size());
+        long amountPaidValue = 0;
+        List<Long> amountOwedValues = new ArrayList<>(whoOwes == null ? 0 : whoOwes.size());
 
         // If either who is paying or who owes is not given, data is not complete
         if (whoIsPaying == null || whoOwes == null) {
@@ -65,8 +65,8 @@ public class TransactionViewModel extends ViewModel {
 
         // If both who owes and who is paying is given, determine if they are equal, otherwise not complete
         if (isDataComplete) {
-            int amountOwedValue = 0;
-            for (Integer amountOwed : amountOwedValues) {
+            long amountOwedValue = 0;
+            for (Long amountOwed : amountOwedValues) {
                 amountOwedValue += amountOwed;
             }
 
@@ -89,7 +89,7 @@ public class TransactionViewModel extends ViewModel {
         return DOLLAR_AMOUNT.matcher(value).matches();
     }
 
-    public static int parseAmountValue(String value) {
+    public static long parseAmountValue(String value) {
         int indexOfDecimal = value.indexOf(".");
         if (indexOfDecimal == -1 || indexOfDecimal == value.length() - 1) {
             // If no decimal place or decimal place is last character
@@ -98,7 +98,7 @@ public class TransactionViewModel extends ViewModel {
             // If decimal place is second last character
             value = value + "0";
         }
-        return Integer.parseInt(value.replace(".", ""));
+        return Long.parseLong(value.replace(".", ""));
     }
 
 }
