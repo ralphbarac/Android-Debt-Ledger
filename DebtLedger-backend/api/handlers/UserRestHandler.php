@@ -95,7 +95,8 @@
                 {
                     $query = "SELECT id, first_name, last_name, email FROM user WHERE id=".$connection->insert_id;
 
-                    if($result = $connection->query($query)) {
+                    if($result = $connection->query($query))
+                    {
                         while($row = $result->fetch_assoc())
                         {
                             $response[] = $row;
@@ -114,7 +115,14 @@
             }
             else
             {
-                $response[] = array("error" => $connection->error);
+                if (strcmp($connection->error, "Duplicate entry '".$info->email."' for key 'email'") == 0)
+                {
+                    $response[] = array("duplicate" => "email in use");
+                }
+                else
+                {
+                    $response[] = array("error" => $connection->error);
+                }
             }
 
             echo json_encode($response);

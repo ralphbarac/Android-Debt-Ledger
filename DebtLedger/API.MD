@@ -20,6 +20,7 @@
 - Add user: /add/`<input>`/
   - `<input>` is a JSON Object containing first_name, last_name, email, and password
   - If user added, returns JSON Array containing JSON Object with user fields (except password)
+  - If user not added due to duplicate email, returns JSON Array containing JSON Object with field "duplicate": "email in use"
   - If user not added, returns JSON Array containing JSON Object with field "failure": "user not added"
 
 - Update user: /user/update/`<input>`/

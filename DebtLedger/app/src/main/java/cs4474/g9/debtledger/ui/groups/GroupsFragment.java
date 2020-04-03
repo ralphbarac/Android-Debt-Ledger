@@ -112,11 +112,10 @@ public class GroupsFragment extends Fragment implements OnActionButtonClickedLis
                                 throw new Exception();
                             } else if (response.getJSONObject(0).has("empty")) {
                                 groupsAdapter.setGroups(new ArrayList<>());
-                                return;
+                            } else {
+                                // On success
+                                groupsAdapter.setGroups(GroupManager.parseGroupsFromJson(response));
                             }
-
-                            // On success
-                            groupsAdapter.setGroups(GroupManager.parseGroupsFromJson(response));
                         } catch (Exception e) {
                             // On parse error, set groups view to fail to finish loading mode
                             groupsView.onFailToFinishLoading();

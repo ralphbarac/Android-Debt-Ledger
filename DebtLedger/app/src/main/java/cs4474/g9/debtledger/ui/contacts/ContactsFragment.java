@@ -177,11 +177,10 @@ public class ContactsFragment extends Fragment implements OnRequestReply {
                                 throw new Exception();
                             } else if (response.getJSONObject(0).has("empty")) {
                                 contactsAdapter.setContactsWithBalances(new ArrayList<>());
-                                return;
+                            } else {
+                                // On success
+                                contactsAdapter.setContactsWithBalances(BalanceCalculator.parseBalancesFromJson(response));
                             }
-
-                            // On success
-                            contactsAdapter.setContactsWithBalances(BalanceCalculator.parseBalancesFromJson(response));
                         } catch (Exception e) {
                             // On parse error, set contacts view to fail to finish loading mode
                             contactsView.onFailToFinishLoading();
@@ -213,11 +212,11 @@ public class ContactsFragment extends Fragment implements OnRequestReply {
                             if (response.getJSONObject(0).has("error")) {
                                 throw new Exception();
                             } else if (response.getJSONObject(0).has("empty")) {
-                                return;
+                                // Do nothing if there are no requests
+                            } else {
+                                // On success
+                                contactRequestsAdapter.setContactRequests(ContactRequestManager.parseContactRequestsFromJson(response));
                             }
-
-                            // On success
-                            contactRequestsAdapter.setContactRequests(ContactRequestManager.parseContactRequestsFromJson(response));
                         } catch (Exception e) {
                             // On parse error, display failed to load contact requests message
                             Toast.makeText(getContext(), R.string.failure_contact_requests, Toast.LENGTH_SHORT).show();
@@ -249,11 +248,11 @@ public class ContactsFragment extends Fragment implements OnRequestReply {
                             if (response.getJSONObject(0).has("error")) {
                                 throw new Exception();
                             } else if (response.getJSONObject(0).has("empty")) {
-                                return;
+                                // Do nothing if there are no requests
+                            } else {
+                                // On success
+                                contactsRequestedAdapter.setContactsRequested(ContactRequestManager.parseContactRequestsFromJson(response));
                             }
-
-                            // On success
-                            contactsRequestedAdapter.setContactsRequested(ContactRequestManager.parseContactRequestsFromJson(response));
                         } catch (Exception e) {
                             // On parse error, display failed to load contact requests message
                             Toast.makeText(getContext(), R.string.failure_contact_requests, Toast.LENGTH_SHORT).show();

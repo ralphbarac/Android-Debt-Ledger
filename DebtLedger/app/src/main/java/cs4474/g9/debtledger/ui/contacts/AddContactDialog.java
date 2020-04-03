@@ -181,7 +181,7 @@ public class AddContactDialog {
                 }
         );
 
-        ConnectionAdapter.getInstance().addToRequestQueue(request, hashCode());
+        ConnectionAdapter.getInstance().addToRequestQueue(request, dialog.getContext().hashCode());
     }
 
     private void makeRequestToAddContactRequest(UserAccount loggedInUser, UserAccount contact) {
@@ -216,6 +216,6 @@ public class AddContactDialog {
                 }
         );
 
-        ConnectionAdapter.getInstance().addToRequestQueue(request, hashCode());
+        ConnectionAdapter.getInstance().addToRequestQueue(request, dialog.getContext().hashCode());
     }
 }

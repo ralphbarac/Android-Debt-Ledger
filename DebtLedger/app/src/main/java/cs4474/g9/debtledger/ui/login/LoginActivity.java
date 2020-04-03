@@ -45,6 +45,8 @@ public class LoginActivity extends AppCompatActivity {
     private MaterialButton loginButton;
     private ProgressBar loadingProgressBar;
 
+    private View invalidEmailPasswordError;
+
     @Override
     public void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
@@ -62,6 +64,7 @@ public class LoginActivity extends AppCompatActivity {
         emailInput = findViewById(R.id.email);
         passwordInput = findViewById(R.id.password);
         final MaterialButton switchToSignupButton = findViewById(R.id.switch_to_signup);
+        invalidEmailPasswordError = findViewById(R.id.invalid_email_password_error_container);
         loginButton = findViewById(R.id.login);
         loadingProgressBar = findViewById(R.id.loading);
 
@@ -96,6 +99,8 @@ public class LoginActivity extends AppCompatActivity {
 
             @Override
             public void afterTextChanged(Editable s) {
+                // Remove invalid email or password error (if visible)
+                invalidEmailPasswordError.setVisibility(View.GONE);
                 loginViewModel.loginDataChanged(emailInput.getText().toString(),
                         passwordInput.getText().toString());
             }
@@ -146,6 +151,7 @@ public class LoginActivity extends AppCompatActivity {
     }
 
     private void makeLoginRequestWithToken(long token) {
+        // Disable email and password input, display loading bar
         emailInput.setEnabled(false);
         passwordInput.setEnabled(false);
         loadingProgressBar.setVisibility(View.VISIBLE);
@@ -158,16 +164,16 @@ public class LoginActivity extends AppCompatActivity {
                         Log.d("LOGIN", response.toString());
 
                         try {
-                            // If user not found, reset form and do nothing...
-                            if (response.getJSONObject(0).has("result") &&
-                                    response.getJSONObject(0).getString("result").equals("user not found")) {
+                            // If error or user missing, reset form and do nothing...
+                            if (response.getJSONObject(0).has("error") ||
+                                    response.getJSONObject(0).has("missing")) {
                                 throw new Exception();
+                            } else {
+                                // On success, parse UserAccount, store in repository, and process to dashboard
+                                UserAccount loggedInUser = UserAccountManager.parseUserAccountFromJson(response.getJSONObject(0));
+                                loginRepository.loginUser(loggedInUser, loggedInUser.getId());
+                                proceedToDashboard(loggedInUser);
                             }
-
-                            // On success, parse UserAccount, store in repository, and process to dashboard
-                            UserAccount loggedInUser = UserAccountManager.parseUserAccountFromJson(response.getJSONObject(0));
-                            loginRepository.loginUser(loggedInUser, loggedInUser.getId());
-                            proceedToDashboard(loggedInUser);
                         } catch (Exception e) {
                             // Reset form and do nothing...
                             emailInput.setEnabled(true);
@@ -192,6 +198,8 @@ public class LoginActivity extends AppCompatActivity {
     }
 
     private void makeLoginRequest(String email, String password) {
+        // Remove invalid email/password error, disable login button, display loading bar
+        invalidEmailPasswordError.setVisibility(View.GONE);
         loginButton.setEnabled(false);
         loadingProgressBar.setVisibility(View.VISIBLE);
 
@@ -204,15 +212,18 @@ public class LoginActivity extends AppCompatActivity {
 
                         try {
                             // If user not found, display login failed to user...
-                            if (response.getJSONObject(0).has("result") &&
-                                    response.getJSONObject(0).getString("result").equals("user not found")) {
+                            if (response.getJSONObject(0).has("error")) {
                                 throw new Exception();
+                            } else if (response.getJSONObject(0).has("missing")) {
+                                invalidEmailPasswordError.setVisibility(View.VISIBLE);
+                                loginButton.setEnabled(true);
+                                loadingProgressBar.setVisibility(View.INVISIBLE);
+                            } else {
+                                // On success, parse UserAccount, store in repository, and process to dashboard
+                                UserAccount loggedInUser = UserAccountManager.parseUserAccountFromJson(response.getJSONObject(0));
+                                loginRepository.loginUser(loggedInUser, loggedInUser.getId());
+                                proceedToDashboard(loggedInUser);
                             }
-
-                            // On success, parse UserAccount, store in repository, and process to dashboard
-                            UserAccount loggedInUser = UserAccountManager.parseUserAccountFromJson(response.getJSONObject(0));
-                            loginRepository.loginUser(loggedInUser, loggedInUser.getId());
-                            proceedToDashboard(loggedInUser);
                         } catch (Exception e) {
                             // On parse error or user not found, display login failed to user
                             Toast.makeText(LoginActivity.this, R.string.login_failed, Toast.LENGTH_SHORT).show();
@@ -249,6 +260,8 @@ public class LoginActivity extends AppCompatActivity {
     @Override
     protected void onDestroy() {
         super.onDestroy();
+
+        // Cancel/terminate any requests that are still running or queued
         ConnectionAdapter.getInstance().cancelAllRequests(hashCode());
     }
 }

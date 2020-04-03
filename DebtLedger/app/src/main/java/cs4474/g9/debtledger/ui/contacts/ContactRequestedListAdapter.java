@@ -127,17 +127,19 @@ public class ContactRequestedListAdapter extends RecyclerView.Adapter<ContactReq
 
         private void makeRequestToDeleteContactRequest(UserAccount loggedInUser, UserAccount contactRequest) {
             RedirectableJsonArrayRequest request = new RedirectableJsonArrayRequest(
-                    ConnectionAdapter.BASE_URL + ContactRequestManager.DELETE_END_POINT + "/"  + loggedInUser.getId() + "/" + contactRequest.getId() + "/",
+                    ConnectionAdapter.BASE_URL + ContactRequestManager.DELETE_END_POINT + "/" + loggedInUser.getId() + "/" + contactRequest.getId() + "/",
                     new Response.Listener<JSONArray>() {
                         @Override
                         public void onResponse(JSONArray response) {
                             Log.d("CONTACTS", response.toString());
 
                             try {
-                                if (response.getJSONObject(0).has("error")) {
+                                if (response.getJSONObject(0).has("error") ||
+                                        response.getJSONObject(0).has("failure")) {
                                     throw new Exception();
                                 } else {
                                     // On success
+                                    response.getJSONObject(0).get("success");
                                     removeRequestedContact(getAdapterPosition());
                                 }
                             } catch (Exception e) {

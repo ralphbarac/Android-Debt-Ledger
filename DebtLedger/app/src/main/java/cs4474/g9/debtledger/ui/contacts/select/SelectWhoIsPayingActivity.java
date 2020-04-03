@@ -112,11 +112,11 @@ public class SelectWhoIsPayingActivity extends AppCompatActivity implements OnCo
                                 throw new Exception();
                             } else if (response.getJSONObject(0).has("empty")) {
                                 selectContactAdapter.setContacts(new ArrayList<>());
-                                return;
+                            } else {
+                                // On success
+                                selectContactAdapter.setContacts(ContactManager.parseContactsFromJson(response));
                             }
 
-                            // On success
-                            selectContactAdapter.setContacts(ContactManager.parseContactsFromJson(response));
                         } catch (Exception e) {
                             // On parse error, set select contacts view to fail to finish loading mode
                             selectContactView.onFailToFinishLoading();

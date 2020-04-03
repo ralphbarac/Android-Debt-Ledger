@@ -170,17 +170,19 @@ public class ContactRequestListAdapter extends RecyclerView.Adapter<ContactReque
 
         private void makeRequestToAcceptContact(UserAccount loggedInUser, UserAccount contactRequest) {
             RedirectableJsonArrayRequest request = new RedirectableJsonArrayRequest(
-                    ConnectionAdapter.BASE_URL + ContactRequestManager.ACCEPT_END_POINT + "/"  + contactRequest.getId() + "/" + loggedInUser.getId() + "/",
+                    ConnectionAdapter.BASE_URL + ContactRequestManager.ACCEPT_END_POINT + "/" + contactRequest.getId() + "/" + loggedInUser.getId() + "/",
                     new Response.Listener<JSONArray>() {
                         @Override
                         public void onResponse(JSONArray response) {
                             Log.d("CONTACTS", response.toString());
 
                             try {
-                                if (response.getJSONObject(0).has("error")) {
+                                if (response.getJSONObject(0).has("error") ||
+                                        response.getJSONObject(0).has("failure")) {
                                     throw new Exception();
                                 } else {
                                     // On success
+                                    response.getJSONObject(0).get("success");
                                     removeContactRequest(getAdapterPosition());
                                     notifyListenersOfContactAccepted(contactRequest);
                                 }
@@ -205,17 +207,19 @@ public class ContactRequestListAdapter extends RecyclerView.Adapter<ContactReque
 
         private void makeRequestToDenyContact(UserAccount loggedInUser, UserAccount contactRequest) {
             RedirectableJsonArrayRequest request = new RedirectableJsonArrayRequest(
-                    ConnectionAdapter.BASE_URL + ContactRequestManager.DENY_END_POINT + "/"  + contactRequest.getId() + "/" + loggedInUser.getId() + "/",
+                    ConnectionAdapter.BASE_URL + ContactRequestManager.DENY_END_POINT + "/" + contactRequest.getId() + "/" + loggedInUser.getId() + "/",
                     new Response.Listener<JSONArray>() {
                         @Override
                         public void onResponse(JSONArray response) {
                             Log.d("CONTACTS", response.toString());
 
                             try {
-                                if (response.getJSONObject(0).has("error")) {
+                                if (response.getJSONObject(0).has("error") ||
+                                        response.getJSONObject(0).has("failure")) {
                                     throw new Exception();
                                 } else {
                                     // On success
+                                    response.getJSONObject(0).get("success");
                                     removeContactRequest(getAdapterPosition());
                                     notifyListenersOfContactRejected(contactRequest);
                                 }

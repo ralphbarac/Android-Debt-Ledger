@@ -389,13 +389,15 @@ public class CreateTransactionActivity extends AppCompatActivity implements OnIn
 
                         try {
                             // If error, display add transactions failed...
-                            if (response.getJSONObject(0).has("error")) {
+                            if (response.getJSONObject(0).has("error")
+                                    || response.getJSONObject(0).has("failure")) {
                                 throw new Exception();
+                            } else {
+                                // On success, return to dashboard
+                                response.getJSONObject(0).get("success");
+                                setResult(RESULT_OK);
+                                finish();
                             }
-
-                            // On success, return to dashboard
-                            setResult(RESULT_OK);
-                            finish();
                         } catch (Exception e) {
                             // On parse error, display add transactions failed to user
                             Toast.makeText(CreateTransactionActivity.this, R.string.failure_add_transactions, Toast.LENGTH_SHORT).show();

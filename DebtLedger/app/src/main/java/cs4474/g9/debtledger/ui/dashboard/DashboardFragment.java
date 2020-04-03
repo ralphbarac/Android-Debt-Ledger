@@ -160,11 +160,10 @@ public class DashboardFragment extends Fragment implements OnActionButtonClicked
                                 throw new Exception();
                             } else if (response.getJSONObject(0).has("empty")) {
                                 pageAdapter.setData(new ArrayList<>());
-                                return;
+                            } else {
+                                // On success
+                                pageAdapter.setData(BalanceCalculator.parseOutstandingBalancesFromJson(response));
                             }
-
-                            // On success
-                            pageAdapter.setData(BalanceCalculator.parseOutstandingBalancesFromJson(response));
                         } catch (Exception e) {
                             // On parse error, set dashboard pages as fail to finish loading mode
                             pageAdapter.onFailToFinishLoading();

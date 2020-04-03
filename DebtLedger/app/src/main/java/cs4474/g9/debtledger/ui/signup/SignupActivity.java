@@ -42,6 +42,8 @@ public class SignupActivity extends AppCompatActivity {
     private SignupViewModel signupViewModel;
     private LoginRepository loginRepository;
 
+    private View duplicateEmailError;
+
     private MaterialButton signupButton;
     private ProgressBar loadingProgressBar;
 
@@ -61,6 +63,7 @@ public class SignupActivity extends AppCompatActivity {
         final TextInputEditText emailInput = findViewById(R.id.email);
         final TextInputEditText passwordInput = findViewById(R.id.password);
         final MaterialButton switchToLoginButton = findViewById(R.id.switch_to_login);
+        duplicateEmailError = findViewById(R.id.duplicate_email_error_container);
         signupButton = findViewById(R.id.signup);
         loadingProgressBar = findViewById(R.id.loading);
 
@@ -114,6 +117,25 @@ public class SignupActivity extends AppCompatActivity {
         emailInput.addTextChangedListener(afterTextChangedListener);
         passwordInput.addTextChangedListener(afterTextChangedListener);
 
+        // Add additional listener to remove duplicate email error when email changes
+        emailInput.addTextChangedListener(new TextWatcher() {
+            @Override
+            public void beforeTextChanged(CharSequence s, int start, int count, int after) {
+
+            }
+
+            @Override
+            public void onTextChanged(CharSequence s, int start, int before, int count) {
+
+            }
+
+            @Override
+            public void afterTextChanged(Editable s) {
+                // Remove duplicate email error (if visible)
+                duplicateEmailError.setVisibility(View.GONE);
+            }
+        });
+
         // On clicking enter in password field, attempts signup
         passwordInput.setOnEditorActionListener(new TextView.OnEditorActionListener() {
 
@@ -161,6 +183,8 @@ public class SignupActivity extends AppCompatActivity {
     }
 
     private void makeSignupRequest(String firstName, String lastName, String email, String password) {
+        // Remove duplicate email error, disable signup button, display loading bar
+        duplicateEmailError.setVisibility(View.GONE);
         signupButton.setEnabled(false);
         loadingProgressBar.setVisibility(View.VISIBLE);
 
@@ -182,14 +206,20 @@ public class SignupActivity extends AppCompatActivity {
 
                         try {
                             // If error, display signup failed to user...
-                            if (response.getJSONObject(0).has("error")) {
+                            if (response.getJSONObject(0).has("error")
+                                    || response.getJSONObject(0).has("failure")) {
                                 throw new Exception();
+                            } else if (response.getJSONObject(0).has("duplicate")) {
+                                // On duplicate email found
+                                duplicateEmailError.setVisibility(View.VISIBLE);
+                                signupButton.setEnabled(true);
+                                loadingProgressBar.setVisibility(View.INVISIBLE);
+                            } else {
+                                // On success, parse UserAccount, store in repository, and proceed to dashboard
+                                UserAccount loggedInUser = UserAccountManager.parseUserAccountFromJson(response.getJSONObject(0));
+                                loginRepository.loginUser(loggedInUser, loggedInUser.getId());
+                                proceedToDashboard(loggedInUser);
                             }
-
-                            // On success, parse UserAccount, store in repository, and proceed to dashboard
-                            UserAccount loggedInUser = UserAccountManager.parseUserAccountFromJson(response.getJSONObject(0));
-                            loginRepository.loginUser(loggedInUser, loggedInUser.getId());
-                            proceedToDashboard(loggedInUser);
                         } catch (Exception e) {
                             // On parse error or user not found, display signup failed to user
                             Toast.makeText(SignupActivity.this, R.string.signup_failed, Toast.LENGTH_SHORT).show();
@@ -226,6 +256,8 @@ public class SignupActivity extends AppCompatActivity {
     @Override
     protected void onDestroy() {
         super.onDestroy();
+
+        // Cancel/terminate any requests that are still running or queued
         ConnectionAdapter.getInstance().cancelAllRequests(hashCode());
     }
 

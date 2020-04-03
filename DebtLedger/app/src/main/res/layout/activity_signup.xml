@@ -39,7 +39,7 @@
             app:layout_constraintEnd_toEndOf="parent"
             app:layout_constraintStart_toStartOf="parent"
             app:layout_constraintTop_toBottomOf="@+id/password_layout"
-            app:layout_constraintVertical_bias="0.2" />
+            app:layout_constraintVertical_bias="0.3" />
 
         <com.google.android.material.button.MaterialButton
             android:id="@+id/switch_to_login"
@@ -105,6 +105,33 @@
                 android:selectAllOnFocus="true" />
 
         </com.google.android.material.textfield.TextInputLayout>
+
+        <LinearLayout
+            android:id="@+id/duplicate_email_error_container"
+            android:orientation="horizontal"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_marginTop="8dp"
+            android:visibility="gone"
+
+            app:layout_constraintStart_toStartOf="@id/password_layout"
+            app:layout_constraintStart_toEndOf="@id/password_layout"
+            app:layout_constraintTop_toBottomOf="@id/password_layout">
+
+            <ImageView
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:layout_marginEnd="4dp"
+                android:src="@drawable/ic_error_red_24dp" />
+
+            <TextView
+                android:id="@+id/duplicate_email_error"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:textColor="@color/red"
+                android:textSize="16sp"
+                android:text="@string/signup_failed_duplicate_email" />
+        </LinearLayout>
 
 
         <com.google.android.material.textfield.TextInputLayout

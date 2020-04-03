@@ -249,11 +249,10 @@ public class SelectWhoOwesActivity extends AppCompatActivity implements OnContac
                                 throw new Exception();
                             } else if (response.getJSONObject(0).has("empty")) {
                                 multipleContactsAdapter.setContacts(new ArrayList<>(), selectedContacts);
-                                return;
+                            } else {
+                                // On success
+                                multipleContactsAdapter.setContacts(ContactManager.parseContactsFromJson(response), selectedContacts);
                             }
-
-                            // On success
-                            multipleContactsAdapter.setContacts(ContactManager.parseContactsFromJson(response), selectedContacts);
                         } catch (Exception e) {
                             // On parse error, set select contacts view to fail to finish loading mode
                             selectMultipleContactsView.onFailToFinishLoading();
@@ -288,11 +287,10 @@ public class SelectWhoOwesActivity extends AppCompatActivity implements OnContac
                                 throw new Exception();
                             } else if (response.getJSONObject(0).has("empty")) {
                                 multipleGroupsAdapter.setGroups(new ArrayList<>(), selectedGroups);
-                                return;
+                            } else {
+                                // On success
+                                multipleGroupsAdapter.setGroups(GroupManager.parseGroupsFromJson(response), selectedGroups);
                             }
-
-                            // On success
-                            multipleGroupsAdapter.setGroups(GroupManager.parseGroupsFromJson(response), selectedGroups);
                         } catch (Exception e) {
                             // On parse error, set select groups view to fail to finish loading mode
                             selectMultipleGroupsView.onFailToFinishLoading();
