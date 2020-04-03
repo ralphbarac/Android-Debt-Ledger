@@ -2,9 +2,6 @@
 <manifest xmlns:android="http://schemas.android.com/apk/res/android"
     package="cs4474.g9.debtledger">
 
-    <uses-permission android:name="android.permission.INTERNET" />
-    <uses-permission android:name="android.permission.ACCESS_NETWORK_STATE" />
-
     <application
         android:allowBackup="true"
         android:icon="@mipmap/ic_launcher"
@@ -16,7 +13,9 @@
         <activity
             android:name=".ui.groups.ViewGroupActivity"
             android:label="@string/title_view_group" />
-        <activity android:name=".ui.contacts.select.SelectGroupMembersActivity" />
+        <activity
+            android:name=".ui.contacts.select.SelectGroupMembersActivity"
+            android:label="@string/title_select_group_members" />
         <activity android:name=".ui.groups.CreateEditGroupActivity" />
         <activity
             android:name=".ViewContactActivity"
@@ -47,5 +46,9 @@
             </intent-filter>
         </activity>
     </application>
+
+    <uses-permission android:name="android.permission.ACCESS_NETWORK_STATE" />
+
+    <uses-permission android:name="android.permission.INTERNET" />
 
 </manifest>
