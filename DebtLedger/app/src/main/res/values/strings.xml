@@ -51,6 +51,7 @@
     <string name="action_select_contacts">Select Contact(s)</string>
     <string name="action_confirm_selection">Confirm Selection</string>
     <string name="title_view_contact">Contact</string>
+    <string name="title_select_group_members">Select Group Members</string>
     <string name="response_no_contact_found">No contact found with that email address</string>
 
     <!-- Strings related to groups -->

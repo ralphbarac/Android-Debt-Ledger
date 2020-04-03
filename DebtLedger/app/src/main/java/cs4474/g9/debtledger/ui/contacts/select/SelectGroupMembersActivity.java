@@ -2,24 +2,31 @@ package cs4474.g9.debtledger.ui.contacts.select;
 
 import android.content.Intent;
 import android.os.Bundle;
+import android.util.Log;
 import android.view.Menu;
 import android.view.MenuItem;
-import android.widget.Toast;
+
+import com.android.volley.Response;
+import com.android.volley.VolleyError;
+
+import org.json.JSONArray;
 
 import java.util.ArrayList;
 import java.util.List;
 
 import androidx.appcompat.app.AppCompatActivity;
 import androidx.recyclerview.widget.LinearLayoutManager;
-import androidx.recyclerview.widget.RecyclerView;
 import cs4474.g9.debtledger.R;
+import cs4474.g9.debtledger.data.ConnectionAdapter;
 import cs4474.g9.debtledger.data.ContactManager;
-import cs4474.g9.debtledger.data.Result;
+import cs4474.g9.debtledger.data.RedirectableJsonArrayRequest;
 import cs4474.g9.debtledger.data.login.LoginRepository;
 import cs4474.g9.debtledger.data.model.UserAccount;
 import cs4474.g9.debtledger.ui.groups.GroupMembersWrapper;
+import cs4474.g9.debtledger.ui.shared.LoadableRecyclerView;
+import cs4474.g9.debtledger.ui.shared.OnActionButtonClickedListener;
 
-public class SelectGroupMembersActivity extends AppCompatActivity implements OnContactChecked {
+public class SelectGroupMembersActivity extends AppCompatActivity implements OnContactChecked, OnActionButtonClickedListener {
 
     public static final String SELECTED_GROUP_MEMBERS = "selected_group_members";
 
@@ -27,6 +34,7 @@ public class SelectGroupMembersActivity extends AppCompatActivity implements OnC
 
     private boolean isMenuIconEnabled = false;
 
+    private LoadableRecyclerView selectMultipleContactsView;
     private SelectMultipleContactsAdapter multipleContactsAdapter;
 
     @Override
@@ -38,24 +46,17 @@ public class SelectGroupMembersActivity extends AppCompatActivity implements OnC
         selectedContacts = wrapper.getGroupMembers();
         isMenuIconEnabled = !selectedContacts.isEmpty();
 
-        UserAccount loggedInUser = LoginRepository.getInstance().getLoggedInUser();
-
-        ContactManager manager = new ContactManager();
-        List<UserAccount> contacts = new ArrayList<>();
-        Result result = manager.getAllContactsOf(loggedInUser);
-        if (result instanceof Result.Success) {
-            contacts = (List<UserAccount>) ((Result.Success) result).getData();
-        } else {
-            Toast.makeText(this, R.string.failure_contacts, Toast.LENGTH_SHORT).show();
-        }
-
-        final RecyclerView selectMultipleContactsView = findViewById(R.id.contacts_list);
+        selectMultipleContactsView = findViewById(R.id.contacts_list);
         selectMultipleContactsView.setHasFixedSize(true);
         selectMultipleContactsView.setLayoutManager(new LinearLayoutManager(this));
+        selectMultipleContactsView.addOnActionButtonClickedClickListener(this);
 
-        multipleContactsAdapter = new SelectMultipleContactsAdapter(contacts, selectedContacts);
+        multipleContactsAdapter = new SelectMultipleContactsAdapter();
         multipleContactsAdapter.addOnContactCheckedListener(this);
         selectMultipleContactsView.setAdapter(multipleContactsAdapter);
+
+        UserAccount loggedInUser = LoginRepository.getInstance().getLoggedInUser();
+        makeRequestForContacts(loggedInUser);
     }
 
     @Override
@@ -82,6 +83,25 @@ public class SelectGroupMembersActivity extends AppCompatActivity implements OnC
             default:
                 return super.onOptionsItemSelected(item);
         }
+    }
+
+    @Override
+    protected void onDestroy() {
+        super.onDestroy();
+
+        // Cancel/terminate any requests that are still running or queued
+        ConnectionAdapter.getInstance().cancelAllRequests(hashCode());
+    }
+
+    @Override
+    public void onFailedToLoadActionButtonClicked() {
+        // Retry getting contacts
+        makeRequestForContacts(LoginRepository.getInstance().getLoggedInUser());
+    }
+
+    @Override
+    public void onEmptyActionButtonClicked() {
+        // No button, so this should be impossible :)
     }
 
     private void returnResult() {
@@ -113,6 +133,45 @@ public class SelectGroupMembersActivity extends AppCompatActivity implements OnC
             isMenuIconEnabled = shouldMenuIconBeEnabled;
             invalidateOptionsMenu();
         }
+    }
+
+    private void makeRequestForContacts(UserAccount loggedInUser) {
+        selectMultipleContactsView.onBeginLoading();
+
+        RedirectableJsonArrayRequest request = new RedirectableJsonArrayRequest(
+                ConnectionAdapter.BASE_URL + ContactManager.LIST_END_POINT + "/" + loggedInUser.getId() + "/",
+                new Response.Listener<JSONArray>() {
+                    @Override
+                    public void onResponse(JSONArray response) {
+                        Log.d("CONTACTS", response.toString());
+
+                        try {
+                            if (response.getJSONObject(0).has("error")) {
+                                throw new Exception();
+                            } else if (response.getJSONObject(0).has("empty")) {
+                                multipleContactsAdapter.setContacts(new ArrayList<>(), new ArrayList<>());
+                            } else {
+                                // On success
+                                multipleContactsAdapter.setContacts(ContactManager.parseContactsFromJson(response), selectedContacts);
+                            }
+
+                        } catch (Exception e) {
+                            // On parse error, set select contacts view to fail to finish loading mode
+                            selectMultipleContactsView.onFailToFinishLoading();
+                        }
+                    }
+                },
+                new Response.ErrorListener() {
+                    @Override
+                    public void onErrorResponse(VolleyError error) {
+                        // On error, set select contacts view to fail to finish loading mode
+                        Log.d("CONTACTS", error.toString());
+                        selectMultipleContactsView.onFailToFinishLoading();
+                    }
+                }
+        );
+
+        ConnectionAdapter.getInstance().addToRequestQueue(request, hashCode());
     }
 
 }

@@ -1,5 +1,6 @@
 package cs4474.g9.debtledger.ui.contacts.select;
 
+import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
@@ -33,7 +34,11 @@ public class SelectMultipleContactsAdapter extends RecyclerView.Adapter<SelectMu
         this.onContactCheckedListeners = new ArrayList<>();
 
         for (UserAccount currentlySelectedContact : currentlySelectedContacts) {
-            selectedContacts.set(contacts.indexOf(currentlySelectedContact));
+            if (contacts.contains(currentlySelectedContact)) {
+                selectedContacts.set(contacts.indexOf(currentlySelectedContact));
+            } else {
+                Log.e("CONTACTS", "The selected contact is not found in the list of contacts!");
+            }
         }
     }
 
