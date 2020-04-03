@@ -20,7 +20,7 @@
     <string name="invalid_first_name">First name must contain only characters!</string>
     <string name="invalid_last_name">Last name must contain only characters!</string>
     <string name="invalid_email">Not a valid email!</string>
-    <string name="invalid_password">Password must be a minimum of 8 characters!</string>
+    <string name="invalid_password">Password must be a minimum of 5 characters!</string>
     <string name="welcome">"Welcome "</string>
     <string name="goodbye">"Goodbye "</string>
     <string name="login_failed">"Unable to login, invalid Email and/or Password!"</string>
@@ -49,6 +49,7 @@
     <string name="action_select_contacts">Select Contact(s)</string>
     <string name="action_confirm_selection">Confirm Selection</string>
     <string name="title_view_contact">Contact</string>
+    <string name="response_no_contact_found">No contact found with that email address</string>
 
     <!-- Strings related to groups -->
     <string name="my_groups">My Groups</string>
@@ -69,6 +70,7 @@
     <string name="failure_accept_contact_request">Unable to accept contact request</string>
     <string name="failure_cancel_contact_request">Unable to cancel contact request</string>
     <string name="failure_contacts">Unable to get contacts</string>
+    <string name="failure_add_contact">Unable to add contact request</string>
     <string name="failure_add_transactions">Unable to add debts</string>
 
 </resources>

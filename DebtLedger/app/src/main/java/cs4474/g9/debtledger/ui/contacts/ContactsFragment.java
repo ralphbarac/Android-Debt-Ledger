@@ -1,5 +1,6 @@
 package cs4474.g9.debtledger.ui.contacts;
 
+import android.content.DialogInterface;
 import android.os.Bundle;
 import android.util.Log;
 import android.view.LayoutInflater;
@@ -123,8 +124,12 @@ public class ContactsFragment extends Fragment implements OnRequestReply {
             case R.id.add_contact:
                 // TODO: Open Add Contact Dialog
                 Log.d("CONTACTS", "Add Contact icon clicked.");
-                AddContactDialog addContact = new AddContactDialog();
-                addContact.show(getActivity().getSupportFragmentManager(),"");
+                AddContactDialog.createAddContactDialog(getActivity()).setOnDismissListener(new DialogInterface.OnDismissListener() {
+                    @Override
+                    public void onDismiss(DialogInterface dialog) {
+                        makeRequestForPendingContactsRequested(LoginRepository.getInstance().getLoggedInUser());
+                    }
+                });
                 return true;
             default:
                 return super.onOptionsItemSelected(item);

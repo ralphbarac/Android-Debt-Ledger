@@ -10,6 +10,7 @@ public class UserAccountManager {
     public static final String LOGIN_END_POINT = "/user/login";
     public static final String LOGIN_WITH_TOKEN_END_POINT = "/user/id";
     public static final String SIGNUP_END_POINT = "/user/add";
+    public static final String GET_USER_BY_EMAIL_END_POINT = "/user/email";
 
     public static JSONObject createJsonFromUserAccount(UserAccount userAccount) throws JSONException {
         JSONObject jsonUserAccount = new JSONObject();
