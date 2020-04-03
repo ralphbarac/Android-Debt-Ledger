@@ -74,5 +74,6 @@
     <string name="failure_contacts">Unable to get contacts</string>
     <string name="failure_add_contact">Unable to add contact request</string>
     <string name="failure_add_transactions">Unable to add debts</string>
+    <string name="failure_change_name">Unable to update name</string>
 
 </resources>

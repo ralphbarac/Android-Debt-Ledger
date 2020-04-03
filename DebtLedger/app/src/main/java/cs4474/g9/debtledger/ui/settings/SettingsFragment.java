@@ -14,18 +14,30 @@ import android.view.ViewGroup;
 import android.widget.ImageView;
 import android.widget.TextView;
 import android.widget.Toast;
+import android.util.Log;
 
 import com.google.android.material.textfield.TextInputEditText;
+import com.android.volley.Response;
+import com.android.volley.VolleyError;
 
 import androidx.annotation.NonNull;
 import androidx.fragment.app.Fragment;
+
+import org.json.JSONException;
+import org.json.JSONObject;
+import org.json.simple.JSONObject;
+import cs4474.g9.debtledger.data.ConnectionAdapter;
+import cs4474.g9.debtledger.data.RedirectableJsonArrayRequest;
 import cs4474.g9.debtledger.R;
+import cs4474.g9.debtledger.data.UserAccountManager;
 import cs4474.g9.debtledger.data.login.LoginRepository;
 import cs4474.g9.debtledger.data.model.UserAccount;
 import cs4474.g9.debtledger.logic.ColourGenerator;
 import cs4474.g9.debtledger.ui.login.LoginActivity;
 
 public class SettingsFragment extends Fragment {
+
+    boolean nameChanged; // Track whether the name needs to be updated in the database
 
     public View onCreateView(@NonNull LayoutInflater inflater, ViewGroup container, Bundle savedInstanceState) {
         View root = inflater.inflate(R.layout.fragment_settings, container, false);
@@ -34,6 +46,8 @@ public class SettingsFragment extends Fragment {
         final LoginRepository loginRepository = LoginRepository.getInstance();
         final UserAccount user = loginRepository.getLoggedInUser();
 
+        nameChanged = false;
+
         // Set profile picture color
         final ImageView userProfilePicture = root.findViewById((R.id.user_avatar));
         userProfilePicture.setColorFilter(ColourGenerator.generateFromName(user.getFirstName(), user.getLastName()));
@@ -41,9 +55,10 @@ public class SettingsFragment extends Fragment {
         final TextView userInitial = root.findViewById((R.id.user_initial_text_view));
         userInitial.setText(String.valueOf(user.getFirstName().charAt(0)));
 
-
         final TextInputEditText firstNameText = root.findViewById((R.id.first_name_input));
         firstNameText.setText(user.getFirstName());
+        final TextInputEditText lastNameText = root.findViewById((R.id.last_name_input));
+        lastNameText.setText(user.getLastName());
 
         // Watch for changes to the first name field and apply them to the user account
         firstNameText.addTextChangedListener(new TextWatcher() {
@@ -58,14 +73,13 @@ public class SettingsFragment extends Fragment {
             @Override
             public void onTextChanged(CharSequence charSequence, int i, int i1, int i2) {
                 if (charSequence.length() != 0) {
+                    nameChanged = true;
                     user.setFirstName(charSequence.toString());
-                    userProfilePicture.setColorFilter(ColourGenerator.generateFromName(user.getFirstName(), user.getLastName()));
+                    userInitial.setText(String.valueOf(charSequence.charAt(0)));
+                    userProfilePicture.setColorFilter(ColourGenerator.generateFromName(firstNameText.getText().toString(), lastNameText.getText().toString()));
                 }
             }
         });
-
-        final TextInputEditText lastNameText = root.findViewById((R.id.last_name_input));
-        lastNameText.setText(user.getLastName());
 
         // Watch for changes to the last name field and apply them to the user account
         lastNameText.addTextChangedListener(new TextWatcher() {
@@ -80,8 +94,9 @@ public class SettingsFragment extends Fragment {
             @Override
             public void onTextChanged(CharSequence charSequence, int i, int i1, int i2) {
                 if (charSequence.length() != 0) {
+                    nameChanged = true;
                     user.setLastName(charSequence.toString());
-                    userProfilePicture.setColorFilter(ColourGenerator.generateFromName(user.getFirstName(), user.getLastName()));
+                    userProfilePicture.setColorFilter(ColourGenerator.generateFromName(firstNameText.getText().toString(), lastNameText.getText().toString()));
                 }
             }
         });
@@ -91,6 +106,53 @@ public class SettingsFragment extends Fragment {
         userEmailText.setText(user.getEmail());
 
         return root;
+    }
+
+    @Override
+    public void onStop() {
+        super.onStop();  // Always call the superclass method first
+        if(nameChanged)
+        {
+            UserAccount user = LoginRepository.getInstance().getLoggedInUser();
+            JSONObject input;
+            try {
+                input = UserAccountManager.createJsonFromUserAccount(user);
+            } catch (JSONException e) {
+                throw new RuntimeException();
+            }
+
+            RedirectableJsonArrayRequest request = new RedirectableJsonArrayRequest(
+                    ConnectionAdapter.BASE_URL + "/user/update/" + ,
+                    new Response.Listener<JSONArray>() {
+                        @Override
+                        public void onResponse(JSONArray response) {
+
+                            try {
+                                if (response.getJSONObject(0).has("error")) {
+                                    throw new Exception();
+                                } else if (response.getJSONObject(0).has("failure")) {
+                                    throw new Exception();
+                                } else {
+                                    numContactRequests = response.length();
+                                }
+                            } catch (Exception e) {
+                                // failed to update user name
+                                Log.d("SETTINGS", e.toString());
+
+                            }
+                        }
+                    },
+                    new Response.ErrorListener() {
+                        @Override
+                        public void onErrorResponse(VolleyError error) {
+                            // failed to update user name
+                            Log.d("SETTINGS", error.toString());
+                        }
+                    }
+            );
+
+            ConnectionAdapter.getInstance().addToRequestQueue(request, hashCode());
+        }
     }
 
     @Override
