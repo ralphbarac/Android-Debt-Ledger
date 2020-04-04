@@ -35,7 +35,15 @@ public class DashboardPageAdapter extends FragmentStatePagerAdapter {
 
     @Override
     public Fragment getItem(int position) {
-        DashboardPageFragment fragment = new DashboardPageFragment(actionButtonClickedListener);
+        String label;
+        if (position == 0) {
+            label = "You're Owed";
+        } else if (position == 2) {
+            label = "You Owe";
+        } else {
+            label = "Balance";
+        }
+        DashboardPageFragment fragment = new DashboardPageFragment(label, actionButtonClickedListener);
         dashboardPages.set(position, fragment);
 
         // Depending on  position, if data is available, set corresponding data

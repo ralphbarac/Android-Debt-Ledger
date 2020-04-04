@@ -1,6 +1,10 @@
 package cs4474.g9.debtledger.ui.dashboard;
 
 import android.os.Bundle;
+import android.text.Spannable;
+import android.text.SpannableString;
+import android.text.Spanned;
+import android.text.style.ForegroundColorSpan;
 import android.util.Pair;
 import android.view.LayoutInflater;
 import android.view.View;
@@ -11,6 +15,7 @@ import java.util.List;
 import java.util.Locale;
 
 import androidx.annotation.NonNull;
+import androidx.core.content.ContextCompat;
 import androidx.fragment.app.Fragment;
 import androidx.recyclerview.widget.LinearLayoutManager;
 import cs4474.g9.debtledger.R;
@@ -30,9 +35,11 @@ public class DashboardPageFragment extends Fragment {
     private boolean isCreated = false;
     private boolean isInFailedToLoadState = false;
 
+    private String label;
     private OnActionButtonClickedListener actionButtonClickedListener;
 
-    public DashboardPageFragment(OnActionButtonClickedListener listener) {
+    public DashboardPageFragment(String label, OnActionButtonClickedListener listener) {
+        this.label = label;
         this.actionButtonClickedListener = listener;
     }
 
@@ -85,7 +92,31 @@ public class DashboardPageFragment extends Fragment {
             for (int i = 0; i < outstandingBalances.size(); i++) {
                 total += outstandingBalances.get(i).second;
             }
-            balanceTextView.setText(String.format(Locale.CANADA, "Balance: %s$%.2f", total < 0 ? "-" : "+", Math.abs(total) / 100.0));
+
+
+            Spannable balanceFormatted = new SpannableString(
+                    String.format(
+                            Locale.CANADA,
+                            "%s: %s$%.2f",
+                            label,
+                            // If label is not balance or total is 0, no +/-, otherwise +/- depending on positive/negative
+                            !label.equals("Balance") || total == 0 ? "" : total < 0 ? "-" : "+",
+                            Math.abs(total) / 100.0
+                    )
+            );
+
+            // Set numerical portion to green/red if applicable
+            if (total != 0) {
+                balanceFormatted.setSpan(
+                        new ForegroundColorSpan(ContextCompat.getColor(getContext(), total < 0 ? R.color.red : R.color.green)),
+                        label.length() + 1,
+                        balanceFormatted.length(),
+                        Spanned.SPAN_INCLUSIVE_EXCLUSIVE
+                );
+                balanceTextView.setText(balanceFormatted);
+            } else {
+                balanceTextView.setText(balanceFormatted);
+            }
         }
     }
 

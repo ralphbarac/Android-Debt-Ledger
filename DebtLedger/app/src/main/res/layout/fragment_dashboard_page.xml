@@ -14,7 +14,7 @@
             android:layout_height="wrap_content"
             android:paddingTop="8dp"
             android:paddingBottom="8dp"
-            android:text="TextView"
+            android:text=""
             android:textAlignment="center"
             android:textSize="20sp" />
 
@@ -22,6 +22,7 @@
             android:id="@+id/outstanding_balance_list"
             android:layout_width="match_parent"
             android:layout_height="match_parent"
+            android:layout_marginBottom="80dp"
             android:nestedScrollingEnabled="false"
 
             app:loadingMessage=""
