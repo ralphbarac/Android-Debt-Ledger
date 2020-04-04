@@ -9,13 +9,22 @@ public class Transaction {
     private long creditor;
     private String description;
     private BigDecimal amount;
-    private Timestamp datetime;
+    private String datetime;
 
     public Transaction(long debtor, long creditor, String description, BigDecimal amount) {
         this.debtor = debtor;
         this.creditor = creditor;
         this.description = description;
         this.amount = amount;
+    }
+
+    public Transaction(long id, long debtor, long creditor, String description, BigDecimal amount, String datetime) {
+        this.id = id;
+        this.debtor = debtor;
+        this.creditor = creditor;
+        this.description = description;
+        this.amount = amount;
+        this.datetime = datetime;
     }
 
     public long getId() {
@@ -38,7 +47,7 @@ public class Transaction {
         return amount;
     }
 
-    public Timestamp getDatetime() {
+    public String getDatetime() {
         return datetime;
     }
 }
