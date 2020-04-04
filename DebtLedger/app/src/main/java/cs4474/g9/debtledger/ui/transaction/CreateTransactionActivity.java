@@ -317,15 +317,12 @@ public class CreateTransactionActivity extends AppCompatActivity implements OnIn
 
     private void updateWhoOwesSection() {
         if (whoOwes != null && !whoOwes.isEmpty()) {
-            whoOwesInputView.setVisibility(View.VISIBLE);
             whoOwesInputAdapter.updateContacts(whoOwes);
 
             whoOwesAddEditIcon.setImageResource(R.drawable.ic_edit_black_24dp);
             whoOwesActionTitle.setVisibility(View.INVISIBLE);
             splitButton.setVisibility(View.VISIBLE);
         } else {
-            whoOwesInputView.setVisibility(View.GONE);
-
             whoOwesAddEditIcon.setImageResource(R.drawable.ic_add_black_24dp);
             whoOwesActionTitle.setVisibility(View.VISIBLE);
             splitButton.setVisibility(View.INVISIBLE);
@@ -353,7 +350,6 @@ public class CreateTransactionActivity extends AppCompatActivity implements OnIn
                     .setPositiveButton("Ok", null)
                     .show();
         } else {
-            // TODO: Ensure creditor has each debtor as contacts
             List<Transaction> transactions = new ArrayList<>();
             UserAccount creditor = whoIsPaying;
             for (int i = 0; i < whoOwes.size(); i++) {
@@ -428,7 +424,7 @@ public class CreateTransactionActivity extends AppCompatActivity implements OnIn
 
     private void confirmTransaction(List<Transaction> transactions) {
         new MaterialAlertDialogBuilder(this)
-                .setTitle("Confirm Transaction")
+                .setTitle("Confirm")
                 .setMessage("Are you sure you want to add the debt?")
                 .setPositiveButton("Yes", new DialogInterface.OnClickListener() {
                     @Override
