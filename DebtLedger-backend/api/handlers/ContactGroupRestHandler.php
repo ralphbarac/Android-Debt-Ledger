@@ -5,7 +5,7 @@
         public function groupList($user)
         {
             $connection = new mysqli("cs4474-debt-ledger.chv9hyuyepg2.us-east-2.rds.amazonaws.com", "admin", "I6leZnstPdI7SSqameT4", "debt_ledger");
-            $query = "SELECT contact_group.id, name, JSON_ARRAYAGG(JSON_OBJECT('id', user.id, 'first_name', user.first_name, 'last_name', user.last_name, 'email', user.email)) AS members FROM contact_group INNER JOIN contact_group_member ON contact_group.id = contact_group_member.group_id INNER JOIN user ON contact_group_member.user = user.id WHERE owner = ".$user." GROUP BY contact_group.id";
+            $query = "SELECT contact_group.id, name, JSON_ARRAYAGG(JSON_OBJECT('id', user.id, 'first_name', user.first_name, 'last_name', user.last_name, 'email', user.email)) AS members FROM contact_group INNER JOIN contact_group_member ON contact_group.id = contact_group_member.group_id INNER JOIN user ON contact_group_member.user = user.id WHERE owner = ".$user." GROUP BY contact_group.id ORDER BY name ASC";
 
             if($result = $connection->query($query))
             {

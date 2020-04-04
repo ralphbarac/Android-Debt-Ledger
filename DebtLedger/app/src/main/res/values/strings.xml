@@ -80,5 +80,6 @@
     <string name="failure_add_group">Unable to add group</string>
     <string name="failure_update_group">Unable to update group</string>
     <string name="failure_update_group_members">Unable to update group members</string>
+    <string name="failure_balances">Unable to get contact balances</string>
 
 </resources>
