@@ -5,6 +5,7 @@ import android.content.Intent;
 import android.os.Bundle;
 import android.text.Editable;
 import android.text.TextWatcher;
+import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.Menu;
 import android.view.MenuInflater;
@@ -14,21 +15,20 @@ import android.view.ViewGroup;
 import android.widget.ImageView;
 import android.widget.TextView;
 import android.widget.Toast;
-import android.util.Log;
 
-import com.google.android.material.textfield.TextInputEditText;
 import com.android.volley.Response;
 import com.android.volley.VolleyError;
+import com.google.android.material.textfield.TextInputEditText;
+
+import org.json.JSONArray;
+import org.json.JSONException;
+import org.json.JSONObject;
 
 import androidx.annotation.NonNull;
 import androidx.fragment.app.Fragment;
-
-import org.json.JSONException;
-import org.json.JSONObject;
-import org.json.JSONArray;
+import cs4474.g9.debtledger.R;
 import cs4474.g9.debtledger.data.ConnectionAdapter;
 import cs4474.g9.debtledger.data.RedirectableJsonArrayRequest;
-import cs4474.g9.debtledger.R;
 import cs4474.g9.debtledger.data.UserAccountManager;
 import cs4474.g9.debtledger.data.login.LoginRepository;
 import cs4474.g9.debtledger.data.model.UserAccount;
@@ -77,6 +77,8 @@ public class SettingsFragment extends Fragment {
                     user.setFirstName(charSequence.toString());
                     userInitial.setText(String.valueOf(charSequence.charAt(0)));
                     userProfilePicture.setColorFilter(ColourGenerator.generateFromName(firstNameText.getText().toString(), lastNameText.getText().toString()));
+                } else {
+                    firstNameText.setError(getString(R.string.invalid_first_name));
                 }
             }
         });
@@ -97,6 +99,8 @@ public class SettingsFragment extends Fragment {
                     nameChanged = true;
                     user.setLastName(charSequence.toString());
                     userProfilePicture.setColorFilter(ColourGenerator.generateFromName(firstNameText.getText().toString(), lastNameText.getText().toString()));
+                } else {
+                    lastNameText.setError(getString(R.string.invalid_first_name));
                 }
             }
         });
@@ -112,8 +116,11 @@ public class SettingsFragment extends Fragment {
     public void onStop() {
         super.onStop();
 
-        if(nameChanged) {
+        makeRequestToUpdateName();
+    }
 
+    private void makeRequestToUpdateName() {
+        if (nameChanged) {
             UserAccount user = LoginRepository.getInstance().getLoggedInUser();
             JSONObject input;
             try {
@@ -129,17 +136,15 @@ public class SettingsFragment extends Fragment {
                     new Response.Listener<JSONArray>() {
                         @Override
                         public void onResponse(JSONArray response) {
+                            Log.d("SETTINGS", response.toString());
 
                             try {
-                                if (response.getJSONObject(0).has("error")) {
-                                    Log.d("SETTINGS ERROR", response.toString());
-                                    throw new Exception();
-                                } else if (response.getJSONObject(0).has("failure")) {
-                                    Log.d("SETTINGS FAILURE", response.toString());
+                                if (response.getJSONObject(0).has("error") ||
+                                        response.getJSONObject(0).has("failure")) {
                                     throw new Exception();
                                 }
                             } catch (Exception e) {
-                                // failed to update user name
+                                // On error, log failed to update user name
                                 Log.d("SETTINGS", e.toString());
                             }
                         }
@@ -147,7 +152,7 @@ public class SettingsFragment extends Fragment {
                     new Response.ErrorListener() {
                         @Override
                         public void onErrorResponse(VolleyError error) {
-                            // failed to update user name
+                            // On error, log failed to update user name error
                             Log.d("SETTINGS", error.toString());
                         }
                     }
@@ -167,6 +172,11 @@ public class SettingsFragment extends Fragment {
         switch (item.getItemId()) {
             case R.id.logout:
                 LoginRepository loginRepository = LoginRepository.getInstance();
+
+                if (nameChanged) {
+                    makeRequestToUpdateName();
+                    nameChanged = false;
+                }
 
                 // Say bye
                 String goodbye = getString(R.string.goodbye) + loginRepository.getLoggedInUser().getFirstName();

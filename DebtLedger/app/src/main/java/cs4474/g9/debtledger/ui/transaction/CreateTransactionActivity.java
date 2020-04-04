@@ -1,5 +1,6 @@
 package cs4474.g9.debtledger.ui.transaction;
 
+import android.content.DialogInterface;
 import android.content.Intent;
 import android.os.Bundle;
 import android.text.Editable;
@@ -34,6 +35,7 @@ import androidx.recyclerview.widget.LinearLayoutManager;
 import androidx.recyclerview.widget.RecyclerView;
 import cs4474.g9.debtledger.R;
 import cs4474.g9.debtledger.data.ConnectionAdapter;
+import cs4474.g9.debtledger.data.ContactManager;
 import cs4474.g9.debtledger.data.RedirectableJsonArrayRequest;
 import cs4474.g9.debtledger.data.login.LoginRepository;
 import cs4474.g9.debtledger.data.model.Group;
@@ -368,8 +370,74 @@ public class CreateTransactionActivity extends AppCompatActivity implements OnIn
                 }
             }
 
-            makeAddTransactionsRequest(transactions);
+            // If logged in user is paying, all people who owes must be their contacts, otherwise must validate
+            if (whoIsPaying.equals(loggedInUser)) {
+                confirmTransaction(transactions);
+            } else {
+                validateTransaction(transactions);
+            }
         }
+    }
+
+    private void validateTransaction(List<Transaction> transactions) {
+        RedirectableJsonArrayRequest request = new RedirectableJsonArrayRequest(
+                ConnectionAdapter.BASE_URL + ContactManager.LIST_END_POINT + "/" + whoIsPaying.getId() + "/",
+                new Response.Listener<JSONArray>() {
+                    @Override
+                    public void onResponse(JSONArray response) {
+                        Log.d("TRANSACTIONS", response.toString());
+
+                        List<UserAccount> contactsOfCreditor;
+                        try {
+                            if (response.getJSONObject(0).has("error")) {
+                                throw new Exception();
+                            } else if (response.getJSONObject(0).has("empty")) {
+                                contactsOfCreditor = new ArrayList<>();
+                            } else {
+                                // On success
+                                contactsOfCreditor = ContactManager.parseContactsFromJson(response);
+                            }
+
+                            if (contactsOfCreditor.containsAll(whoOwes)) {
+                                confirmTransaction(transactions);
+                            } else {
+                                new MaterialAlertDialogBuilder(CreateTransactionActivity.this)
+                                        .setTitle("Missing Contacts!")
+                                        .setMessage(whoIsPaying.getFirstName() + " " + whoIsPaying.getLastName() + " is not a contact with everyone who owes!")
+                                        .setPositiveButton("Ok", null)
+                                        .show();
+                            }
+                        } catch (Exception e) {
+                            // On parse error, display add transactions failed to user
+                            Toast.makeText(CreateTransactionActivity.this, R.string.failure_add_transactions, Toast.LENGTH_SHORT).show();
+                        }
+                    }
+                },
+                new Response.ErrorListener() {
+                    @Override
+                    public void onErrorResponse(VolleyError error) {
+                        // On error, display add transactions failed to user
+                        Log.d("TRANSACTIONS", error.toString());
+                        Toast.makeText(CreateTransactionActivity.this, R.string.failure_add_transactions, Toast.LENGTH_SHORT).show();
+                    }
+                }
+        );
+
+        ConnectionAdapter.getInstance().addToRequestQueue(request, hashCode());
+    }
+
+    private void confirmTransaction(List<Transaction> transactions) {
+        new MaterialAlertDialogBuilder(this)
+                .setTitle("Confirm Transaction")
+                .setMessage("Are you sure you want to add the debt?")
+                .setPositiveButton("Yes", new DialogInterface.OnClickListener() {
+                    @Override
+                    public void onClick(DialogInterface dialog, int which) {
+                        makeAddTransactionsRequest(transactions);
+                    }
+                })
+                .setNegativeButton("No", null)
+                .show();
     }
 
     private void makeAddTransactionsRequest(List<Transaction> transactions) {

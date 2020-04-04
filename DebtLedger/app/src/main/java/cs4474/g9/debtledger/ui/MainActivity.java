@@ -10,6 +10,7 @@ import com.android.volley.VolleyError;
 import com.google.android.material.bottomnavigation.BottomNavigationView;
 
 import org.json.JSONArray;
+import org.json.JSONObject;
 
 import androidx.annotation.Nullable;
 import androidx.appcompat.app.AppCompatActivity;
@@ -41,6 +42,15 @@ public class MainActivity extends AppCompatActivity {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_main);
         bottomNavigationView = findViewById(R.id.bottom_nav_bar);
+
+        try {
+            JSONObject o = new JSONObject();
+            o.put("test", "  ");
+            o.put("test2", "test ");
+            Log.d("JSON", o.toString());
+        } catch (Exception e) {
+            e.printStackTrace();
+        }
 
         // Settings up bottom navigation
         AppBarConfiguration appBarConfiguration = new AppBarConfiguration.Builder(

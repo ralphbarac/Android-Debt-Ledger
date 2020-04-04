@@ -1,7 +1,5 @@
 package cs4474.g9.debtledger.data;
 
-import android.util.Log;
-
 import org.json.JSONArray;
 import org.json.JSONException;
 import org.json.JSONObject;
@@ -54,7 +52,6 @@ public class GroupManager {
             i++;
         }
         jsonSetGroupMembers.put("members", groupMembers);
-        Log.d("GENERATED SET", jsonSetGroupMembers.toString());
         return jsonSetGroupMembers;
     }
 

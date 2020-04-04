@@ -17,8 +17,8 @@
     <string name="action_sign_up">Sign Up</string>
     <string name="action_switch_to_login">Already a User? Login!</string>
     <string name="action_switch_to_sign_up">Not a User? Sign up!</string>
-    <string name="invalid_first_name">First name must contain only characters!</string>
-    <string name="invalid_last_name">Last name must contain only characters!</string>
+    <string name="invalid_first_name">First name must not be empty!</string>
+    <string name="invalid_last_name">Last name must not be empty!</string>
     <string name="invalid_email">Not a valid email!</string>
     <string name="invalid_password">Password must be a minimum of 6 characters!</string>
     <string name="welcome">"Welcome "</string>
@@ -76,5 +76,9 @@
     <string name="failure_add_contact">Unable to add contact request</string>
     <string name="failure_add_transactions">Unable to add debts</string>
     <string name="failure_change_name">Unable to update name</string>
+    <string name="failure_delete_group">Unable to delete group</string>
+    <string name="failure_add_group">Unable to add group</string>
+    <string name="failure_update_group">Unable to update group</string>
+    <string name="failure_update_group_members">Unable to update group members</string>
 
 </resources>

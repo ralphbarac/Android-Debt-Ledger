@@ -13,6 +13,7 @@ import android.view.Menu;
 import android.view.MenuItem;
 import android.widget.ImageView;
 import android.widget.TextView;
+import android.widget.Toast;
 
 import com.android.volley.Response;
 import com.android.volley.VolleyError;
@@ -47,6 +48,7 @@ public class ViewGroupActivity extends AppCompatActivity {
     public static final String MODIFIED = "modified";
 
     private Group group;
+    // Variables to check current status of group
     private boolean modified = false;
     private boolean deleted = false;
 
@@ -161,6 +163,14 @@ public class ViewGroupActivity extends AppCompatActivity {
         }
     }
 
+    @Override
+    protected void onDestroy() {
+        super.onDestroy();
+
+        // Cancel/terminate any requests that are still running or queued
+        ConnectionAdapter.getInstance().cancelAllRequests(hashCode());
+    }
+
     private void confirmDeletion() {
         // Create confirmation dialogue box
         MaterialAlertDialogBuilder builder = new MaterialAlertDialogBuilder(this);
@@ -191,29 +201,28 @@ public class ViewGroupActivity extends AppCompatActivity {
                 new Response.Listener<JSONArray>() {
                     @Override
                     public void onResponse(JSONArray response) {
+                        Log.d("DELETE GROUP", response.toString());
 
                         try {
-                            if (response.getJSONObject(0).has("error")) {
-                                Log.d("DELETE GROUP ERROR", response.toString());
-                                throw new Exception();
-                            } else if (response.getJSONObject(0).has("failure")) {
-                                Log.d("DELETE GROUP FAILURE", response.toString());
+                            if (response.getJSONObject(0).has("error") ||
+                                    response.getJSONObject(0).has("failure")) {
                                 throw new Exception();
                             } else {
                                 deleted = true;
                                 finish();
                             }
                         } catch (Exception e) {
-                            // failed to delete group from database
-                            Log.d("DELETE GROUP", e.toString());
+                            // On error, display failed to delete group from database
+                            Toast.makeText(ViewGroupActivity.this, R.string.failure_delete_group, Toast.LENGTH_SHORT).show();
                         }
                     }
                 },
                 new Response.ErrorListener() {
                     @Override
                     public void onErrorResponse(VolleyError error) {
-                        // failed to update user name
+                        // On error, display failed to delete group from database
                         Log.d("DELETE GROUP", error.toString());
+                        Toast.makeText(ViewGroupActivity.this, R.string.failure_delete_group, Toast.LENGTH_SHORT).show();
                     }
                 }
         );
@@ -231,6 +240,7 @@ public class ViewGroupActivity extends AppCompatActivity {
 
     @Override
     public void finish() {
+        // If the group has either been deleted/modified, pass that information back
         if (deleted) {
             Intent data = new Intent();
             data.putExtra(DELETED, true);

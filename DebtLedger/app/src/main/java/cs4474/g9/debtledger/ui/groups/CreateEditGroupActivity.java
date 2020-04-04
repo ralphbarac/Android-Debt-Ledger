@@ -107,7 +107,7 @@ public class CreateEditGroupActivity extends AppCompatActivity implements OnMemb
 
             @Override
             public void onTextChanged(CharSequence s, int start, int before, int count) {
-                name = s.toString();
+                name = s.toString().trim();
                 updateFieldsInPlaceOfViewModelsObserver();
             }
 
@@ -136,7 +136,7 @@ public class CreateEditGroupActivity extends AppCompatActivity implements OnMemb
                         : String.format(Locale.CANADA, "%d member%s", members.size(), members.size() > 1 ? "s" : "")
         );
 
-        if (groupNameTitle.length() == 0) {
+        if (name.length() == 0) {
             groupAvatar.setColorFilter(Color.BLACK);
             groupAvatarCharacter.setText("");
         } else {
@@ -145,7 +145,7 @@ public class CreateEditGroupActivity extends AppCompatActivity implements OnMemb
         }
 
         boolean shouldFormBeSubmittable;
-        if (groupNameTitle.length() == 0 || members.size() == 0) {
+        if (name.length() == 0 || members.size() == 0) {
             shouldFormBeSubmittable = false;
         } else {
             shouldFormBeSubmittable = true;
@@ -205,6 +205,14 @@ public class CreateEditGroupActivity extends AppCompatActivity implements OnMemb
         }
     }
 
+    @Override
+    protected void onDestroy() {
+        super.onDestroy();
+
+        // Cancel/terminate any requests that are still running or queued
+        ConnectionAdapter.getInstance().cancelAllRequests(hashCode());
+    }
+
     public void addGroupMembers(View view) {
         Intent toSelectGroupMembers = new Intent(this, SelectGroupMembersActivity.class);
         GroupMembersWrapper wrapper = new GroupMembersWrapper(members);
@@ -251,15 +259,15 @@ public class CreateEditGroupActivity extends AppCompatActivity implements OnMemb
                     public void onResponse(JSONArray response) {
                         Log.d("UPDATE GROUP", response.toString());
                         try {
-                            if (response.getJSONObject(0).has("error") || response.getJSONObject(0).has("failure")) {
+                            if (response.getJSONObject(0).has("error") ||
+                                    response.getJSONObject(0).has("failure")) {
                                 // If error, do nothing...
                                 throw new Exception();
                             } else {
                                 // On success, do nothing
                             }
                         } catch (Exception e) {
-                            Toast.makeText(CreateEditGroupActivity.this, "Error Adding Group", Toast.LENGTH_SHORT);
-                            throw new RuntimeException();
+                            Toast.makeText(CreateEditGroupActivity.this, R.string.failure_update_group, Toast.LENGTH_SHORT).show();
                         }
                     }
                 },
@@ -268,7 +276,7 @@ public class CreateEditGroupActivity extends AppCompatActivity implements OnMemb
                     public void onErrorResponse(VolleyError error) {
                         // On error, display add failed to user
                         Log.d("UPDATE GROUP", error.toString());
-                        Toast.makeText(CreateEditGroupActivity.this, "Error Adding Group", Toast.LENGTH_SHORT);
+                        Toast.makeText(CreateEditGroupActivity.this, R.string.failure_update_group, Toast.LENGTH_SHORT).show();
                     }
                 }
         );
@@ -295,7 +303,7 @@ public class CreateEditGroupActivity extends AppCompatActivity implements OnMemb
                                 setGroupMembers(set_info);
                             }
                         } catch (Exception e) {
-                            Toast.makeText(CreateEditGroupActivity.this, "Error Adding Group", Toast.LENGTH_SHORT).show();
+                            Toast.makeText(CreateEditGroupActivity.this, R.string.failure_add_group, Toast.LENGTH_SHORT).show();
                         }
                     }
                 },
@@ -304,7 +312,7 @@ public class CreateEditGroupActivity extends AppCompatActivity implements OnMemb
                     public void onErrorResponse(VolleyError error) {
                         // On error, display add failed to user
                         Log.d("ADD GROUP", error.toString());
-                        Toast.makeText(CreateEditGroupActivity.this, "Error Adding Group", Toast.LENGTH_SHORT).show();
+                        Toast.makeText(CreateEditGroupActivity.this, R.string.failure_add_group, Toast.LENGTH_SHORT).show();
                     }
                 }
         );
@@ -342,7 +350,7 @@ public class CreateEditGroupActivity extends AppCompatActivity implements OnMemb
                             }
                         } catch (Exception e) {
                             // On parse error, display set failed to user
-                            Toast.makeText(CreateEditGroupActivity.this, "Set Group Members Failed", Toast.LENGTH_SHORT).show();
+                            Toast.makeText(CreateEditGroupActivity.this, R.string.failure_update_group_members, Toast.LENGTH_SHORT).show();
 
                         }
                     }
@@ -352,7 +360,7 @@ public class CreateEditGroupActivity extends AppCompatActivity implements OnMemb
                     public void onErrorResponse(VolleyError error) {
                         // On error, display set failed to user
                         Log.d("SET GROUP DATA", error.toString());
-                        Toast.makeText(CreateEditGroupActivity.this, "Set Group Members Failed", Toast.LENGTH_SHORT).show();
+                        Toast.makeText(CreateEditGroupActivity.this, R.string.failure_update_group_members, Toast.LENGTH_SHORT).show();
                     }
                 }
         );
