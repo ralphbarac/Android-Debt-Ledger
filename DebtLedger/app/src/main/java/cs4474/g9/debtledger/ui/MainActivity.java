@@ -51,7 +51,6 @@ public class MainActivity extends AppCompatActivity {
         NavigationUI.setupWithNavController(bottomNavigationView, navController);
 
         // Adding notification badge (if necessary) to contacts icon
-        // TODO: Also call this method when new request added, or request responded to
         updateContactsNotificationBadge();
     }
 

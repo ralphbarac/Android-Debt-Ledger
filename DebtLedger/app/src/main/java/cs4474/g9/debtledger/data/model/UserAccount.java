@@ -12,14 +12,6 @@ public class UserAccount implements Serializable {
     private String email;
     private String password;
 
-    public UserAccount(long id, String firstName, String lastName, String email, String password) {
-        this.id = id;
-        this.firstName = firstName;
-        this.lastName = lastName;
-        this.email = email;
-        this.password = password;
-    }
-
     public UserAccount(long id, String firstName, String lastName, String email) {
         this.id = id;
         this.firstName = firstName;
@@ -32,12 +24,6 @@ public class UserAccount implements Serializable {
         this.lastName = lastName;
         this.email = email;
         this.password = password;
-    }
-
-    public UserAccount(String firstName, String lastName, String email) {
-        this.firstName = firstName;
-        this.lastName = lastName;
-        this.email = email;
     }
 
     public long getId() {
@@ -78,8 +64,7 @@ public class UserAccount implements Serializable {
     public boolean equals(@Nullable Object obj) {
         if (obj instanceof UserAccount) {
             UserAccount userAccount = (UserAccount) obj;
-            // TODO: Use ids eventually...
-            return this.firstName.equals(userAccount.getFirstName()) && this.lastName.equals(userAccount.getLastName());
+            return this.id == userAccount.getId();
         } else {
             return false;
         }

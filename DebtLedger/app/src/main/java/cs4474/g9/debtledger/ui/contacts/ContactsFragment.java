@@ -122,7 +122,6 @@ public class ContactsFragment extends Fragment implements OnRequestReply {
     public boolean onOptionsItemSelected(MenuItem item) {
         switch (item.getItemId()) {
             case R.id.add_contact:
-                // TODO: Open Add Contact Dialog
                 Log.d("CONTACTS", "Add Contact icon clicked.");
                 AddContactDialog.createAddContactDialog(getActivity()).setOnDismissListener(new DialogInterface.OnDismissListener() {
                     @Override

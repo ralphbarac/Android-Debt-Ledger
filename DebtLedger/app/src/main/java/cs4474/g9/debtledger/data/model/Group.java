@@ -39,8 +39,7 @@ public class Group implements Serializable {
     public boolean equals(@Nullable Object obj) {
         if (obj instanceof Group) {
             Group group = (Group) obj;
-            // TODO: Use ids eventually...
-            return this.name.equals(group.getGroupName());
+            return this.id == group.getId();
         } else {
             return false;
         }

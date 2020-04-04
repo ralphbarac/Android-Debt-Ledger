@@ -66,12 +66,6 @@ public class GroupListAdapter extends RecyclerView.Adapter<GroupListAdapter.Item
         return groups == null ? 0 : groups.size();
     }
 
-    public void addNewGroup(Group group) {
-        //TODO: Currently just adds to top of list
-        groups.add(group);
-        notifyDataSetChanged();
-    }
-
     public class Item extends RecyclerView.ViewHolder implements View.OnClickListener {
         public ImageView groupAvatar;
         public TextView groupAvatarCharacter;

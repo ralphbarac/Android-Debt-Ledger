@@ -5,9 +5,6 @@ import android.util.Log;
 import android.widget.ImageView;
 import android.widget.TextView;
 
-import androidx.appcompat.app.AppCompatActivity;
-import androidx.recyclerview.widget.LinearLayoutManager;
-
 import com.android.volley.Response;
 import com.android.volley.VolleyError;
 import com.google.android.material.button.MaterialButton;
@@ -15,14 +12,14 @@ import com.google.android.material.button.MaterialButton;
 import org.json.JSONArray;
 
 import java.util.ArrayList;
-import java.util.Locale;
 
+import androidx.appcompat.app.AppCompatActivity;
+import androidx.recyclerview.widget.LinearLayoutManager;
 import cs4474.g9.debtledger.data.ConnectionAdapter;
 import cs4474.g9.debtledger.data.RedirectableJsonArrayRequest;
 import cs4474.g9.debtledger.data.login.LoginRepository;
 import cs4474.g9.debtledger.data.model.TransactionManager;
 import cs4474.g9.debtledger.data.model.UserAccount;
-import cs4474.g9.debtledger.logic.BalanceCalculator;
 import cs4474.g9.debtledger.logic.ColourGenerator;
 import cs4474.g9.debtledger.ui.contacts.ContactHistoryListAdapter;
 import cs4474.g9.debtledger.ui.shared.LoadableRecyclerView;
