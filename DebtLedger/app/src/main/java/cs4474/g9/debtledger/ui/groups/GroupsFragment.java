@@ -30,7 +30,11 @@ import cs4474.g9.debtledger.data.model.UserAccount;
 import cs4474.g9.debtledger.ui.shared.LoadableRecyclerView;
 import cs4474.g9.debtledger.ui.shared.OnActionButtonClickedListener;
 
+import static android.app.Activity.RESULT_OK;
+
 public class GroupsFragment extends Fragment implements OnActionButtonClickedListener {
+
+    public static final int CREATE_REQUEST = 0;
 
     private LoadableRecyclerView groupsView;
     private GroupListAdapter groupsAdapter;
@@ -69,11 +73,23 @@ public class GroupsFragment extends Fragment implements OnActionButtonClickedLis
             case R.id.add_group:
                 Intent toAddGroup = new Intent(getActivity(), CreateEditGroupActivity.class);
                 toAddGroup.putExtra(CreateEditGroupActivity.MODE, CreateEditGroupActivity.CREATE_MODE);
-                startActivity(toAddGroup);
+                startActivityForResult(toAddGroup, CREATE_REQUEST);
                 Log.d("GROUPS", "Add Group icon clicked.");
                 return true;
             default:
                 return super.onOptionsItemSelected(item);
+        }
+    }
+
+    @Override
+    public void onActivityResult(int requestCode, int resultCode, @Nullable Intent data) {
+        Log.d("GROUPS", "onActivityResponse");
+        super.onActivityResult(requestCode, resultCode, data);
+
+        if (requestCode == CREATE_REQUEST) {
+            if (resultCode == RESULT_OK) {
+                makeRequestForGroups(LoginRepository.getInstance().getLoggedInUser());
+            }
         }
     }
 

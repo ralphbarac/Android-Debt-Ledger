@@ -22,8 +22,11 @@ import cs4474.g9.debtledger.data.ConnectionAdapter;
 import cs4474.g9.debtledger.data.ContactRequestManager;
 import cs4474.g9.debtledger.data.RedirectableJsonArrayRequest;
 import cs4474.g9.debtledger.data.login.LoginRepository;
+import cs4474.g9.debtledger.ui.groups.ViewGroupActivity;
 
 public class MainActivity extends AppCompatActivity {
+
+    public static final int VIEW_GROUP_REQUEST = 0;
 
     public static final String CHANGE_TAB = "change_tab";
     public static final int DASHBOARD_TAB = 0;
@@ -70,6 +73,15 @@ public class MainActivity extends AppCompatActivity {
                 case SETTINGS_TAB:
                     bottomNavigationView.setSelectedItemId(R.id.navigation_settings);
                     break;
+            }
+        }
+
+        // A workaround (fuck), in order to update groups after modifying/deleting viewed group
+        if (requestCode == MainActivity.VIEW_GROUP_REQUEST) {
+            if (resultCode == RESULT_OK) {
+                if (data != null && (data.hasExtra(ViewGroupActivity.MODIFIED) || data.hasExtra(ViewGroupActivity.DELETED))) {
+                    bottomNavigationView.setSelectedItemId(R.id.navigation_groups);
+                }
             }
         }
     }

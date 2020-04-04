@@ -35,7 +35,7 @@ import static android.app.Activity.RESULT_OK;
 
 public class DashboardFragment extends Fragment implements OnActionButtonClickedListener {
 
-    public static final int FROM_DASHBOARD = 0;
+    public static final int CREATE_TRANSACTION_REQUEST = 0;
 
     private final int SEMI_TRANSPARENT = 130;
     private final int SOLID = 255;
@@ -56,7 +56,7 @@ public class DashboardFragment extends Fragment implements OnActionButtonClicked
             @Override
             public void onClick(View v) {
                 Intent toCreateTransaction = new Intent(getActivity(), CreateTransactionActivity.class);
-                startActivityForResult(toCreateTransaction, FROM_DASHBOARD);
+                startActivityForResult(toCreateTransaction, CREATE_TRANSACTION_REQUEST);
             }
         });
 
@@ -120,7 +120,7 @@ public class DashboardFragment extends Fragment implements OnActionButtonClicked
     public void onActivityResult(int requestCode, int resultCode, @Nullable Intent data) {
         super.onActivityResult(requestCode, resultCode, data);
 
-        if (requestCode == FROM_DASHBOARD) {
+        if (requestCode == CREATE_TRANSACTION_REQUEST) {
             if (resultCode ==  RESULT_OK) {
                 makeRequestForContacts(LoginRepository.getInstance().getLoggedInUser());
             }

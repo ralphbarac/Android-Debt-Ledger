@@ -14,10 +14,12 @@ import android.widget.TextView;
 import android.widget.Toast;
 
 import com.android.volley.Response;
-//import com.android.volley.VolleyError;
-import com.android.volley.Response;
 import com.android.volley.VolleyError;
 import com.google.android.material.textfield.TextInputEditText;
+
+import org.json.JSONArray;
+import org.json.JSONException;
+import org.json.JSONObject;
 
 import java.io.Serializable;
 import java.util.ArrayList;
@@ -28,11 +30,6 @@ import androidx.annotation.Nullable;
 import androidx.appcompat.app.AppCompatActivity;
 import androidx.recyclerview.widget.LinearLayoutManager;
 import androidx.recyclerview.widget.RecyclerView;
-
-import org.json.JSONArray;
-import org.json.JSONException;
-import org.json.JSONObject;
-
 import cs4474.g9.debtledger.R;
 import cs4474.g9.debtledger.data.ConnectionAdapter;
 import cs4474.g9.debtledger.data.GroupManager;
@@ -259,7 +256,6 @@ public class CreateEditGroupActivity extends AppCompatActivity implements OnMemb
                                 throw new Exception();
                             } else {
                                 // On success, do nothing
-
                             }
                         } catch (Exception e) {
                             Toast.makeText(CreateEditGroupActivity.this, "Error Adding Group", Toast.LENGTH_SHORT);
@@ -287,23 +283,19 @@ public class CreateEditGroupActivity extends AppCompatActivity implements OnMemb
                     public void onResponse(JSONArray response) {
                         Log.d("ADD GROUP", response.toString());
                         try {
-                            if (response.getJSONObject(0).has("error") || response.getJSONObject(0).has("failure")) {
+                            if (response.getJSONObject(0).has("error") ||
+                                    response.getJSONObject(0).has("failure")) {
                                 // If error, do nothing...
                                 throw new Exception();
                             } else {
                                 // On success, set members
                                 int group_id = response.getJSONObject(0).getInt("id");
                                 JSONObject set_info;
-                                try {
-                                    set_info = GroupManager.createJsonForSetGroupMembers(group_id, members);
-                                    setGroupMembers(set_info);
-                                } catch (JSONException e) {
-                                    throw new RuntimeException();
-                                }
+                                set_info = GroupManager.createJsonForSetGroupMembers(group_id, members);
+                                setGroupMembers(set_info);
                             }
                         } catch (Exception e) {
-                            Toast.makeText(CreateEditGroupActivity.this, "Error Adding Group", Toast.LENGTH_SHORT);
-                            throw new RuntimeException();
+                            Toast.makeText(CreateEditGroupActivity.this, "Error Adding Group", Toast.LENGTH_SHORT).show();
                         }
                     }
                 },
@@ -312,7 +304,7 @@ public class CreateEditGroupActivity extends AppCompatActivity implements OnMemb
                     public void onErrorResponse(VolleyError error) {
                         // On error, display add failed to user
                         Log.d("ADD GROUP", error.toString());
-                        Toast.makeText(CreateEditGroupActivity.this, "Error Adding Group", Toast.LENGTH_SHORT);
+                        Toast.makeText(CreateEditGroupActivity.this, "Error Adding Group", Toast.LENGTH_SHORT).show();
                     }
                 }
         );
@@ -328,7 +320,8 @@ public class CreateEditGroupActivity extends AppCompatActivity implements OnMemb
                         Log.d("SET GROUP MEMBERS", response.toString());
                         try {
                             // If error, do nothing...
-                            if (response.getJSONObject(0).has("error") || response.getJSONObject(0).has("failure")) {
+                            if (response.getJSONObject(0).has("error") ||
+                                    response.getJSONObject(0).has("failure")) {
                                 throw new Exception();
                             } else {
                                 // On success, notify user and exit activity
@@ -337,11 +330,20 @@ public class CreateEditGroupActivity extends AppCompatActivity implements OnMemb
                                 } else {
                                     Toast.makeText(CreateEditGroupActivity.this, "Group Edited", Toast.LENGTH_SHORT).show();
                                 }
-                                CreateEditGroupActivity.this.finish();
+
+                                if (isCreateMode) {
+                                    setResult(RESULT_OK);
+                                } else {
+                                    Intent data = new Intent();
+                                    data.putExtra(GROUP, new Group(group_id, name, members));
+                                    setResult(RESULT_OK, data);
+                                }
+                                finish();
                             }
                         } catch (Exception e) {
-//                            throw new RuntimeException();
-                            Log.d("SET GROUP MEMBERS", response.toString());
+                            // On parse error, display set failed to user
+                            Toast.makeText(CreateEditGroupActivity.this, "Set Group Members Failed", Toast.LENGTH_SHORT).show();
+
                         }
                     }
                 },

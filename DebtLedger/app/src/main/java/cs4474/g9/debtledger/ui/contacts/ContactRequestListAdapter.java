@@ -220,10 +220,10 @@ public class ContactRequestListAdapter extends RecyclerView.Adapter<ContactReque
                                     throw new Exception();
                                 } else {
                                     // On success
-                                    if (response.getJSONObject(0).get("status").equals("denied")) {
-                                        removeContactRequest(getAdapterPosition());
-                                        notifyListenersOfContactRejected(contactRequest);
-                                    }
+                                    response.getJSONObject(0).get("success");
+                                    removeContactRequest(getAdapterPosition());
+                                    notifyListenersOfContactRejected(contactRequest);
+
                                 }
                             } catch (Exception e) {
                                 // On parse error, display failed to deny contact request message

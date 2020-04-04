@@ -1,7 +1,7 @@
 package cs4474.g9.debtledger.ui.groups;
 
+import android.app.Activity;
 import android.content.Intent;
-import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
@@ -17,6 +17,7 @@ import cs4474.g9.debtledger.R;
 import cs4474.g9.debtledger.data.model.Group;
 import cs4474.g9.debtledger.data.model.UserAccount;
 import cs4474.g9.debtledger.logic.ColourGenerator;
+import cs4474.g9.debtledger.ui.MainActivity;
 
 public class GroupListAdapter extends RecyclerView.Adapter<GroupListAdapter.Item> {
 
@@ -86,12 +87,15 @@ public class GroupListAdapter extends RecyclerView.Adapter<GroupListAdapter.Item
 
             view.setOnClickListener(this);
         }
-
-        public void onClick(View v) {
-            Log.d("GROUP", "Group clicked.");
-            Intent toViewGroup = new Intent(v.getContext(), ViewGroupActivity.class);
+        public void onClick(View view) {
+            Intent toViewGroup = new Intent(view.getContext(), ViewGroupActivity.class);
             toViewGroup.putExtra(ViewGroupActivity.GROUP, groups.get(getAdapterPosition()));
-            v.getContext().startActivity(toViewGroup);
+
+            if (view.getContext() instanceof Activity) {
+                ((Activity) view.getContext()).startActivityForResult(toViewGroup, MainActivity.VIEW_GROUP_REQUEST);
+            } else {
+                view.getContext().startActivity(toViewGroup);
+            }
         }
     }
 }

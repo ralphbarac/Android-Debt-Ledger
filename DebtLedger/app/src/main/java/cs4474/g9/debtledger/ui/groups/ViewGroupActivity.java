@@ -23,6 +23,7 @@ import org.json.JSONArray;
 import java.util.List;
 import java.util.Locale;
 
+import androidx.annotation.Nullable;
 import androidx.appcompat.app.AlertDialog;
 import androidx.appcompat.app.AppCompatActivity;
 import androidx.core.content.ContextCompat;
@@ -39,9 +40,15 @@ import cs4474.g9.debtledger.ui.contacts.ContactListAdapter;
 
 public class ViewGroupActivity extends AppCompatActivity {
 
+    private final static int EDIT_REQUEST = 0;
+
     public static final String GROUP = "group";
+    public static final String DELETED = "deleted";
+    public static final String MODIFIED = "modified";
 
     private Group group;
+    private boolean modified = false;
+    private boolean deleted = false;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -131,13 +138,26 @@ public class ViewGroupActivity extends AppCompatActivity {
                 Intent toEditGroup = new Intent(this, CreateEditGroupActivity.class);
                 toEditGroup.putExtra(CreateEditGroupActivity.MODE, CreateEditGroupActivity.EDIT_MODE);
                 toEditGroup.putExtra(CreateEditGroupActivity.GROUP, group);
-                startActivity(toEditGroup);
+                startActivityForResult(toEditGroup, EDIT_REQUEST);
                 return true;
             case R.id.delete_group:
                 confirmDeletion();
                 return true;
             default:
                 return super.onOptionsItemSelected(item);
+        }
+    }
+
+    @Override
+    protected void onActivityResult(int requestCode, int resultCode, @Nullable Intent data) {
+        super.onActivityResult(requestCode, resultCode, data);
+
+        if (requestCode == EDIT_REQUEST) {
+            if (resultCode == RESULT_OK) {
+                if (data != null && data.hasExtra(GROUP)) {
+                    modified = true;
+                }
+            }
         }
     }
 
@@ -179,6 +199,9 @@ public class ViewGroupActivity extends AppCompatActivity {
                             } else if (response.getJSONObject(0).has("failure")) {
                                 Log.d("DELETE GROUP FAILURE", response.toString());
                                 throw new Exception();
+                            } else {
+                                deleted = true;
+                                finish();
                             }
                         } catch (Exception e) {
                             // failed to delete group from database
@@ -196,7 +219,6 @@ public class ViewGroupActivity extends AppCompatActivity {
         );
 
         ConnectionAdapter.getInstance().addToRequestQueue(request, hashCode());
-        finish();
     }
 
 
@@ -205,5 +227,21 @@ public class ViewGroupActivity extends AppCompatActivity {
         // When clicking back arrow in top left, mimic behaviour of back
         onBackPressed();
         return true;
+    }
+
+    @Override
+    public void finish() {
+        if (deleted) {
+            Intent data = new Intent();
+            data.putExtra(DELETED, true);
+            setResult(RESULT_OK, data);
+        } else if (modified) {
+            Intent data = new Intent();
+            data.putExtra(MODIFIED, true);
+            data.putExtra(GROUP, group);
+            setResult(RESULT_OK, data);
+        }
+
+        super.finish();
     }
 }
