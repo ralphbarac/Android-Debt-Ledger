@@ -5,12 +5,18 @@ import android.graphics.Color;
 import android.os.Bundle;
 import android.text.Editable;
 import android.text.TextWatcher;
+import android.util.Log;
 import android.view.Menu;
 import android.view.MenuItem;
 import android.view.View;
 import android.widget.ImageView;
 import android.widget.TextView;
+import android.widget.Toast;
 
+import com.android.volley.Response;
+//import com.android.volley.VolleyError;
+import com.android.volley.Response;
+import com.android.volley.VolleyError;
 import com.google.android.material.textfield.TextInputEditText;
 
 import java.io.Serializable;
@@ -22,7 +28,16 @@ import androidx.annotation.Nullable;
 import androidx.appcompat.app.AppCompatActivity;
 import androidx.recyclerview.widget.LinearLayoutManager;
 import androidx.recyclerview.widget.RecyclerView;
+
+import org.json.JSONArray;
+import org.json.JSONException;
+import org.json.JSONObject;
+
 import cs4474.g9.debtledger.R;
+import cs4474.g9.debtledger.data.ConnectionAdapter;
+import cs4474.g9.debtledger.data.GroupManager;
+import cs4474.g9.debtledger.data.RedirectableJsonArrayRequest;
+import cs4474.g9.debtledger.data.login.LoginRepository;
 import cs4474.g9.debtledger.data.model.Group;
 import cs4474.g9.debtledger.data.model.UserAccount;
 import cs4474.g9.debtledger.logic.ColourGenerator;
@@ -41,6 +56,8 @@ public class CreateEditGroupActivity extends AppCompatActivity implements OnMemb
     private boolean isFormSubmittable = false;
 
     private String name;
+    private String old_name;
+    private long group_id;
     private List<UserAccount> members;
 
     private ImageView groupAvatar;
@@ -66,6 +83,8 @@ public class CreateEditGroupActivity extends AppCompatActivity implements OnMemb
             setTitle(R.string.title_edit_group);
             Group group = (Group) intent.getSerializableExtra(GROUP);
             name = group.getGroupName();
+            old_name = group.getGroupName();
+            group_id = group.getId();
             members = group.getGroupMembers();
         } else {
             isCreateMode = true;
@@ -175,6 +194,7 @@ public class CreateEditGroupActivity extends AppCompatActivity implements OnMemb
 
     @Override
     protected void onActivityResult(int requestCode, int resultCode, @Nullable Intent data) {
+        super.onActivityResult(requestCode, resultCode, data);
         if (requestCode == SELECT_GROUP_MEMBERS) {
             if (resultCode == RESULT_OK) {
                 Serializable value = data.getSerializableExtra(SelectGroupMembersActivity.SELECTED_GROUP_MEMBERS);
@@ -202,6 +222,138 @@ public class CreateEditGroupActivity extends AppCompatActivity implements OnMemb
     }
 
     public void createOrSaveGroup() {
-        // TODO: Create or Save Group
+        if (isCreateMode) { // add new group
+            UserAccount owner = LoginRepository.getInstance().getLoggedInUser();
+            JSONObject add_info;
+            try {
+                add_info = GroupManager.createJsonForAddGroup(owner.getId(), name);
+                addGroup(add_info);
+            } catch (JSONException e) {
+                throw new RuntimeException();
+            }
+        } else { // edit group
+            if (!old_name.equals(name)) {
+                updateGroup(group_id);
+            }
+
+            JSONObject set_info;
+            try {
+                set_info = GroupManager.createJsonForSetGroupMembers(group_id, members);
+                setGroupMembers(set_info);
+            } catch (JSONException e) {
+                throw new RuntimeException();
+            }
+        }
+    }
+
+    public void updateGroup(long id) {
+        RedirectableJsonArrayRequest updateRequest = new RedirectableJsonArrayRequest(
+                ConnectionAdapter.BASE_URL + "/contact_group/update/" + id + "/" + name + "/",
+                new Response.Listener<JSONArray>() {
+                    @Override
+                    public void onResponse(JSONArray response) {
+                        Log.d("UPDATE GROUP", response.toString());
+                        try {
+                            if (response.getJSONObject(0).has("error") || response.getJSONObject(0).has("failure")) {
+                                // If error, do nothing...
+                                throw new Exception();
+                            } else {
+                                // On success, do nothing
+
+                            }
+                        } catch (Exception e) {
+                            Toast.makeText(CreateEditGroupActivity.this, "Error Adding Group", Toast.LENGTH_SHORT);
+                            throw new RuntimeException();
+                        }
+                    }
+                },
+                new Response.ErrorListener() {
+                    @Override
+                    public void onErrorResponse(VolleyError error) {
+                        // On error, display add failed to user
+                        Log.d("UPDATE GROUP", error.toString());
+                        Toast.makeText(CreateEditGroupActivity.this, "Error Adding Group", Toast.LENGTH_SHORT);
+                    }
+                }
+        );
+        ConnectionAdapter.getInstance().addToRequestQueue(updateRequest, hashCode());
+    }
+
+    public void addGroup(JSONObject data) {
+        RedirectableJsonArrayRequest addRequest = new RedirectableJsonArrayRequest(
+                ConnectionAdapter.BASE_URL + "/contact_group/add/" + data.toString() + "/",
+                new Response.Listener<JSONArray>() {
+                    @Override
+                    public void onResponse(JSONArray response) {
+                        Log.d("ADD GROUP", response.toString());
+                        try {
+                            if (response.getJSONObject(0).has("error") || response.getJSONObject(0).has("failure")) {
+                                // If error, do nothing...
+                                throw new Exception();
+                            } else {
+                                // On success, set members
+                                int group_id = response.getJSONObject(0).getInt("id");
+                                JSONObject set_info;
+                                try {
+                                    set_info = GroupManager.createJsonForSetGroupMembers(group_id, members);
+                                    setGroupMembers(set_info);
+                                } catch (JSONException e) {
+                                    throw new RuntimeException();
+                                }
+                            }
+                        } catch (Exception e) {
+                            Toast.makeText(CreateEditGroupActivity.this, "Error Adding Group", Toast.LENGTH_SHORT);
+                            throw new RuntimeException();
+                        }
+                    }
+                },
+                new Response.ErrorListener() {
+                    @Override
+                    public void onErrorResponse(VolleyError error) {
+                        // On error, display add failed to user
+                        Log.d("ADD GROUP", error.toString());
+                        Toast.makeText(CreateEditGroupActivity.this, "Error Adding Group", Toast.LENGTH_SHORT);
+                    }
+                }
+        );
+        ConnectionAdapter.getInstance().addToRequestQueue(addRequest, hashCode());
+    }
+
+    public void setGroupMembers(JSONObject data) {
+        RedirectableJsonArrayRequest setRequest = new RedirectableJsonArrayRequest(
+                ConnectionAdapter.BASE_URL + "/contact_group_member/set/" + data.toString() + "/",
+                new Response.Listener<JSONArray>() {
+                    @Override
+                    public void onResponse(JSONArray response) {
+                        Log.d("SET GROUP MEMBERS", response.toString());
+                        try {
+                            // If error, do nothing...
+                            if (response.getJSONObject(0).has("error") || response.getJSONObject(0).has("failure")) {
+                                throw new Exception();
+                            } else {
+                                // On success, notify user and exit activity
+                                if (isCreateMode) {
+                                    Toast.makeText(CreateEditGroupActivity.this, "Group Added", Toast.LENGTH_SHORT).show();
+                                } else {
+                                    Toast.makeText(CreateEditGroupActivity.this, "Group Edited", Toast.LENGTH_SHORT).show();
+                                }
+                                CreateEditGroupActivity.this.finish();
+                            }
+                        } catch (Exception e) {
+//                            throw new RuntimeException();
+                            Log.d("SET GROUP MEMBERS", response.toString());
+                        }
+                    }
+                },
+                new Response.ErrorListener() {
+                    @Override
+                    public void onErrorResponse(VolleyError error) {
+                        // On error, display set failed to user
+                        Log.d("SET GROUP DATA", error.toString());
+                        Toast.makeText(CreateEditGroupActivity.this, "Set Group Members Failed", Toast.LENGTH_SHORT).show();
+                    }
+                }
+        );
+        ConnectionAdapter.getInstance().addToRequestQueue(setRequest, hashCode());
     }
 }

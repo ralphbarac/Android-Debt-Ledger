@@ -1,14 +1,19 @@
 package cs4474.g9.debtledger.data;
 
+import android.util.Log;
+import android.widget.Toast;
+
 import org.json.JSONArray;
 import org.json.JSONException;
 import org.json.JSONObject;
 
 import java.util.ArrayList;
 import java.util.List;
+import java.util.ListIterator;
 
 import cs4474.g9.debtledger.data.model.Group;
 import cs4474.g9.debtledger.data.model.UserAccount;
+import cs4474.g9.debtledger.ui.groups.CreateEditGroupActivity;
 
 public class GroupManager {
 
@@ -50,6 +55,27 @@ public class GroupManager {
         groupList.add(new Group("Pizza Hut Boys", group2list));
 
         return new Result.Success<>(groupList);
+    }
+
+    public static JSONObject createJsonForAddGroup(long id, String name) throws JSONException {
+        JSONObject jsonAddGroup = new JSONObject();
+        jsonAddGroup.put("owner", id);
+        jsonAddGroup.put("name", name);
+        return jsonAddGroup;
+    }
+
+    public static JSONObject createJsonForSetGroupMembers(long id, List<UserAccount> members) throws JSONException {
+        JSONObject jsonSetGroupMembers = new JSONObject();
+        jsonSetGroupMembers.put("group_id", id);
+        JSONArray groupMembers = new JSONArray();
+        int i = 0;
+        while (i < members.size()) {
+            groupMembers.put(members.get(i).getId());
+            i++;
+        }
+        jsonSetGroupMembers.put("members", groupMembers);
+        Log.d("GENERATED SET", jsonSetGroupMembers.toString());
+        return jsonSetGroupMembers;
     }
 
 }
