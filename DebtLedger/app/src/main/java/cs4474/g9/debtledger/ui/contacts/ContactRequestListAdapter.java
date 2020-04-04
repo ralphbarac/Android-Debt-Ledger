@@ -20,6 +20,7 @@ import java.util.ArrayList;
 import java.util.List;
 
 import androidx.annotation.NonNull;
+import androidx.appcompat.app.AlertDialog;
 import androidx.recyclerview.widget.RecyclerView;
 import cs4474.g9.debtledger.R;
 import cs4474.g9.debtledger.ViewContactActivity;
@@ -140,11 +141,10 @@ public class ContactRequestListAdapter extends RecyclerView.Adapter<ContactReque
                 public void onClick(View v) {
                     final UserAccount contactRequest = contactRequests.get(getAdapterPosition());
                     String name = contactRequest.getFirstName() + " " + contactRequest.getLastName();
-                    new MaterialAlertDialogBuilder(v.getContext())
+                    AlertDialog dialog = new MaterialAlertDialogBuilder(v.getContext())
                             .setTitle("Confirm Reject")
                             .setMessage("Are you sure you want to reject the contact request from " + name + "?")
-                            .setPositiveButton("No", null)
-                            .setNegativeButton("Yes", new DialogInterface.OnClickListener() {
+                            .setPositiveButton("Yes", new DialogInterface.OnClickListener() {
                                 @Override
                                 public void onClick(DialogInterface dialog, int which) {
                                     makeRequestToDenyContact(
@@ -153,6 +153,7 @@ public class ContactRequestListAdapter extends RecyclerView.Adapter<ContactReque
                                     );
                                 }
                             })
+                            .setNegativeButton("No", null)
                             .show();
                 }
             });
