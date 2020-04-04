@@ -86,7 +86,7 @@
         public function getWithContact($user, $contact)
         {
             $connection = new mysqli("cs4474-debt-ledger.chv9hyuyepg2.us-east-2.rds.amazonaws.com", "admin", "I6leZnstPdI7SSqameT4", "debt_ledger");
-            $query = "SELECT * FROM transaction WHERE creditor=".$user." OR creditor=".$contact." ORDER BY date DESC";
+            $query = "SELECT * FROM transaction WHERE (creditor=".$user." AND debtor=".$contact.") OR (creditor=".$contact." AND debtor=".$user.") ORDER BY date DESC";
 
             if($result = $connection->query($query))
             {

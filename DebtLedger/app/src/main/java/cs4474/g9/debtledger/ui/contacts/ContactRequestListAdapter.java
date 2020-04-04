@@ -182,9 +182,10 @@ public class ContactRequestListAdapter extends RecyclerView.Adapter<ContactReque
                                     throw new Exception();
                                 } else {
                                     // On success
-                                    response.getJSONObject(0).get("success");
-                                    removeContactRequest(getAdapterPosition());
-                                    notifyListenersOfContactAccepted(contactRequest);
+                                    if (response.getJSONObject(0).get("status").equals("accepted")) {
+                                        removeContactRequest(getAdapterPosition());
+                                        notifyListenersOfContactAccepted(contactRequest);
+                                    }
                                 }
                             } catch (Exception e) {
                                 // On parse error, display failed to accept contact request message
@@ -219,9 +220,10 @@ public class ContactRequestListAdapter extends RecyclerView.Adapter<ContactReque
                                     throw new Exception();
                                 } else {
                                     // On success
-                                    response.getJSONObject(0).get("success");
-                                    removeContactRequest(getAdapterPosition());
-                                    notifyListenersOfContactRejected(contactRequest);
+                                    if (response.getJSONObject(0).get("status").equals("denied")) {
+                                        removeContactRequest(getAdapterPosition());
+                                        notifyListenersOfContactRejected(contactRequest);
+                                    }
                                 }
                             } catch (Exception e) {
                                 // On parse error, display failed to deny contact request message

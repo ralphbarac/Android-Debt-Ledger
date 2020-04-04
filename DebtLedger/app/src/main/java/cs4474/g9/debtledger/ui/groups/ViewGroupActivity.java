@@ -1,40 +1,36 @@
 package cs4474.g9.debtledger.ui.groups;
 
+import android.content.DialogInterface;
 import android.content.Intent;
 import android.os.Bundle;
 import android.text.Spannable;
 import android.text.SpannableString;
 import android.text.Spanned;
 import android.text.style.ForegroundColorSpan;
+import android.util.Log;
 import android.util.Pair;
 import android.view.Menu;
 import android.view.MenuItem;
 import android.widget.ImageView;
 import android.widget.TextView;
-import android.util.Log;
-import android.app.AlertDialog;
-import android.content.DialogInterface;
+
+import com.android.volley.Response;
+import com.android.volley.VolleyError;
+import com.google.android.material.dialog.MaterialAlertDialogBuilder;
+
+import org.json.JSONArray;
 
 import java.util.List;
 import java.util.Locale;
 
+import androidx.appcompat.app.AlertDialog;
 import androidx.appcompat.app.AppCompatActivity;
 import androidx.core.content.ContextCompat;
 import androidx.recyclerview.widget.LinearLayoutManager;
 import androidx.recyclerview.widget.RecyclerView;
-
-import com.android.volley.Response;
-import com.android.volley.VolleyError;
-
-import org.json.JSONArray;
-import org.json.JSONException;
-import org.json.JSONObject;
-
 import cs4474.g9.debtledger.R;
 import cs4474.g9.debtledger.data.ConnectionAdapter;
 import cs4474.g9.debtledger.data.RedirectableJsonArrayRequest;
-import cs4474.g9.debtledger.data.UserAccountManager;
-import cs4474.g9.debtledger.data.login.LoginRepository;
 import cs4474.g9.debtledger.data.model.Group;
 import cs4474.g9.debtledger.data.model.UserAccount;
 import cs4474.g9.debtledger.logic.BalanceCalculator;
@@ -136,6 +132,7 @@ public class ViewGroupActivity extends AppCompatActivity {
                 toEditGroup.putExtra(CreateEditGroupActivity.MODE, CreateEditGroupActivity.EDIT_MODE);
                 toEditGroup.putExtra(CreateEditGroupActivity.GROUP, group);
                 startActivity(toEditGroup);
+                return true;
             case R.id.delete_group:
                 confirmDeletion();
                 return true;
@@ -144,10 +141,9 @@ public class ViewGroupActivity extends AppCompatActivity {
         }
     }
 
-    private void confirmDeletion()
-    {
+    private void confirmDeletion() {
         // Create confirmation dialogue box
-        AlertDialog.Builder builder = new AlertDialog.Builder(this);
+        MaterialAlertDialogBuilder builder = new MaterialAlertDialogBuilder(this);
         builder.setCancelable(true);
         builder.setTitle("Delete Group");
         builder.setMessage("Are you sure you want to delete this group?");
@@ -158,7 +154,7 @@ public class ViewGroupActivity extends AppCompatActivity {
                         deleteGroup();
                     }
                 });
-        builder.setNegativeButton(android.R.string.cancel, new DialogInterface.OnClickListener() {
+        builder.setNegativeButton("Cancel", new DialogInterface.OnClickListener() {
             @Override
             public void onClick(DialogInterface dialog, int which) {
             }
@@ -169,8 +165,7 @@ public class ViewGroupActivity extends AppCompatActivity {
 
     }
 
-    private void deleteGroup()
-    {
+    private void deleteGroup() {
         RedirectableJsonArrayRequest request = new RedirectableJsonArrayRequest(
                 ConnectionAdapter.BASE_URL + "/contact_group/delete/" + group.getId() + "/",
                 new Response.Listener<JSONArray>() {

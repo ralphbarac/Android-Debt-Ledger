@@ -1,7 +1,6 @@
 package cs4474.g9.debtledger.data;
 
 import android.util.Log;
-import android.widget.Toast;
 
 import org.json.JSONArray;
 import org.json.JSONException;
@@ -9,11 +8,9 @@ import org.json.JSONObject;
 
 import java.util.ArrayList;
 import java.util.List;
-import java.util.ListIterator;
 
 import cs4474.g9.debtledger.data.model.Group;
 import cs4474.g9.debtledger.data.model.UserAccount;
-import cs4474.g9.debtledger.ui.groups.CreateEditGroupActivity;
 
 public class GroupManager {
 
@@ -38,23 +35,6 @@ public class GroupManager {
             groups.add(parseGroupFromJson(groupsJson.getJSONObject(i)));
         }
         return groups;
-    }
-
-    public Result<List<Group>> getGroupsOf(UserAccount user) {
-        // TODO: Implement, currently using dummy data
-        List<UserAccount> group1list = new ArrayList<>();
-        List<UserAccount> group2list = new ArrayList<>();
-        group1list.add(new UserAccount("John", "Doe", ""));
-        group1list.add(new UserAccount("Thomas", "Morphew", ""));
-        group2list.add(new UserAccount("Thomas", "Morphew", ""));
-        group2list.add(new UserAccount("Timothy", "Young", ""));
-        group2list.add(new UserAccount("Will", "Smith", ""));
-
-        List<Group> groupList = new ArrayList<>();
-        groupList.add(new Group("Roomies", group1list));
-        groupList.add(new Group("Pizza Hut Boys", group2list));
-
-        return new Result.Success<>(groupList);
     }
 
     public static JSONObject createJsonForAddGroup(long id, String name) throws JSONException {
