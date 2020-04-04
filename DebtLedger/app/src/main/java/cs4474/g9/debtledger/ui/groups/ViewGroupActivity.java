@@ -20,7 +20,9 @@ import com.android.volley.VolleyError;
 import com.google.android.material.dialog.MaterialAlertDialogBuilder;
 
 import org.json.JSONArray;
+import org.json.JSONObject;
 
+import java.util.ArrayList;
 import java.util.List;
 import java.util.Locale;
 
@@ -33,6 +35,7 @@ import androidx.recyclerview.widget.RecyclerView;
 import cs4474.g9.debtledger.R;
 import cs4474.g9.debtledger.data.ConnectionAdapter;
 import cs4474.g9.debtledger.data.RedirectableJsonArrayRequest;
+import cs4474.g9.debtledger.data.login.LoginRepository;
 import cs4474.g9.debtledger.data.model.Group;
 import cs4474.g9.debtledger.data.model.UserAccount;
 import cs4474.g9.debtledger.logic.BalanceCalculator;
@@ -62,19 +65,7 @@ public class ViewGroupActivity extends AppCompatActivity {
         group = (Group) getIntent().getSerializableExtra(GROUP);
         List<UserAccount> members = group.getGroupMembers();
 
-        BalanceCalculator calculator = new BalanceCalculator();
-        List<Pair<UserAccount, Long>> memberBalances = calculator.calculateBalances(members);
-
-        // Computing amount that user owes and amount user is owed
-        long youOwe = 0;
-        long youreOwed = 0;
-        for (Pair<UserAccount, Long> memberBalance : memberBalances) {
-            if (memberBalance.second < 0) {
-                youOwe = youOwe + memberBalance.second;
-            } else {
-                youreOwed = youreOwed + memberBalance.second;
-            }
-        }
+        calculateBalances(members); // Get balance with all members of group and update relevant UI
 
         // Binding group data to UI
         final ImageView groupAvatar = findViewById(R.id.group_avatar);
@@ -90,41 +81,7 @@ public class ViewGroupActivity extends AppCompatActivity {
                         : String.format(Locale.CANADA, "%d member%s", members.size(), members.size() > 1 ? "s" : "")
         );
 
-        // Setting amount that user owes
-        final TextView youOweText = findViewById(R.id.group_owe);
-        Spannable youOweFormatted = new SpannableString(
-                String.format(Locale.CANADA, "You Owe: $%.2f", Math.abs(youOwe) / 100.0)
-        );
-        // Set number portion to red
-        youOweFormatted.setSpan(
-                new ForegroundColorSpan(ContextCompat.getColor(this, R.color.red)),
-                9,
-                youOweFormatted.length(),
-                Spanned.SPAN_INCLUSIVE_EXCLUSIVE
-        );
-        youOweText.setText(youOweFormatted);
 
-        // Setting amount user is owed
-        final TextView youreOwedText = findViewById(R.id.group_owed);
-        Spannable youreOweFormatted = new SpannableString(
-                String.format(Locale.CANADA, "You're Owed: $%.2f", Math.abs(youreOwed) / 100.0)
-        );
-        // Set number portion to green
-        youreOweFormatted.setSpan(
-                new ForegroundColorSpan(ContextCompat.getColor(this, R.color.green)),
-                13,
-                youreOweFormatted.length(),
-                Spanned.SPAN_INCLUSIVE_EXCLUSIVE
-        );
-        youreOwedText.setText(youreOweFormatted);
-
-        // Setting up list (recycler) view and adapater
-        final RecyclerView groupMembersView = findViewById(R.id.group_members_list);
-        groupMembersView.setHasFixedSize(true);
-        groupMembersView.setLayoutManager(new LinearLayoutManager(this));
-
-        final ContactListAdapter groupMembersAdapter = new ContactListAdapter(memberBalances);
-        groupMembersView.setAdapter(groupMembersAdapter);
     }
 
     @Override
@@ -169,6 +126,106 @@ public class ViewGroupActivity extends AppCompatActivity {
 
         // Cancel/terminate any requests that are still running or queued
         ConnectionAdapter.getInstance().cancelAllRequests(hashCode());
+    }
+
+    private void updateUI(List<Pair<UserAccount, Long>> memberBalances)
+    {
+        // Computing amount that user owes and amount user is owed
+        long youOwe = 0;
+        long youreOwed = 0;
+
+        for (int i = 0; i < memberBalances.size(); i++) {
+            Pair<UserAccount, Long> memberBalance = memberBalances.get(i);
+            if (memberBalance.second < 0) {
+                youOwe = youOwe + memberBalance.second;
+            } else {
+                youreOwed = youreOwed + memberBalance.second;
+            }
+        }
+
+        // Setting amount that user owes
+        final TextView youOweText = findViewById(R.id.group_owe);
+        Spannable youOweFormatted = new SpannableString(
+                String.format(Locale.CANADA, "You Owe: $%.2f", Math.abs(youOwe) / 100.0)
+        );
+        // Set number portion to red
+        youOweFormatted.setSpan(
+                new ForegroundColorSpan(ContextCompat.getColor(this, R.color.red)),
+                9,
+                youOweFormatted.length(),
+                Spanned.SPAN_INCLUSIVE_EXCLUSIVE
+        );
+        youOweText.setText(youOweFormatted);
+
+        // Setting amount user is owed
+        final TextView youreOwedText = findViewById(R.id.group_owed);
+        Spannable youreOweFormatted = new SpannableString(
+                String.format(Locale.CANADA, "You're Owed: $%.2f", Math.abs(youreOwed) / 100.0)
+        );
+        // Set number portion to green
+        youreOweFormatted.setSpan(
+                new ForegroundColorSpan(ContextCompat.getColor(this, R.color.green)),
+                13,
+                youreOweFormatted.length(),
+                Spanned.SPAN_INCLUSIVE_EXCLUSIVE
+        );
+        youreOwedText.setText(youreOweFormatted);
+
+        // Setting up list (recycler) view and adapater
+        final RecyclerView groupMembersView = findViewById(R.id.group_members_list);
+        groupMembersView.setHasFixedSize(true);
+        groupMembersView.setLayoutManager(new LinearLayoutManager(this));
+
+        final ContactListAdapter groupMembersAdapter = new ContactListAdapter(memberBalances);
+        groupMembersView.setAdapter(groupMembersAdapter);
+    }
+
+
+    private void calculateBalances(List<UserAccount> contacts)
+    {
+        List<Pair<UserAccount, Long>> balances = new ArrayList<>(); // List of pairs associating a user with their balance with the logged in user
+        UserAccount user = LoginRepository.getInstance().getLoggedInUser();
+
+        RedirectableJsonArrayRequest request = new RedirectableJsonArrayRequest(
+                ConnectionAdapter.BASE_URL + "/transaction/balances/" + user.getId() + "/",
+                new Response.Listener<JSONArray>() {
+                    @Override
+                    public void onResponse(JSONArray response) {
+                        try {
+                            if (response.getJSONObject(0).has("error") ||
+                                    response.getJSONObject(0).has("failure")) {
+                                throw new Exception();
+                            }else{ // Got list of transactions, total them to find balance with logged in user
+                                for (int i = 0; i < response.length(); i++)
+                                {
+                                    JSONObject transaction = response.getJSONObject(i);
+                                    for(UserAccount contact : contacts)
+                                    {
+                                        if(contact.getEmail().equals(transaction.get("email").toString()))
+                                        {
+                                            Long balance = transaction.getLong("balance"); // get the balance as a long
+                                            balances.add(Pair.create(contact, balance)); // Add a pair with the contact and their balance with the user
+                                        }
+                                    }
+                                }
+                                updateUI(balances);
+                            }
+                        } catch (Exception e) {
+                            // On error, log failed to update user name
+                            Log.d("CONTACT TRANSACTIONS", e.toString());
+                        }
+                    }
+                },
+                new Response.ErrorListener() {
+                    @Override
+                    public void onErrorResponse(VolleyError error) {
+                        // On error, log failed to update user name error
+                        Log.d("CONTACT TRANSACTIONS", error.toString());
+                    }
+                }
+        );
+
+        ConnectionAdapter.getInstance().addToRequestQueue(request, hashCode());
     }
 
     private void confirmDeletion() {
