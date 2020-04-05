@@ -9,6 +9,15 @@
     <androidx.constraintlayout.widget.ConstraintLayout
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
+        android:layout_marginTop="-2dp"
+        android:layout_marginStart="-2dp"
+        android:layout_marginEnd="-2dp"
+        android:paddingTop="0dp"
+        android:paddingBottom="2dp"
+        android:paddingStart="0dp"
+        android:paddingEnd="0dp"
+        android:elevation="2dp"
+        android:outlineProvider="bounds"
         tools:context=".ViewContactActivity">
 
         <ImageView
@@ -50,7 +59,7 @@
 
         <TextView
             android:id="@+id/email"
-            android:layout_width="222dp"
+            android:layout_width="0dp"
             android:layout_height="wrap_content"
             android:layout_marginStart="8dp"
             android:layout_marginTop="8dp"
@@ -59,7 +68,7 @@
             android:text="email@address.com"
             app:layout_constraintEnd_toEndOf="parent"
             app:layout_constraintHorizontal_bias="1.0"
-            app:layout_constraintStart_toEndOf="@+id/contact_avatar_character"
+            app:layout_constraintStart_toEndOf="@+id/contact_avatar"
             app:layout_constraintTop_toBottomOf="@+id/name" />
 
         <TextView
@@ -104,17 +113,6 @@
             app:layout_constraintTop_toBottomOf="@+id/contact_avatar" />
     </androidx.constraintlayout.widget.ConstraintLayout>
 
-    <cs4474.g9.debtledger.ui.shared.LoadableRecyclerView
-        android:id="@+id/transactionHistory"
-        android:layout_width="match_parent"
-        android:layout_height="wrap_content"
-
-        app:emptyAction=""
-        app:emptyMessage="No History ):"
-        app:failedToLoadAction="Retry"
-        app:failedToLoadMessage="Failed to load History ):"
-        app:loadingMessage="" />
-
     <LinearLayout
         android:id="@+id/status_container"
         android:layout_width="match_parent"
@@ -146,5 +144,16 @@
             android:layout_height="wrap_content"
             android:layout_gravity="center_horizontal" />
     </LinearLayout>
+
+    <cs4474.g9.debtledger.ui.shared.LoadableRecyclerView
+        android:id="@+id/transactionHistory"
+        android:layout_width="match_parent"
+        android:layout_height="match_parent"
+
+        app:emptyAction=""
+        app:emptyMessage="No History ):"
+        app:failedToLoadAction="Retry"
+        app:failedToLoadMessage="Failed to load History ):"
+        app:loadingMessage="" />
 
 </LinearLayout>

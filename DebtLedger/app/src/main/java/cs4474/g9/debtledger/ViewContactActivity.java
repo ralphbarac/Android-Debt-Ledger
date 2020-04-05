@@ -22,6 +22,7 @@ import java.util.ArrayList;
 import java.util.List;
 
 import androidx.appcompat.app.AppCompatActivity;
+import androidx.recyclerview.widget.DividerItemDecoration;
 import androidx.recyclerview.widget.LinearLayoutManager;
 import cs4474.g9.debtledger.data.ConnectionAdapter;
 import cs4474.g9.debtledger.data.RedirectableJsonArrayRequest;
@@ -75,6 +76,8 @@ public class ViewContactActivity extends AppCompatActivity implements OnActionBu
         transactionHistoryList.setHasFixedSize(true);
         transactionHistoryList.setLayoutManager(new LinearLayoutManager(this));
         transactionHistoryList.addOnActionButtonClickedClickListener(this);
+        transactionHistoryList.addItemDecoration(new DividerItemDecoration(this,
+                DividerItemDecoration.VERTICAL));
         historyAdapter = new ContactHistoryListAdapter();
         transactionHistoryList.setAdapter(historyAdapter);
 

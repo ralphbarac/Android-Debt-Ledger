@@ -3,18 +3,7 @@
     xmlns:app="http://schemas.android.com/apk/res-auto"
     android:orientation="vertical"
     android:layout_width="match_parent"
-    android:layout_height="wrap_content">
-
-    <cs4474.g9.debtledger.ui.shared.LoadableRecyclerView
-        android:id="@+id/groups_list"
-        android:layout_width="match_parent"
-        android:layout_height="wrap_content"
-
-        app:loadingMessage=""
-        app:failedToLoadMessage="Failed to load Groups ):"
-        app:failedToLoadAction="Retry"
-        app:emptyMessage="No Groups ):"
-        app:emptyAction="Add Group" />
+    android:layout_height="match_parent">
 
     <LinearLayout
         android:id="@+id/status_container"
@@ -47,4 +36,15 @@
             android:layout_height="wrap_content"
             android:layout_gravity="center_horizontal" />
     </LinearLayout>
+
+    <cs4474.g9.debtledger.ui.shared.LoadableRecyclerView
+        android:id="@+id/groups_list"
+        android:layout_width="match_parent"
+        android:layout_height="match_parent"
+
+        app:loadingMessage=""
+        app:failedToLoadMessage="Failed to load Groups ):"
+        app:failedToLoadAction="Retry"
+        app:emptyMessage="No Groups ):"
+        app:emptyAction="Add Group" />
 </LinearLayout>

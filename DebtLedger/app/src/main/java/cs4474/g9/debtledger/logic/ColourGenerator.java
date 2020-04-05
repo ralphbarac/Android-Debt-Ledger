@@ -7,7 +7,7 @@ public class ColourGenerator {
     public static int generateFromName(String firstName, String lastName) {
         // A special easter egg
         if (firstName.equals("Mary") && lastName.equals("Sirohey")) {
-            return Color.rgb(200, 90, 200);
+            return Color.rgb(105, 22, 130);
         }
 
         float[] hsv = new float[3];
@@ -27,11 +27,6 @@ public class ColourGenerator {
     }
 
     public static int generateFromGroupName(String groupName) {
-        // A special easter egg
-        if (groupName.toLowerCase().contains("purple")) {
-            return Color.rgb(200, 90, 200);
-        }
-
         float[] hsv = new float[3];
         hsv[0] = Math.abs(groupName.hashCode()) % 360;
         // If hue is approximately yellow, adjust, since yellow does not look nice
