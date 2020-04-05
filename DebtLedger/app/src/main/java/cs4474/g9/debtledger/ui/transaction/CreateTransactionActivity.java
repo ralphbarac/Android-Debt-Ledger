@@ -400,7 +400,7 @@ public class CreateTransactionActivity extends AppCompatActivity implements OnIn
                             } else {
                                 new MaterialAlertDialogBuilder(CreateTransactionActivity.this)
                                         .setTitle("Missing Contacts!")
-                                        .setMessage(whoIsPaying.getFirstName() + " " + whoIsPaying.getLastName() + " is not a contact with everyone who owes!")
+                                        .setMessage(whoIsPaying.getFirstName() + " " + whoIsPaying.getLastName() + " is not a contact with everyone who owes! In order to add debt, ensure " + whoIsPaying.getFirstName() + " has everyone who owes as a contact.")
                                         .setPositiveButton("Ok", null)
                                         .show();
                             }
