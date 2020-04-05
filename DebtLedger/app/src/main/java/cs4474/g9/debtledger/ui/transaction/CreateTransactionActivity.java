@@ -460,6 +460,7 @@ public class CreateTransactionActivity extends AppCompatActivity implements OnIn
                             } else {
                                 // On success, return to dashboard
                                 response.getJSONObject(0).get("success");
+                                Toast.makeText(CreateTransactionActivity.this, "Debt Added", Toast.LENGTH_SHORT).show();
                                 setResult(RESULT_OK);
                                 finish();
                             }

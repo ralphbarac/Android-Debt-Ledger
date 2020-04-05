@@ -110,9 +110,9 @@
         android:layout_height="wrap_content"
 
         app:emptyAction=""
-        app:emptyMessage="No history"
+        app:emptyMessage="No History ):"
         app:failedToLoadAction="Retry"
-        app:failedToLoadMessage="Failed to load history ):"
+        app:failedToLoadMessage="Failed to load History ):"
         app:loadingMessage="" />
 
     <LinearLayout

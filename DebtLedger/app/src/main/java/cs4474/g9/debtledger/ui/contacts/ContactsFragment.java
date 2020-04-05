@@ -33,8 +33,9 @@ import cs4474.g9.debtledger.data.model.UserAccount;
 import cs4474.g9.debtledger.logic.BalanceCalculator;
 import cs4474.g9.debtledger.ui.MainActivity;
 import cs4474.g9.debtledger.ui.shared.LoadableRecyclerView;
+import cs4474.g9.debtledger.ui.shared.OnActionButtonClickedListener;
 
-public class ContactsFragment extends Fragment implements OnRequestReply {
+public class ContactsFragment extends Fragment implements OnRequestReply, OnActionButtonClickedListener {
 
     private TextView contactRequestsTitle;
     private RecyclerView contactRequestsView;
@@ -98,6 +99,7 @@ public class ContactsFragment extends Fragment implements OnRequestReply {
         contactsView = root.findViewById(R.id.my_contacts_list);
         contactsView.setHasFixedSize(true);
         contactsView.setLayoutManager(new LinearLayoutManager(getContext()));
+        contactsView.addOnActionButtonClickedClickListener(this);
         contactsAdapter = new ContactListAdapter();
         contactsView.setAdapter(contactsAdapter);
 
@@ -151,6 +153,21 @@ public class ContactsFragment extends Fragment implements OnRequestReply {
         if (getActivity() instanceof MainActivity) {
             ((MainActivity) getActivity()).updateContactsNotificationBadge();
         }
+    }
+
+    @Override
+    public void onFailedToLoadActionButtonClicked() {
+        makeRequestForContactsWithBalances(LoginRepository.getInstance().getLoggedInUser());
+    }
+
+    @Override
+    public void onEmptyActionButtonClicked() {
+        AddContactDialog.createAddContactDialog(getActivity()).setOnDismissListener(new DialogInterface.OnDismissListener() {
+            @Override
+            public void onDismiss(DialogInterface dialog) {
+                makeRequestForPendingContactsRequested(LoginRepository.getInstance().getLoggedInUser());
+            }
+        });
     }
 
     @Override

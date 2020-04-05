@@ -32,8 +32,9 @@ import cs4474.g9.debtledger.data.model.UserAccount;
 import cs4474.g9.debtledger.logic.ColourGenerator;
 import cs4474.g9.debtledger.ui.contacts.ContactHistoryListAdapter;
 import cs4474.g9.debtledger.ui.shared.LoadableRecyclerView;
+import cs4474.g9.debtledger.ui.shared.OnActionButtonClickedListener;
 
-public class ViewContactActivity extends AppCompatActivity {
+public class ViewContactActivity extends AppCompatActivity implements OnActionButtonClickedListener {
 
     public static final String CONTACT = "contact";
 
@@ -73,6 +74,7 @@ public class ViewContactActivity extends AppCompatActivity {
 
         transactionHistoryList.setHasFixedSize(true);
         transactionHistoryList.setLayoutManager(new LinearLayoutManager(this));
+        transactionHistoryList.addOnActionButtonClickedClickListener(this);
         historyAdapter = new ContactHistoryListAdapter();
         transactionHistoryList.setAdapter(historyAdapter);
 
@@ -125,6 +127,23 @@ public class ViewContactActivity extends AppCompatActivity {
 
     }
 
+    @Override
+    protected void onDestroy() {
+        super.onDestroy();
+
+        // Cancel/terminate any requests that are still running or queued
+        ConnectionAdapter.getInstance().cancelAllRequests(hashCode());
+    }
+
+    @Override
+    public void onFailedToLoadActionButtonClicked() {
+        makeRequestForTransactionHistory();
+    }
+
+    @Override
+    public void onEmptyActionButtonClicked() {
+        // No button, so this should be impossible :)
+    }
 
     private void makeAddTransactionsRequest(List<Transaction> transactions) {
         JSONArray input;

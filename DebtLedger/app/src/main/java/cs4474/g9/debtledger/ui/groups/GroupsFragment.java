@@ -110,7 +110,7 @@ public class GroupsFragment extends Fragment implements OnActionButtonClickedLis
     public void onEmptyActionButtonClicked() {
         Intent toAddGroup = new Intent(getActivity(), CreateEditGroupActivity.class);
         toAddGroup.putExtra(CreateEditGroupActivity.MODE, CreateEditGroupActivity.CREATE_MODE);
-        startActivity(toAddGroup);
+        startActivityForResult(toAddGroup, CREATE_REQUEST);
     }
 
     private void makeRequestForGroups(UserAccount loggedInUser) {
