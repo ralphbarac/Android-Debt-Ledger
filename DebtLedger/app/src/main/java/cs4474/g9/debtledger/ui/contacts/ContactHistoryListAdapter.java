@@ -20,6 +20,7 @@ import java.util.Locale;
 
 import cs4474.g9.debtledger.R;
 import cs4474.g9.debtledger.ViewContactActivity;
+import cs4474.g9.debtledger.data.login.LoginRepository;
 import cs4474.g9.debtledger.data.model.Transaction;
 import cs4474.g9.debtledger.data.model.UserAccount;
 import cs4474.g9.debtledger.logic.ColourGenerator;
@@ -43,8 +44,18 @@ public class ContactHistoryListAdapter  extends RecyclerView.Adapter<ContactHist
     public void onBindViewHolder(@NonNull ContactHistoryListAdapter.Item holder, int position) {
         Transaction temp = transactionList.get(position);
         holder.description.setText(temp.getDescription());
-        holder.amount.setText(temp.getAmount().toString());
+
         holder.date.setText(temp.getDatetime());
+
+
+        if(temp.getCreditor() == LoginRepository.getInstance().getLoggedInUser().getId()){
+            holder.amount.setText("+$" + temp.getAmount().toString());
+            holder.amount.setTextColor(Color.GREEN);
+        }
+        else {
+            holder.amount.setText("-$" + temp.getAmount().toString());
+            holder.amount.setTextColor(Color.RED);
+        }
     }
 
     @NonNull
