@@ -20,7 +20,7 @@ import cs4474.g9.debtledger.R;
 public class ConnectionAdapter {
 
     public static final String BASE_URL = "http://ec2-18-191-166-106.us-east-2.compute.amazonaws.com";
-    private static final int TIMEOUT_MS = 30000; // 30s
+    private static final int TIMEOUT_MS = 5000; // 5s
 
     private static ConnectionAdapter instance;
     private RequestQueue requestQueue;
