@@ -1,5 +1,6 @@
 <?xml version="1.0" encoding="utf-8"?>
 <manifest xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:tools="http://schemas.android.com/tools"
     package="cs4474.g9.debtledger">
 
     <application
@@ -35,7 +36,9 @@
         <activity
             android:name=".ui.MainActivity"
             android:label="@string/app_name"
-            android:windowSoftInputMode="adjustPan" />
+            android:windowSoftInputMode="adjustPan"
+            android:screenOrientation="portrait"
+            tools:ignore="LockedOrientationActivity" />
         <activity
             android:name=".ui.login.LoginActivity"
             android:label="@string/app_name">
