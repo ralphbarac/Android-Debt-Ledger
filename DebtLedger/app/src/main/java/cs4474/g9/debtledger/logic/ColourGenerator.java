@@ -11,7 +11,7 @@ public class ColourGenerator {
         }
 
         float[] hsv = new float[3];
-        hsv[0] = Math.abs((firstName + lastName).hashCode()) % 360;
+        hsv[0] = Math.abs(firstName.hashCode() + lastName.hashCode()) % 360;
         // If hue is approximately yellow, adjust, since yellow does not look nice
         float yellowness = Math.abs(hsv[0] - 60);
         if (yellowness < 2.5) {
