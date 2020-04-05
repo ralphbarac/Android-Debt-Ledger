@@ -15,14 +15,17 @@ public class SignupFormState {
     private Integer emailError;
     @Nullable
     private Integer passwordError;
+    @Nullable
+    private Integer confirmPasswordError;
 
     private boolean isDataValid;
 
-    SignupFormState(@Nullable Integer firstNameError, @Nullable Integer lastNameError, @Nullable Integer emailError, @Nullable Integer passwordError) {
+    SignupFormState(@Nullable Integer firstNameError, @Nullable Integer lastNameError, @Nullable Integer emailError, @Nullable Integer passwordError, @Nullable Integer confirmPasswordError) {
         this.firstNameError = firstNameError;
         this.lastNameError = lastNameError;
         this.emailError = emailError;
         this.passwordError = passwordError;
+        this.confirmPasswordError = confirmPasswordError;
         this.isDataValid = false;
     }
 
@@ -52,6 +55,11 @@ public class SignupFormState {
     @Nullable
     Integer getPasswordError() {
         return passwordError;
+    }
+
+    @Nullable
+    Integer getConfirmPasswordError() {
+        return confirmPasswordError;
     }
 
     boolean isDataValid() {

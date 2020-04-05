@@ -19,18 +19,19 @@ public class SignupViewModel extends ViewModel {
         return signupFormState;
     }
 
-    public void signupFormDataChanged(String firstName, String lastName, String email, String password) {
+    public void signupFormDataChanged(String firstName, String lastName, String email, String password, String confirmPassword) {
         // Update value of login form state, depending on what applies, which is propagated to the view
-        Integer firstNameError, lastNameError, emailError, passwordError;
+        Integer firstNameError, lastNameError, emailError, passwordError, confirmPasswordError;
         firstNameError = isNameValid(firstName) ? null : R.string.invalid_first_name;
         lastNameError = isNameValid(lastName) ? null : R.string.invalid_last_name;
         emailError = isEmailValid(email) ? null : R.string.invalid_email;
         passwordError = isPasswordValid(password) ? null : R.string.invalid_password;
+        confirmPasswordError = password.equals(confirmPassword) ? null : R.string.invalid_confirm_password;
 
-        if (firstNameError == null && lastNameError == null && emailError == null && passwordError == null) {
+        if (firstNameError == null && lastNameError == null && emailError == null && passwordError == null && confirmPasswordError == null) {
             signupFormState.setValue(new SignupFormState(true));
         } else {
-            signupFormState.setValue(new SignupFormState(firstNameError, lastNameError, emailError, passwordError));
+            signupFormState.setValue(new SignupFormState(firstNameError, lastNameError, emailError, passwordError, confirmPasswordError));
         }
     }
 

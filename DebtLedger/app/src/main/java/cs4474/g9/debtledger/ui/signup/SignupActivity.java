@@ -62,6 +62,7 @@ public class SignupActivity extends AppCompatActivity {
         final TextInputEditText lastNameInput = findViewById(R.id.last_name);
         final TextInputEditText emailInput = findViewById(R.id.email);
         final TextInputEditText passwordInput = findViewById(R.id.password);
+        final TextInputEditText confirmPasswordInput = findViewById(R.id.confirm_password);
         final MaterialButton switchToLoginButton = findViewById(R.id.switch_to_login);
         duplicateEmailError = findViewById(R.id.duplicate_email_error_container);
         signupButton = findViewById(R.id.signup);
@@ -89,6 +90,9 @@ public class SignupActivity extends AppCompatActivity {
                 if (signupFormState.getPasswordError() != null) {
                     passwordInput.setError(getString(signupFormState.getPasswordError()));
                 }
+                if (signupFormState.getConfirmPasswordError() != null) {
+                    confirmPasswordInput.setError(getString(signupFormState.getConfirmPasswordError()));
+                }
             }
         });
 
@@ -108,7 +112,8 @@ public class SignupActivity extends AppCompatActivity {
                         firstNameInput.getText().toString(),
                         lastNameInput.getText().toString(),
                         emailInput.getText().toString(),
-                        passwordInput.getText().toString()
+                        passwordInput.getText().toString(),
+                        confirmPasswordInput.getText().toString()
                 );
             }
         };
@@ -116,6 +121,7 @@ public class SignupActivity extends AppCompatActivity {
         lastNameInput.addTextChangedListener(afterTextChangedListener);
         emailInput.addTextChangedListener(afterTextChangedListener);
         passwordInput.addTextChangedListener(afterTextChangedListener);
+        confirmPasswordInput.addTextChangedListener(afterTextChangedListener);
 
         // Add additional listener to remove duplicate email error when email changes
         emailInput.addTextChangedListener(new TextWatcher() {
@@ -146,12 +152,14 @@ public class SignupActivity extends AppCompatActivity {
                     ((InputMethodManager) getSystemService(Context.INPUT_METHOD_SERVICE))
                             .hideSoftInputFromWindow(v.getWindowToken(), 0);
 
-                    makeSignupRequest(
-                            firstNameInput.getText().toString(),
-                            lastNameInput.getText().toString(),
-                            emailInput.getText().toString(),
-                            passwordInput.getText().toString()
-                    );
+                    if (signupButton.isEnabled()) {
+                        makeSignupRequest(
+                                firstNameInput.getText().toString(),
+                                lastNameInput.getText().toString(),
+                                emailInput.getText().toString(),
+                                passwordInput.getText().toString()
+                        );
+                    }
                 }
                 return false;
             }
