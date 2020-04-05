@@ -9,9 +9,6 @@ import android.widget.ImageView;
 import android.widget.TextView;
 import android.widget.Toast;
 
-import androidx.appcompat.app.AppCompatActivity;
-import androidx.recyclerview.widget.LinearLayoutManager;
-
 import com.android.volley.Response;
 import com.android.volley.VolleyError;
 import com.google.android.material.button.MaterialButton;
@@ -23,19 +20,18 @@ import org.json.JSONException;
 import java.math.BigDecimal;
 import java.util.ArrayList;
 import java.util.List;
-import java.util.Locale;
 
+import androidx.appcompat.app.AppCompatActivity;
+import androidx.recyclerview.widget.LinearLayoutManager;
 import cs4474.g9.debtledger.data.ConnectionAdapter;
 import cs4474.g9.debtledger.data.RedirectableJsonArrayRequest;
 import cs4474.g9.debtledger.data.login.LoginRepository;
 import cs4474.g9.debtledger.data.model.Transaction;
 import cs4474.g9.debtledger.data.model.TransactionManager;
 import cs4474.g9.debtledger.data.model.UserAccount;
-import cs4474.g9.debtledger.logic.BalanceCalculator;
 import cs4474.g9.debtledger.logic.ColourGenerator;
 import cs4474.g9.debtledger.ui.contacts.ContactHistoryListAdapter;
 import cs4474.g9.debtledger.ui.shared.LoadableRecyclerView;
-import cs4474.g9.debtledger.ui.transaction.CreateTransactionActivity;
 
 public class ViewContactActivity extends AppCompatActivity {
 
@@ -63,7 +59,7 @@ public class ViewContactActivity extends AppCompatActivity {
 
         // Binding contact data to UI
         final ImageView contactAvatar = findViewById(R.id.contact_avatar);
-        contactAvatar.setColorFilter(ColourGenerator.generateFromName(contactAccount.getFirstName(),contactAccount.getLastName()));
+        contactAvatar.setColorFilter(ColourGenerator.generateFromName(contactAccount.getFirstName(), contactAccount.getLastName()));
         final TextView contactCharacter = findViewById(R.id.contact_avatar_character);
         contactCharacter.setText(contactAccount.getFirstName().substring(0, 1));
         final TextView contactNameTitle = findViewById(R.id.name);
@@ -82,7 +78,7 @@ public class ViewContactActivity extends AppCompatActivity {
 
         // Binding dynamic contact data to UI
         // Get all past transactions between the logged in user and the viewed contact and display them in the recycler view
-        thing();
+        makeRequestForTransactionHistory();
 
         // Creditor is the guy who is owed money
         // Debtor is the guy who owes money
@@ -95,16 +91,15 @@ public class ViewContactActivity extends AppCompatActivity {
             @Override
             public void onClick(View view) {
                 String forgiveRepay = "";
-                if(result.compareTo(BigDecimal.ZERO) > 0){
+                if (result.compareTo(BigDecimal.ZERO) > 0) {
                     forgiveRepay = "forgive";
-                }
-                else{
+                } else {
                     forgiveRepay = "repay";
                 }
                 // Start a dialogue confirmation
                 new MaterialAlertDialogBuilder(view.getContext())
                         .setTitle("Confirm Balance")
-                        .setMessage("Are you sure you want to " + forgiveRepay + " " + contactAccount.getFirstName() + " $" + result.toString() + "?")
+                        .setMessage("Are you sure you want to " + forgiveRepay + " " + contactAccount.getFirstName() + " $" + result.abs().toString() + "?")
                         .setNegativeButton("No", null)
                         .setPositiveButton("Yes", new DialogInterface.OnClickListener() {
                             @Override
@@ -113,13 +108,10 @@ public class ViewContactActivity extends AppCompatActivity {
                                 UserAccount loggedInUser = LoginRepository.getInstance().getLoggedInUser();
                                 List<Transaction> tempList = new ArrayList<>();
 
-                                if(result.compareTo(BigDecimal.ZERO) > 0){
-                                    tempList.add(new Transaction(loggedInUser.getId(), contactAccount.getId(), "Forgave", result));
-
-                                }
-                                else {
-                                    tempList.add(new Transaction(contactAccount.getId(), loggedInUser.getId(), "Repaid", result.multiply(BigDecimal.valueOf(-1))));
-
+                                if (result.compareTo(BigDecimal.ZERO) > 0) {
+                                    tempList.add(new Transaction(loggedInUser.getId(), contactAccount.getId(), "Forgiven", result));
+                                } else {
+                                    tempList.add(new Transaction(contactAccount.getId(), loggedInUser.getId(), "Repayment", result));
                                 }
                                 makeAddTransactionsRequest(tempList);
 
@@ -159,7 +151,7 @@ public class ViewContactActivity extends AppCompatActivity {
                                 response.getJSONObject(0).get("success");
 
                                 // Update the list
-                                thing();
+                                makeRequestForTransactionHistory();
                                 result = calculateBalance();
                                 setupButton();
                             }
@@ -183,39 +175,44 @@ public class ViewContactActivity extends AppCompatActivity {
     }
 
 
-    private void setupButton(){
+    private void setupButton() {
         // There are 3 cases, 1. The balance between 2 users is 0, 2. The balance is negative, 3. The balance is positive
 
-        if(result.compareTo(BigDecimal.ZERO) == 0){
+        if (result.compareTo(BigDecimal.ZERO) == 0) {
             // No money is owed
-            repayButton.setEnabled(false);
-            youowe.setText("You owe: ");
-            total.setText("$" + result.toString());
+            repayButton.setVisibility(View.INVISIBLE);
+            if (historyAdapter.getItemCount() > 0) {
+                youowe.setText("Balance: ");
+                total.setText("$0.00");
+            } else {
+                youowe.setText("");
+                total.setText("");
+            }
             total.setTextColor(Color.BLACK);
-        }
-        else if(result.compareTo(BigDecimal.ZERO) > 0){
+        } else if (result.compareTo(BigDecimal.ZERO) > 0) {
             // You are owed money
+            repayButton.setVisibility(View.VISIBLE);
             repayButton.setEnabled(true);
             repayButton.setText("Forgive");
-            youowe.setText("You are owed: ");
-            total.setText("+$" + result.toString());
+            youowe.setText("You're owed: ");
+            total.setText("$" + result.toString());
             total.setTextColor(Color.GREEN);
-        }
-        else{
+        } else {
             // You owe money
+            repayButton.setVisibility(View.VISIBLE);
             repayButton.setEnabled(true);
             repayButton.setText("Repay");
             youowe.setText("You owe: ");
-            total.setText("-$" + result.toString());
+            total.setText("$" + result.abs().toString());
             total.setTextColor(Color.RED);
         }
     }
 
-    private BigDecimal calculateBalance(){
+    private BigDecimal calculateBalance() {
         // Calculate the balance between the logged in user and the viewed contact
         UserAccount loggedInUser = LoginRepository.getInstance().getLoggedInUser();
         BigDecimal sum = BigDecimal.ZERO;
-        if(listOfTransactions != null) {
+        if (listOfTransactions != null) {
             for (int i = 0; i < listOfTransactions.size(); i++) {
                 if (listOfTransactions.get(i).getCreditor() == loggedInUser.getId()) {
                     // Then amount is positive
@@ -228,7 +225,7 @@ public class ViewContactActivity extends AppCompatActivity {
         return sum;
     }
 
-    private void thing(){
+    private void makeRequestForTransactionHistory() {
         UserAccount loggedInUser = LoginRepository.getInstance().getLoggedInUser();
         transactionHistoryList.onBeginLoading();
         RedirectableJsonArrayRequest request = new RedirectableJsonArrayRequest(

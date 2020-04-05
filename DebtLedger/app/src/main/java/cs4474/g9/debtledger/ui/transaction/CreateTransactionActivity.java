@@ -394,6 +394,7 @@ public class CreateTransactionActivity extends AppCompatActivity implements OnIn
                                 contactsOfCreditor = ContactManager.parseContactsFromJson(response);
                             }
 
+                            contactsOfCreditor.add(whoIsPaying);
                             if (contactsOfCreditor.containsAll(whoOwes)) {
                                 confirmTransaction(transactions);
                             } else {

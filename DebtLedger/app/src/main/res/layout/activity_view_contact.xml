@@ -1,166 +1,150 @@
 <?xml version="1.0" encoding="utf-8"?>
-<androidx.constraintlayout.widget.ConstraintLayout xmlns:android="http://schemas.android.com/apk/res/android"
+<LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
     xmlns:app="http://schemas.android.com/apk/res-auto"
     xmlns:tools="http://schemas.android.com/tools"
+    android:orientation="vertical"
     android:layout_width="match_parent"
-    android:layout_height="match_parent"
-    tools:context=".ViewContactActivity">
+    android:layout_height="match_parent">
 
-    <ImageView
-        android:id="@+id/contact_avatar"
-        android:layout_width="144dp"
-        android:layout_height="144dp"
-        android:layout_marginStart="16dp"
-        android:layout_marginTop="16dp"
-        app:layout_constraintStart_toStartOf="parent"
-        app:layout_constraintTop_toTopOf="parent"
-        app:srcCompat="@drawable/circle" />
-
-    <TextView
-        android:id="@+id/contact_avatar_character"
-        android:layout_width="144dp"
-        android:layout_height="144dp"
-        android:layout_marginStart="16dp"
-        android:layout_marginTop="16dp"
-        android:gravity="center_vertical|center"
-        android:textColor="@color/white"
-        android:textSize="72sp"
-        app:layout_constraintStart_toStartOf="parent"
-        app:layout_constraintTop_toTopOf="parent" />
-
-    <TextView
-        android:id="@+id/name"
-        android:layout_width="222dp"
+    <androidx.constraintlayout.widget.ConstraintLayout
+        android:layout_width="match_parent"
         android:layout_height="wrap_content"
-        android:layout_marginStart="8dp"
-        android:layout_marginTop="24dp"
-        android:layout_marginEnd="16dp"
-        android:gravity="right"
-        android:text="FirstName LastName"
-        android:textSize="24sp"
-        app:layout_constraintEnd_toEndOf="parent"
-        app:layout_constraintHorizontal_bias="1.0"
-        app:layout_constraintStart_toEndOf="@+id/contact_avatar_character"
-        app:layout_constraintTop_toTopOf="parent" />
+        tools:context=".ViewContactActivity">
 
-    <TextView
-        android:id="@+id/email"
-        android:layout_width="222dp"
-        android:layout_height="wrap_content"
-        android:layout_marginStart="8dp"
-        android:layout_marginTop="8dp"
-        android:layout_marginEnd="16dp"
-        android:gravity="right"
-        android:text="email@address.com"
-        app:layout_constraintEnd_toEndOf="parent"
-        app:layout_constraintHorizontal_bias="1.0"
-        app:layout_constraintStart_toEndOf="@+id/contact_avatar_character"
-        app:layout_constraintTop_toBottomOf="@+id/name" />
+        <ImageView
+            android:id="@+id/contact_avatar"
+            android:layout_width="144dp"
+            android:layout_height="144dp"
+            android:layout_marginStart="16dp"
+            android:layout_marginTop="16dp"
+            app:layout_constraintStart_toStartOf="parent"
+            app:layout_constraintTop_toTopOf="parent"
+            app:srcCompat="@drawable/circle" />
 
-    <TextView
-        android:id="@+id/total"
-        android:layout_width="wrap_content"
-        android:layout_height="wrap_content"
-        android:layout_marginTop="18dp"
-        android:layout_marginEnd="16dp"
-        android:text="$0"
-        app:layout_constraintBottom_toBottomOf="@+id/contact_avatar_character"
-        app:layout_constraintEnd_toEndOf="parent"
-        app:layout_constraintTop_toBottomOf="@+id/email" />
+        <TextView
+            android:id="@+id/contact_avatar_character"
+            android:layout_width="144dp"
+            android:layout_height="144dp"
+            android:layout_marginStart="16dp"
+            android:layout_marginTop="16dp"
+            android:gravity="center_vertical|center"
+            android:textColor="@color/white"
+            android:textSize="72sp"
+            app:layout_constraintStart_toStartOf="parent"
+            app:layout_constraintTop_toTopOf="parent" />
 
-    <TextView
-        android:id="@+id/youowe"
-        android:layout_width="wrap_content"
-        android:layout_height="wrap_content"
-        android:layout_marginTop="18dp"
-        android:text="You owe: "
-        app:layout_constraintBottom_toBottomOf="@+id/contact_avatar_character"
-        app:layout_constraintEnd_toStartOf="@+id/total"
-        app:layout_constraintTop_toBottomOf="@+id/email" />
+        <TextView
+            android:id="@+id/name"
+            android:layout_width="0dp"
+            android:layout_height="wrap_content"
+            android:layout_marginStart="8dp"
+            android:layout_marginTop="24dp"
+            android:layout_marginEnd="16dp"
+            android:gravity="right"
+            android:text="FirstName LastName"
+            android:textSize="24sp"
+            android:textColor="@color/black"
+            app:layout_constraintEnd_toEndOf="parent"
+            app:layout_constraintStart_toEndOf="@+id/contact_avatar"
+            app:layout_constraintTop_toTopOf="parent" />
 
-    <com.google.android.material.button.MaterialButton
-        android:id="@+id/repay"
-        android:layout_width="wrap_content"
-        android:layout_height="wrap_content"
-        android:layout_marginTop="24dp"
-        android:layout_marginEnd="16dp"
-        android:enabled="false"
-        android:text="Repay"
-        app:layout_constraintEnd_toEndOf="parent"
-        app:layout_constraintTop_toBottomOf="@+id/contact_avatar_character" />
+        <TextView
+            android:id="@+id/email"
+            android:layout_width="222dp"
+            android:layout_height="wrap_content"
+            android:layout_marginStart="8dp"
+            android:layout_marginTop="8dp"
+            android:layout_marginEnd="16dp"
+            android:gravity="right"
+            android:text="email@address.com"
+            app:layout_constraintEnd_toEndOf="parent"
+            app:layout_constraintHorizontal_bias="1.0"
+            app:layout_constraintStart_toEndOf="@+id/contact_avatar_character"
+            app:layout_constraintTop_toBottomOf="@+id/name" />
 
-    <LinearLayout
-        android:id="@+id/transacitonContainer"
+        <TextView
+            android:id="@+id/total"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_marginEnd="16dp"
+            android:text=""
+            app:layout_constraintBottom_toBottomOf="@+id/contact_avatar"
+            app:layout_constraintEnd_toEndOf="parent" />
+
+        <TextView
+            android:id="@+id/youowe"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:text=""
+            app:layout_constraintBottom_toBottomOf="@+id/contact_avatar"
+            app:layout_constraintEnd_toStartOf="@+id/total" />
+
+        <com.google.android.material.button.MaterialButton
+            android:id="@+id/repay"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_marginTop="16dp"
+            android:layout_marginEnd="16dp"
+            android:enabled="false"
+            android:text="Repay"
+            android:visibility="invisible"
+            app:layout_constraintEnd_toEndOf="parent"
+            app:layout_constraintTop_toBottomOf="@+id/contact_avatar_character" />
+
+        <TextView
+            android:id="@+id/history"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_marginStart="16dp"
+            android:layout_marginTop="16dp"
+            android:text="History"
+            android:textColor="@color/black"
+            android:textSize="24sp"
+            app:layout_constraintStart_toStartOf="parent"
+            app:layout_constraintTop_toBottomOf="@+id/contact_avatar" />
+    </androidx.constraintlayout.widget.ConstraintLayout>
+
+    <cs4474.g9.debtledger.ui.shared.LoadableRecyclerView
+        android:id="@+id/transactionHistory"
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
 
+        app:emptyAction=""
+        app:emptyMessage="No history"
+        app:failedToLoadAction="Retry"
+        app:failedToLoadMessage="Failed to load history ):"
+        app:loadingMessage="" />
+
+    <LinearLayout
+        android:id="@+id/status_container"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
         android:orientation="vertical"
-        app:layout_constraintEnd_toEndOf="parent"
-        app:layout_constraintHorizontal_bias="0.0"
-        app:layout_constraintStart_toStartOf="parent"
-        app:layout_constraintTop_toBottomOf="@+id/repay">
+        android:layout_marginTop="8dp"
+        android:layout_marginBottom="8dp">
 
-        <LinearLayout
-            android:id="@+id/status_container"
-            android:layout_width="match_parent"
+        <ProgressBar
+            android:id="@+id/loading_progress_bar"
+            android:layout_width="wrap_content"
             android:layout_height="wrap_content"
-            android:layout_marginTop="8dp"
+            android:layout_gravity="center_horizontal" />
+
+        <TextView
+            android:id="@+id/message_text_view"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_marginTop="16dp"
             android:layout_marginBottom="8dp"
-            android:orientation="vertical">
+            android:layout_gravity="center_horizontal"
+            android:textSize="20sp" />
 
-            <ProgressBar
-                android:id="@+id/loading_progress_bar"
-                android:layout_width="wrap_content"
-                android:layout_height="wrap_content"
-                android:layout_gravity="center_horizontal" />
-
-            <TextView
-                android:id="@+id/message_text_view"
-                android:layout_width="wrap_content"
-                android:layout_height="wrap_content"
-                android:layout_gravity="center_horizontal"
-                android:layout_marginTop="16dp"
-                android:layout_marginBottom="8dp"
-                android:textSize="20sp" />
-
-            <com.google.android.material.button.MaterialButton
-                android:id="@+id/action_button"
-                style="@style/Widget.MaterialComponents.Button.TextButton"
-                android:layout_width="wrap_content"
-                android:layout_height="wrap_content"
-                android:layout_gravity="center_horizontal"
-                app:strokeColor="@color/colorPrimary" />
-        </LinearLayout>
-
-        <cs4474.g9.debtledger.ui.shared.LoadableRecyclerView
-            android:id="@+id/transactionHistory"
-            android:layout_width="match_parent"
+        <com.google.android.material.button.MaterialButton
+            android:id="@+id/action_button"
+            style="@style/Widget.MaterialComponents.Button.TextButton"
+            app:strokeColor="@color/colorPrimary"
+            android:layout_width="wrap_content"
             android:layout_height="wrap_content"
-            android:layout_marginStart="1dp"
-            android:layout_marginTop="2dp"
-            android:layout_marginEnd="1dp"
-
-
-            app:emptyAction="Add Contact"
-            app:emptyMessage="No past Debts ):"
-            app:failedToLoadAction="Retry"
-            app:failedToLoadMessage="Failed to load past Debts ):"
-            app:loadingMessage=""
-
-            />
-
-
+            android:layout_gravity="center_horizontal" />
     </LinearLayout>
 
-
-    <TextView
-        android:id="@+id/history"
-        android:layout_width="89dp"
-        android:layout_height="34dp"
-        android:layout_marginStart="16dp"
-        android:layout_marginTop="24dp"
-        android:text="History"
-        android:textSize="24sp"
-        app:layout_constraintStart_toStartOf="parent"
-        app:layout_constraintTop_toBottomOf="@+id/contact_avatar_character" />
-</androidx.constraintlayout.widget.ConstraintLayout>
+</LinearLayout>

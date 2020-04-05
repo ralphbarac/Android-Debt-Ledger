@@ -1,31 +1,21 @@
 package cs4474.g9.debtledger.ui.contacts;
 
-import android.content.Intent;
 import android.graphics.Color;
-import android.util.Log;
-import android.util.Pair;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
-import android.widget.ImageView;
 import android.widget.TextView;
+
+import java.util.ArrayList;
+import java.util.List;
 
 import androidx.annotation.NonNull;
 import androidx.recyclerview.widget.RecyclerView;
-
-import java.lang.reflect.Array;
-import java.util.ArrayList;
-import java.util.List;
-import java.util.Locale;
-
 import cs4474.g9.debtledger.R;
-import cs4474.g9.debtledger.ViewContactActivity;
 import cs4474.g9.debtledger.data.login.LoginRepository;
 import cs4474.g9.debtledger.data.model.Transaction;
-import cs4474.g9.debtledger.data.model.UserAccount;
-import cs4474.g9.debtledger.logic.ColourGenerator;
 
-public class ContactHistoryListAdapter  extends RecyclerView.Adapter<ContactHistoryListAdapter.Item> {
+public class ContactHistoryListAdapter extends RecyclerView.Adapter<ContactHistoryListAdapter.Item> {
 
     private List<Transaction> transactionList;
 
@@ -45,14 +35,17 @@ public class ContactHistoryListAdapter  extends RecyclerView.Adapter<ContactHist
         Transaction temp = transactionList.get(position);
         holder.description.setText(temp.getDescription());
 
-        holder.date.setText(temp.getDatetime());
+        holder.date.setText(
+                temp.getDatetime().length() > 10
+                        ? temp.getDatetime().substring(0, 10)
+                        : temp.getDatetime()
+        );
 
 
-        if(temp.getCreditor() == LoginRepository.getInstance().getLoggedInUser().getId()){
+        if (temp.getCreditor() == LoginRepository.getInstance().getLoggedInUser().getId()) {
             holder.amount.setText("+$" + temp.getAmount().toString());
             holder.amount.setTextColor(Color.GREEN);
-        }
-        else {
+        } else {
             holder.amount.setText("-$" + temp.getAmount().toString());
             holder.amount.setTextColor(Color.RED);
         }
