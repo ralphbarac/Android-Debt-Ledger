@@ -14,16 +14,21 @@ import androidx.recyclerview.widget.RecyclerView;
 import cs4474.g9.debtledger.R;
 import cs4474.g9.debtledger.data.model.UserAccount;
 import cs4474.g9.debtledger.logic.ColourGenerator;
+import cs4474.g9.debtledger.ui.settings.AccessibleColours;
 
 public class GroupMemberListAdapter extends RecyclerView.Adapter<GroupMemberListAdapter.Item> {
 
     private List<UserAccount> groupMembers;
     private List<OnMemberRemoved> onMemberRemovedListeners;
 
-    public GroupMemberListAdapter(List<UserAccount> groupMembers) {
+    private boolean isInAccessibleMode;
+
+    public GroupMemberListAdapter(List<UserAccount> groupMembers, boolean isInAccessibleMode) {
         super();
         this.groupMembers = groupMembers;
         this.onMemberRemovedListeners = new ArrayList<>();
+
+        this.isInAccessibleMode = isInAccessibleMode;
     }
 
     public void addOnMemberRemovedListener(OnMemberRemoved listener) {
@@ -74,7 +79,9 @@ public class GroupMemberListAdapter extends RecyclerView.Adapter<GroupMemberList
             this.contactAvatarCharacter = view.findViewById(R.id.contact_avatar_character);
             this.contactName = view.findViewById(R.id.name);
 
-            view.findViewById(R.id.remove).setOnClickListener(new View.OnClickListener() {
+            ImageView remove = view.findViewById(R.id.remove);
+            remove.setColorFilter(AccessibleColours.getNegativeColour(isInAccessibleMode));
+            remove.setOnClickListener(new View.OnClickListener() {
                 @Override
                 public void onClick(View v) {
                     groupMembers.remove(getAdapterPosition());

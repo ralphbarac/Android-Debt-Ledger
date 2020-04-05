@@ -1,8 +1,10 @@
 package cs4474.g9.debtledger.ui.groups;
 
 import android.content.Intent;
+import android.content.SharedPreferences;
 import android.graphics.Color;
 import android.os.Bundle;
+import android.preference.PreferenceManager;
 import android.text.Editable;
 import android.text.TextWatcher;
 import android.util.Log;
@@ -39,6 +41,7 @@ import cs4474.g9.debtledger.data.model.Group;
 import cs4474.g9.debtledger.data.model.UserAccount;
 import cs4474.g9.debtledger.logic.ColourGenerator;
 import cs4474.g9.debtledger.ui.contacts.select.SelectGroupMembersActivity;
+import cs4474.g9.debtledger.ui.settings.Preference;
 
 public class CreateEditGroupActivity extends AppCompatActivity implements OnMemberRemoved {
 
@@ -66,9 +69,15 @@ public class CreateEditGroupActivity extends AppCompatActivity implements OnMemb
     private RecyclerView groupMembersView;
     private GroupMemberListAdapter groupMembersAdapter;
 
+    private boolean isInAccessibleMode;
+
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
+
+        SharedPreferences preferences = PreferenceManager.getDefaultSharedPreferences(this);
+        isInAccessibleMode = preferences.getBoolean(Preference.ACCESSIBILITY, false);
+
         setContentView(R.layout.activity_create_edit_group);
 
         getSupportActionBar().setHomeAsUpIndicator(R.drawable.ic_close_white_24dp);
@@ -121,7 +130,7 @@ public class CreateEditGroupActivity extends AppCompatActivity implements OnMemb
         groupMembersView.setHasFixedSize(true);
         groupMembersView.setLayoutManager(new LinearLayoutManager(this));
 
-        groupMembersAdapter = new GroupMemberListAdapter(members);
+        groupMembersAdapter = new GroupMemberListAdapter(members, isInAccessibleMode);
         groupMembersAdapter.addOnMemberRemovedListener(this);
         groupMembersView.setAdapter(groupMembersAdapter);
 

@@ -1,7 +1,6 @@
 package cs4474.g9.debtledger.ui.contacts;
 
 import android.content.Intent;
-import android.graphics.Color;
 import android.util.Log;
 import android.util.Pair;
 import android.view.LayoutInflater;
@@ -20,19 +19,24 @@ import cs4474.g9.debtledger.R;
 import cs4474.g9.debtledger.ViewContactActivity;
 import cs4474.g9.debtledger.data.model.UserAccount;
 import cs4474.g9.debtledger.logic.ColourGenerator;
+import cs4474.g9.debtledger.ui.settings.AccessibleColours;
 
 public class ContactListAdapter extends RecyclerView.Adapter<ContactListAdapter.Item> {
 
     private List<Pair<UserAccount, Long>> contactsWithBalances;
 
-    public ContactListAdapter(List<Pair<UserAccount, Long>> contactsWithBalances) {
+    private boolean isInAccessibleMode;
+
+    public ContactListAdapter(List<Pair<UserAccount, Long>> contactsWithBalances, boolean isInAccessibleMode) {
         super();
         this.contactsWithBalances = contactsWithBalances;
+        this.isInAccessibleMode = isInAccessibleMode;
     }
 
-    public ContactListAdapter() {
+    public ContactListAdapter(boolean isInAccessibleMode) {
         super();
         this.contactsWithBalances = new ArrayList<>();
+        this.isInAccessibleMode = isInAccessibleMode;
     }
 
     public void setContactsWithBalances(List<Pair<UserAccount, Long>> contactsWithBalances) {
@@ -61,9 +65,9 @@ public class ContactListAdapter extends RecyclerView.Adapter<ContactListAdapter.
         } else {
             holder.amount.setText(String.format(Locale.CANADA, "%s$%.2f", amount < 0 ? "-" : "+", Math.abs(amount) / 100.0));
             if (amount < 0) {
-                holder.amount.setTextColor(Color.RED);
+                holder.amount.setTextColor(AccessibleColours.getNegativeColour(isInAccessibleMode));
             } else {
-                holder.amount.setTextColor(Color.GREEN);
+                holder.amount.setTextColor(AccessibleColours.getPositiveColour(isInAccessibleMode));
             }
         }
     }

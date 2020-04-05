@@ -30,16 +30,21 @@ import cs4474.g9.debtledger.data.RedirectableJsonArrayRequest;
 import cs4474.g9.debtledger.data.login.LoginRepository;
 import cs4474.g9.debtledger.data.model.UserAccount;
 import cs4474.g9.debtledger.logic.ColourGenerator;
+import cs4474.g9.debtledger.ui.settings.AccessibleColours;
 
 public class ContactRequestListAdapter extends RecyclerView.Adapter<ContactRequestListAdapter.Item> {
 
     private List<UserAccount> contactRequests;
     private List<OnRequestReply> onRequestReplyListeners;
 
-    public ContactRequestListAdapter() {
+    private boolean isInAccessibleMode;
+
+    public ContactRequestListAdapter(boolean isInAccessibleMode) {
         super();
         this.contactRequests = new ArrayList<>();
         this.onRequestReplyListeners = new ArrayList<>();
+
+        this.isInAccessibleMode = isInAccessibleMode;
     }
 
     public void addOnContactAcceptedListener(OnRequestReply listener) {
@@ -73,15 +78,8 @@ public class ContactRequestListAdapter extends RecyclerView.Adapter<ContactReque
         return contactRequests == null ? 0 : contactRequests.size();
     }
 
-    public void addContactRequest(UserAccount contactRequest) {
-        contactRequests.add(contactRequest);
-//        notifyItemInserted(contactRequests.size() - 1);
-        notifyDataSetChanged();
-    }
-
     private void removeContactRequest(int position) {
         contactRequests.remove(position);
-//        notifyItemRemoved(position);
         notifyDataSetChanged();
     }
 
@@ -111,6 +109,9 @@ public class ContactRequestListAdapter extends RecyclerView.Adapter<ContactReque
             this.contactName = view.findViewById(R.id.name);
             this.accept = view.findViewById(R.id.accept);
             this.reject = view.findViewById(R.id.reject);
+
+            this.accept.setColorFilter(AccessibleColours.getPositiveColour(isInAccessibleMode));
+            this.reject.setColorFilter(AccessibleColours.getNegativeColour(isInAccessibleMode));
 
             // On click confirm acceptance of contact request
             this.accept.setOnClickListener(new View.OnClickListener() {

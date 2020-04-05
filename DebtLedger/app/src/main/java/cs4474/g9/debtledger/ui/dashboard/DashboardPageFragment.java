@@ -1,6 +1,8 @@
 package cs4474.g9.debtledger.ui.dashboard;
 
+import android.content.SharedPreferences;
 import android.os.Bundle;
+import android.preference.PreferenceManager;
 import android.text.Spannable;
 import android.text.SpannableString;
 import android.text.Spanned;
@@ -15,12 +17,13 @@ import java.util.List;
 import java.util.Locale;
 
 import androidx.annotation.NonNull;
-import androidx.core.content.ContextCompat;
 import androidx.fragment.app.Fragment;
 import androidx.recyclerview.widget.LinearLayoutManager;
 import cs4474.g9.debtledger.R;
 import cs4474.g9.debtledger.data.login.LoginRepository;
 import cs4474.g9.debtledger.data.model.UserAccount;
+import cs4474.g9.debtledger.ui.settings.AccessibleColours;
+import cs4474.g9.debtledger.ui.settings.Preference;
 import cs4474.g9.debtledger.ui.shared.LoadableRecyclerView;
 import cs4474.g9.debtledger.ui.shared.OnActionButtonClickedListener;
 
@@ -34,6 +37,7 @@ public class DashboardPageFragment extends Fragment {
 
     private boolean isCreated = false;
     private boolean isInFailedToLoadState = false;
+    private boolean isInAccessibleMode = false;
 
     private String label;
     private OnActionButtonClickedListener actionButtonClickedListener;
@@ -44,6 +48,9 @@ public class DashboardPageFragment extends Fragment {
     }
 
     public View onCreateView(@NonNull LayoutInflater inflater, ViewGroup container, Bundle savedInstanceState) {
+        SharedPreferences preferences = PreferenceManager.getDefaultSharedPreferences(getContext());
+        isInAccessibleMode = preferences.getBoolean(Preference.ACCESSIBILITY, false);
+
         View root = inflater.inflate(R.layout.fragment_dashboard_page, container, false);
         balanceTextView = root.findViewById(R.id.balance);
         balanceTextView.setText("...");
@@ -53,7 +60,10 @@ public class DashboardPageFragment extends Fragment {
         outstandingBalancesView.setLayoutManager(new LinearLayoutManager(getContext()));
         outstandingBalancesView.addOnActionButtonClickedClickListener(actionButtonClickedListener);
 
-        outstandingBalancesAdapter = new OutstandingBalanceListAdapter(LoginRepository.getInstance().getLoggedInUser());
+        outstandingBalancesAdapter = new OutstandingBalanceListAdapter(
+                LoginRepository.getInstance().getLoggedInUser(),
+                isInAccessibleMode
+        );
         outstandingBalancesView.setAdapter(outstandingBalancesAdapter);
 
         isCreated = true;
@@ -108,7 +118,11 @@ public class DashboardPageFragment extends Fragment {
             // Set numerical portion to green/red if applicable
             if (total != 0) {
                 balanceFormatted.setSpan(
-                        new ForegroundColorSpan(ContextCompat.getColor(getContext(), total < 0 ? R.color.red : R.color.green)),
+                        new ForegroundColorSpan(
+                                total < 0
+                                        ? AccessibleColours.getNegativeColour(isInAccessibleMode)
+                                        : AccessibleColours.getPositiveColour(isInAccessibleMode)
+                        ),
                         label.length() + 1,
                         balanceFormatted.length(),
                         Spanned.SPAN_INCLUSIVE_EXCLUSIVE

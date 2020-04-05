@@ -109,6 +109,12 @@ public class SettingsFragment extends Fragment {
         final TextInputEditText userEmailText = root.findViewById(R.id.user_email_text_view);
         userEmailText.setText(user.getEmail());
 
+        // Add preference fragment to activity
+        getActivity().getSupportFragmentManager()
+                .beginTransaction()
+                .replace(R.id.preferences_placeholder, new PreferencesFragment())
+                .commit();
+
         return root;
     }
 

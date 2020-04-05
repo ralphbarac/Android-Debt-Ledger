@@ -1,7 +1,6 @@
 package cs4474.g9.debtledger.ui.dashboard;
 
 import android.content.Intent;
-import android.graphics.Color;
 import android.util.Log;
 import android.util.Pair;
 import android.view.LayoutInflater;
@@ -20,22 +19,21 @@ import cs4474.g9.debtledger.R;
 import cs4474.g9.debtledger.ViewContactActivity;
 import cs4474.g9.debtledger.data.model.UserAccount;
 import cs4474.g9.debtledger.logic.ColourGenerator;
+import cs4474.g9.debtledger.ui.settings.AccessibleColours;
 
 public class OutstandingBalanceListAdapter extends RecyclerView.Adapter<OutstandingBalanceListAdapter.Item> {
 
     private UserAccount loggedInUser;
     private List<Pair<UserAccount, Long>> outstandingBalances;
 
-    public OutstandingBalanceListAdapter(UserAccount loggedInUser, List<Pair<UserAccount, Long>> outstandingBalances) {
-        super();
-        this.loggedInUser = loggedInUser;
-        this.outstandingBalances = outstandingBalances;
-    }
+    private boolean isInAccessibleMode;
 
-    public OutstandingBalanceListAdapter(UserAccount loggedInUser) {
+    public OutstandingBalanceListAdapter(UserAccount loggedInUser, boolean isInAccessibleMode) {
         super();
         this.loggedInUser = loggedInUser;
         this.outstandingBalances = new ArrayList<>();
+
+        this.isInAccessibleMode = isInAccessibleMode;
     }
 
     public void setOutstandingBalances(List<Pair<UserAccount, Long>> outstandingBalances) {
@@ -65,12 +63,12 @@ public class OutstandingBalanceListAdapter extends RecyclerView.Adapter<Outstand
 
         if (amount < 0) {
             holder.arrow.setRotationY(0);
-            holder.arrow.setColorFilter(Color.RED);
-            holder.amount.setTextColor(Color.RED);
+            holder.arrow.setColorFilter(AccessibleColours.getNegativeColour(isInAccessibleMode));
+            holder.amount.setTextColor(AccessibleColours.getNegativeColour(isInAccessibleMode));
         } else {
             holder.arrow.setRotationY(180);
-            holder.arrow.setColorFilter(Color.GREEN);
-            holder.amount.setTextColor(Color.GREEN);
+            holder.arrow.setColorFilter(AccessibleColours.getPositiveColour(isInAccessibleMode));
+            holder.amount.setTextColor(AccessibleColours.getPositiveColour(isInAccessibleMode));
         }
     }
 

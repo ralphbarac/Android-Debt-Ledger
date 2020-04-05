@@ -1,8 +1,10 @@
 package cs4474.g9.debtledger;
 
 import android.content.DialogInterface;
+import android.content.SharedPreferences;
 import android.graphics.Color;
 import android.os.Bundle;
+import android.preference.PreferenceManager;
 import android.util.Log;
 import android.view.View;
 import android.widget.ImageView;
@@ -32,6 +34,8 @@ import cs4474.g9.debtledger.data.model.TransactionManager;
 import cs4474.g9.debtledger.data.model.UserAccount;
 import cs4474.g9.debtledger.logic.ColourGenerator;
 import cs4474.g9.debtledger.ui.contacts.ContactHistoryListAdapter;
+import cs4474.g9.debtledger.ui.settings.AccessibleColours;
+import cs4474.g9.debtledger.ui.settings.Preference;
 import cs4474.g9.debtledger.ui.shared.LoadableRecyclerView;
 import cs4474.g9.debtledger.ui.shared.OnActionButtonClickedListener;
 
@@ -48,9 +52,15 @@ public class ViewContactActivity extends AppCompatActivity implements OnActionBu
     private TextView youowe;
     private TextView total;
 
+    private boolean isInAccessibleMode;
+
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
+
+        SharedPreferences preferences = PreferenceManager.getDefaultSharedPreferences(this);
+        isInAccessibleMode = preferences.getBoolean(Preference.ACCESSIBILITY, false);
+
         setContentView(R.layout.activity_view_contact);
 
         getSupportActionBar().setDisplayHomeAsUpEnabled(true);
@@ -78,7 +88,7 @@ public class ViewContactActivity extends AppCompatActivity implements OnActionBu
         transactionHistoryList.addOnActionButtonClickedClickListener(this);
         transactionHistoryList.addItemDecoration(new DividerItemDecoration(this,
                 DividerItemDecoration.VERTICAL));
-        historyAdapter = new ContactHistoryListAdapter();
+        historyAdapter = new ContactHistoryListAdapter(isInAccessibleMode);
         transactionHistoryList.setAdapter(historyAdapter);
 
         // Binding dynamic contact data to UI
@@ -218,7 +228,7 @@ public class ViewContactActivity extends AppCompatActivity implements OnActionBu
             repayButton.setText("Forgive");
             youowe.setText("You're owed: ");
             total.setText("$" + result.toString());
-            total.setTextColor(Color.GREEN);
+            total.setTextColor(AccessibleColours.getPositiveColour(isInAccessibleMode));
         } else {
             // You owe money
             repayButton.setVisibility(View.VISIBLE);
@@ -226,7 +236,7 @@ public class ViewContactActivity extends AppCompatActivity implements OnActionBu
             repayButton.setText("Repay");
             youowe.setText("You owe: ");
             total.setText("$" + result.abs().toString());
-            total.setTextColor(Color.RED);
+            total.setTextColor(AccessibleColours.getNegativeColour(isInAccessibleMode));
         }
     }
 

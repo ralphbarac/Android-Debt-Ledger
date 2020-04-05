@@ -2,7 +2,9 @@ package cs4474.g9.debtledger.ui.groups;
 
 import android.content.DialogInterface;
 import android.content.Intent;
+import android.content.SharedPreferences;
 import android.os.Bundle;
+import android.preference.PreferenceManager;
 import android.text.Spannable;
 import android.text.SpannableString;
 import android.text.Spanned;
@@ -29,7 +31,6 @@ import java.util.Locale;
 import androidx.annotation.Nullable;
 import androidx.appcompat.app.AlertDialog;
 import androidx.appcompat.app.AppCompatActivity;
-import androidx.core.content.ContextCompat;
 import androidx.recyclerview.widget.LinearLayoutManager;
 import androidx.recyclerview.widget.RecyclerView;
 import cs4474.g9.debtledger.R;
@@ -40,6 +41,8 @@ import cs4474.g9.debtledger.data.model.Group;
 import cs4474.g9.debtledger.data.model.UserAccount;
 import cs4474.g9.debtledger.logic.ColourGenerator;
 import cs4474.g9.debtledger.ui.contacts.ContactListAdapter;
+import cs4474.g9.debtledger.ui.settings.AccessibleColours;
+import cs4474.g9.debtledger.ui.settings.Preference;
 
 public class ViewGroupActivity extends AppCompatActivity {
 
@@ -54,9 +57,15 @@ public class ViewGroupActivity extends AppCompatActivity {
     private boolean modified = false;
     private boolean deleted = false;
 
+    private boolean isInAccessibleMode;
+
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
+
+        SharedPreferences preferences = PreferenceManager.getDefaultSharedPreferences(this);
+        isInAccessibleMode = preferences.getBoolean(Preference.ACCESSIBILITY, false);
+
         setContentView(R.layout.activity_view_group);
 
         getSupportActionBar().setDisplayHomeAsUpEnabled(true);
@@ -154,7 +163,7 @@ public class ViewGroupActivity extends AppCompatActivity {
         );
         // Set number portion to red
         youOweFormatted.setSpan(
-                new ForegroundColorSpan(ContextCompat.getColor(this, R.color.red)),
+                new ForegroundColorSpan(AccessibleColours.getNegativeColour(isInAccessibleMode)),
                 9,
                 youOweFormatted.length(),
                 Spanned.SPAN_INCLUSIVE_EXCLUSIVE
@@ -168,7 +177,7 @@ public class ViewGroupActivity extends AppCompatActivity {
         );
         // Set number portion to green
         youreOweFormatted.setSpan(
-                new ForegroundColorSpan(ContextCompat.getColor(this, R.color.green)),
+                new ForegroundColorSpan(AccessibleColours.getPositiveColour(isInAccessibleMode)),
                 13,
                 youreOweFormatted.length(),
                 Spanned.SPAN_INCLUSIVE_EXCLUSIVE
@@ -180,7 +189,7 @@ public class ViewGroupActivity extends AppCompatActivity {
         groupMembersView.setHasFixedSize(true);
         groupMembersView.setLayoutManager(new LinearLayoutManager(this));
 
-        final ContactListAdapter groupMembersAdapter = new ContactListAdapter(memberBalances);
+        final ContactListAdapter groupMembersAdapter = new ContactListAdapter(memberBalances, isInAccessibleMode);
         groupMembersView.setAdapter(groupMembersAdapter);
     }
 

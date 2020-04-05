@@ -29,14 +29,19 @@ import cs4474.g9.debtledger.data.RedirectableJsonArrayRequest;
 import cs4474.g9.debtledger.data.login.LoginRepository;
 import cs4474.g9.debtledger.data.model.UserAccount;
 import cs4474.g9.debtledger.logic.ColourGenerator;
+import cs4474.g9.debtledger.ui.settings.AccessibleColours;
 
 public class ContactRequestedListAdapter extends RecyclerView.Adapter<ContactRequestedListAdapter.Item> {
 
     private List<UserAccount> contactsRequested;
 
-    public ContactRequestedListAdapter() {
+    private boolean isInAccessibleMode;
+
+    public ContactRequestedListAdapter(boolean isInAccessibleMode) {
         super();
         this.contactsRequested = new ArrayList<>();
+
+        this.isInAccessibleMode = isInAccessibleMode;
     }
 
     public void setContactsRequested(List<UserAccount> contactsRequested) {
@@ -90,6 +95,8 @@ public class ContactRequestedListAdapter extends RecyclerView.Adapter<ContactReq
             this.contactAvatarCharacter = view.findViewById(R.id.contact_avatar_character);
             this.contactName = view.findViewById(R.id.name);
             this.cancel = view.findViewById(R.id.cancel);
+
+            this.cancel.setColorFilter(AccessibleColours.getNegativeColour(isInAccessibleMode));
 
             // On click confirm cancellation of contact request
             this.cancel.setOnClickListener(new View.OnClickListener() {

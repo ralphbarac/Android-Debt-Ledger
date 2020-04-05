@@ -1,7 +1,9 @@
 package cs4474.g9.debtledger.ui.contacts;
 
 import android.content.DialogInterface;
+import android.content.SharedPreferences;
 import android.os.Bundle;
+import android.preference.PreferenceManager;
 import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.Menu;
@@ -32,6 +34,7 @@ import cs4474.g9.debtledger.data.model.TransactionManager;
 import cs4474.g9.debtledger.data.model.UserAccount;
 import cs4474.g9.debtledger.logic.BalanceCalculator;
 import cs4474.g9.debtledger.ui.MainActivity;
+import cs4474.g9.debtledger.ui.settings.Preference;
 import cs4474.g9.debtledger.ui.shared.LoadableRecyclerView;
 import cs4474.g9.debtledger.ui.shared.OnActionButtonClickedListener;
 
@@ -48,7 +51,12 @@ public class ContactsFragment extends Fragment implements OnRequestReply, OnActi
     private LoadableRecyclerView contactsView;
     private ContactListAdapter contactsAdapter;
 
+    private boolean isInAccessibleMode = false;
+
     public View onCreateView(@NonNull LayoutInflater inflater, ViewGroup container, Bundle savedInstanceState) {
+        SharedPreferences preferences = PreferenceManager.getDefaultSharedPreferences(getContext());
+        isInAccessibleMode = preferences.getBoolean(Preference.ACCESSIBILITY, false);
+
         View root = inflater.inflate(R.layout.fragment_contacts, container, false);
         setHasOptionsMenu(true);
 
@@ -59,7 +67,7 @@ public class ContactsFragment extends Fragment implements OnRequestReply, OnActi
         contactRequestsView = root.findViewById(R.id.requests_to_me_list);
         contactRequestsView.setHasFixedSize(true);
         contactRequestsView.setLayoutManager(new LinearLayoutManager(getContext()));
-        contactRequestsAdapter = new ContactRequestListAdapter();
+        contactRequestsAdapter = new ContactRequestListAdapter(isInAccessibleMode);
         contactRequestsAdapter.addOnContactAcceptedListener(this);
         contactRequestsAdapter.registerAdapterDataObserver(new RecyclerView.AdapterDataObserver() {
             @Override
@@ -80,7 +88,7 @@ public class ContactsFragment extends Fragment implements OnRequestReply, OnActi
         contactsRequestedView = root.findViewById(R.id.my_requests_list);
         contactsRequestedView.setHasFixedSize(true);
         contactsRequestedView.setLayoutManager(new LinearLayoutManager(getContext()));
-        contactsRequestedAdapter = new ContactRequestedListAdapter();
+        contactsRequestedAdapter = new ContactRequestedListAdapter(isInAccessibleMode);
         contactsRequestedAdapter.registerAdapterDataObserver(new RecyclerView.AdapterDataObserver() {
             @Override
             public void onChanged() {
@@ -100,7 +108,7 @@ public class ContactsFragment extends Fragment implements OnRequestReply, OnActi
         contactsView.setHasFixedSize(true);
         contactsView.setLayoutManager(new LinearLayoutManager(getContext()));
         contactsView.addOnActionButtonClickedClickListener(this);
-        contactsAdapter = new ContactListAdapter();
+        contactsAdapter = new ContactListAdapter(isInAccessibleMode);
         contactsView.setAdapter(contactsAdapter);
 
         // Make call to backend to get contacts

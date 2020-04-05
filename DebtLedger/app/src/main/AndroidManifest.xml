@@ -25,7 +25,8 @@
             android:label="@string/title_view_contact" />
         <activity
             android:name=".ui.transaction.CreateTransactionActivity"
-            android:label="@string/title_create_transaction" />
+            android:label="@string/title_create_transaction"
+            android:windowSoftInputMode="stateHidden" />
         <activity
             android:name=".ui.contacts.select.SelectWhoOwesActivity"
             android:label="@string/title_select_multiple_contacts" />
@@ -35,12 +36,12 @@
         <activity
             android:name=".ui.signup.SignupActivity"
             android:label="@string/app_name"
-            android:windowSoftInputMode="stateHidden"/>
+            android:windowSoftInputMode="stateHidden" />
         <activity
             android:name=".ui.MainActivity"
             android:label="@string/app_name"
-            android:windowSoftInputMode="adjustPan"
             android:screenOrientation="portrait"
+            android:windowSoftInputMode="adjustPan"
             tools:ignore="LockedOrientationActivity" />
         <activity
             android:name=".ui.login.LoginActivity"
@@ -53,9 +54,8 @@
             </intent-filter>
         </activity>
     </application>
+    <uses-permission android:name="android.permission.INTERNET" />
 
     <uses-permission android:name="android.permission.ACCESS_NETWORK_STATE" />
-
-    <uses-permission android:name="android.permission.INTERNET" />
 
 </manifest>

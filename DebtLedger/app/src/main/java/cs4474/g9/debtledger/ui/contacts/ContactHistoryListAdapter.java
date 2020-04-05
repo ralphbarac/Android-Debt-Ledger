@@ -1,6 +1,5 @@
 package cs4474.g9.debtledger.ui.contacts;
 
-import android.graphics.Color;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
@@ -14,14 +13,19 @@ import androidx.recyclerview.widget.RecyclerView;
 import cs4474.g9.debtledger.R;
 import cs4474.g9.debtledger.data.login.LoginRepository;
 import cs4474.g9.debtledger.data.model.Transaction;
+import cs4474.g9.debtledger.ui.settings.AccessibleColours;
 
 public class ContactHistoryListAdapter extends RecyclerView.Adapter<ContactHistoryListAdapter.Item> {
 
     private List<Transaction> transactionList;
 
+    private boolean isInAccessibleMode;
+
     // Create empty list
-    public ContactHistoryListAdapter() {
+    public ContactHistoryListAdapter(boolean isInAccessibleMode) {
         transactionList = new ArrayList<>();
+
+        this.isInAccessibleMode = isInAccessibleMode;
     }
 
     // Set new list to
@@ -44,10 +48,10 @@ public class ContactHistoryListAdapter extends RecyclerView.Adapter<ContactHisto
 
         if (temp.getCreditor() == LoginRepository.getInstance().getLoggedInUser().getId()) {
             holder.amount.setText("+$" + temp.getAmount().toString());
-            holder.amount.setTextColor(Color.GREEN);
+            holder.amount.setTextColor(AccessibleColours.getPositiveColour(isInAccessibleMode));
         } else {
             holder.amount.setText("-$" + temp.getAmount().toString());
-            holder.amount.setTextColor(Color.RED);
+            holder.amount.setTextColor(AccessibleColours.getNegativeColour(isInAccessibleMode));
         }
     }
 
