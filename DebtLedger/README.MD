@@ -4,7 +4,7 @@
 
 DISCLAIMER: The passwords are stored in plain text, so do not use a legitimate password when signing up.
 
-- The application is not useful until you add a contact, which requires requesting a contact and that request being accepted
+- The application is not very useful until you add a contact, which requires requesting a contact and that request being accepted
 - For this reason, there are existing accounts which are setup to enable full use of the application
 
 Timothy Lee:
@@ -19,15 +19,17 @@ Password: password
 
 ### Method 1: Using physical (Android) device
 
-1. Allow installation of apps from unknown source, steps may differ depending on device and Android version (NOTE: you may also complete this after step 6, as Android should prompt you)
-   1. Using your Android device, open settings
-   2. Find "Security"
-   3. Enable "Unknown source"
+1. Allow installation of apps from unknown source, steps may differ depending on device and Android version
+  - NOTE: you may choose to (or be required to) complete this after step 6, as Android should (or would) prompt you
+  - e.g. Settings -> Security -> Unknown source
 2. Plug your Android device into your computer
 3. Using your computer, copy `debt-ledger.apk` into your `Download` folder on your Android device
 4. Unplug your Android device from your computer
-5. Using your Android device, browse your Download folder using a File Manager (NOTE: the file may not show up in your Downloads application since it was not marked as a download in Android's system, so ensure you use a general File Manager)
-6. Click on (to open) `debt-ledger.apk` (NOTE: if you have not completed step 1, your device should not prompt you to allow installation from unknown source)
+5. Using your Android device, browse your Download folder using a File Manager/Explorer
+  - NOTE: the file may not show up in your Downloads application since it was not marked as a download in Android's system, so ensure you use a general File Manager/Explorer
+  - e.g. Settings -> Storage -> Explore (this should use Android's built in File Explorer, capable of installing APKs)
+6. Click on the APK file `debt-ledger.apk`
+  - NOTE: if you have not completed step 1, your device should now prompt you to allow installation from unknown source
 7. Follow instructions to install the app
 
 ### Method 2: Using emulated device
