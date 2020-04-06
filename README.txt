@@ -25,7 +25,7 @@ Password: password
 
 # How to Run the Application:
 
-## Method 1: Using physical (Android) device (min. Android 5.0)
+## Method 1: Using physical Android device (min. Android 5.0)
 
 1. Allow installation of apps from unknown source, steps may differ depending on device and Android version
    - NOTE: you may choose to (or be required to) complete this after step 6, as Android should (or would) prompt you
@@ -40,7 +40,7 @@ Password: password
    - NOTE: if you have not completed step 1, your device should now prompt you to allow installation from unknown source
 7. Follow instructions to install the app
 
-## Method 2: Using emulated device
+## Method 2: Using emulated Android device
 
 1. Download and Install Android Studio: https://developer.android.com/studio
 2. Download and Unzip the Android Source Code (`DebtLedger.zip`)
