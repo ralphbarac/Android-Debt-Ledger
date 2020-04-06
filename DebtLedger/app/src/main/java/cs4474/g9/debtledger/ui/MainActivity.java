@@ -31,7 +31,6 @@ public class MainActivity extends AppCompatActivity {
     public static final int VIEW_CONTACT_REQUEST = 1;
 
     public static final String CHANGE_TAB = "change_tab";
-    public static final String TAB = "tab";
     public static final int DASHBOARD_TAB = 0;
     public static final int CONTACTS_TAB = 1;
     public static final int GROUPS_TAB = 2;
@@ -52,22 +51,6 @@ public class MainActivity extends AppCompatActivity {
         NavController navController = Navigation.findNavController(this, R.id.nav_host_fragment_container);
         NavigationUI.setupActionBarWithNavController(this, navController, appBarConfiguration);
         NavigationUI.setupWithNavController(bottomNavigationView, navController);
-
-        // Set initial view as designated (or dashboard by default)
-        switch (getIntent().getIntExtra(TAB, DASHBOARD_TAB)) {
-            case DASHBOARD_TAB:
-                bottomNavigationView.setSelectedItemId(R.id.navigation_dashboard);
-                break;
-            case CONTACTS_TAB:
-                bottomNavigationView.setSelectedItemId(R.id.navigation_contacts);
-                break;
-            case GROUPS_TAB:
-                bottomNavigationView.setSelectedItemId(R.id.navigation_groups);
-                break;
-            case SETTINGS_TAB:
-                bottomNavigationView.setSelectedItemId(R.id.navigation_settings);
-                break;
-        }
 
         // Adding notification badge (if necessary) to contacts icon
         updateContactsNotificationBadge();
