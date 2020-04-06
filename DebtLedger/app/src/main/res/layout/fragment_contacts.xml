@@ -65,7 +65,7 @@
             app:loadingMessage=""
             app:failedToLoadMessage="Failed to load Contacts ):"
             app:failedToLoadAction="Retry"
-            app:emptyMessage="No Contacts ):"
+            app:emptyMessage="No Contacts"
             app:emptyAction="Add Contact" />
 
         <LinearLayout

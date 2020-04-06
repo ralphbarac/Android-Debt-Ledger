@@ -90,7 +90,7 @@
             app:loadingMessage=""
             app:failedToLoadMessage="Failed to load Groups ):"
             app:failedToLoadAction="Retry"
-            app:emptyMessage="No Groups ):"
+            app:emptyMessage="No Groups"
             app:emptyAction="Add Group" />
 
         <LinearLayout
@@ -149,7 +149,7 @@
             app:loadingMessage=""
             app:failedToLoadMessage="Failed to load Contacts ):"
             app:failedToLoadAction="Retry"
-            app:emptyMessage="No Contacts ):"
+            app:emptyMessage="No Contacts"
             app:emptyAction="Add Contact" />
 
         <LinearLayout

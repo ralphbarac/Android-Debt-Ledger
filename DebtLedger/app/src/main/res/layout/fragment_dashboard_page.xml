@@ -28,7 +28,7 @@
             app:loadingMessage=""
             app:failedToLoadMessage="Failed to load Balances ):"
             app:failedToLoadAction="Retry"
-            app:emptyMessage="No Outstanding Balances :)"
+            app:emptyMessage="No Outstanding Balances..."
             app:emptyAction="" />
 
         <LinearLayout

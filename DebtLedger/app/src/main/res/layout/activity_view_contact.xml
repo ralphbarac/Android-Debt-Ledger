@@ -154,7 +154,7 @@
         android:layout_height="match_parent"
 
         app:emptyAction=""
-        app:emptyMessage="No History ):"
+        app:emptyMessage="No History"
         app:failedToLoadAction="Retry"
         app:failedToLoadMessage="Failed to load History ):"
         app:loadingMessage="" />
