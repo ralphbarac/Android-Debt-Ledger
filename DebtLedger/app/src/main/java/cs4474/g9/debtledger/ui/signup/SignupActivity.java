@@ -223,10 +223,10 @@ public class SignupActivity extends AppCompatActivity {
                                 signupButton.setEnabled(true);
                                 loadingProgressBar.setVisibility(View.INVISIBLE);
                             } else {
-                                // On success, parse UserAccount, store in repository, and proceed to dashboard
+                                // On success, parse UserAccount, store in repository, and proceed to contacts
                                 UserAccount loggedInUser = UserAccountManager.parseUserAccountFromJson(response.getJSONObject(0));
                                 loginRepository.loginUser(loggedInUser, loggedInUser.getId());
-                                proceedToDashboard(loggedInUser);
+                                proceedToContacts(loggedInUser);
                             }
                         } catch (Exception e) {
                             // On parse error or user not found, display signup failed to user
@@ -251,12 +251,13 @@ public class SignupActivity extends AppCompatActivity {
         ConnectionAdapter.getInstance().addToRequestQueue(request, hashCode());
     }
 
-    private void proceedToDashboard(UserAccount loggedInUser) {
+    private void proceedToContacts(UserAccount loggedInUser) {
         String welcome = getString(R.string.welcome) + loggedInUser.getFirstName();
         Toast.makeText(this, welcome, Toast.LENGTH_LONG).show();
 
-        Intent toDashboard = new Intent(this, MainActivity.class);
-        startActivity(toDashboard);
+        Intent toContacts = new Intent(this, MainActivity.class);
+        toContacts.putExtra(MainActivity.TAB, MainActivity.CONTACTS_TAB);
+        startActivity(toContacts);
         setResult(Activity.RESULT_OK);
         finish();
     }
