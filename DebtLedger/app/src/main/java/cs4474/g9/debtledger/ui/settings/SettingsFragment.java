@@ -1,6 +1,8 @@
 package cs4474.g9.debtledger.ui.settings;
 
 import android.app.Activity;
+import android.content.Context;
+import android.content.DialogInterface;
 import android.content.Intent;
 import android.os.Bundle;
 import android.text.Editable;
@@ -18,6 +20,7 @@ import android.widget.Toast;
 
 import com.android.volley.Response;
 import com.android.volley.VolleyError;
+import com.google.android.material.dialog.MaterialAlertDialogBuilder;
 import com.google.android.material.textfield.TextInputEditText;
 
 import org.json.JSONArray;
@@ -177,29 +180,43 @@ public class SettingsFragment extends Fragment {
     public boolean onOptionsItemSelected(MenuItem item) {
         switch (item.getItemId()) {
             case R.id.logout:
-                LoginRepository loginRepository = LoginRepository.getInstance();
-
-                if (nameChanged) {
-                    makeRequestToUpdateName();
-                    nameChanged = false;
-                }
-
-                // Say bye
-                String goodbye = getString(R.string.goodbye) + loginRepository.getLoggedInUser().getFirstName();
-                Toast.makeText(getContext(), goodbye, Toast.LENGTH_LONG).show();
-
-                loginRepository.logoutUser();
-
-                Intent toLogin = new Intent(getActivity(), LoginActivity.class);
-                startActivity(toLogin);
-                if (getActivity() != null) {
-                    getActivity().setResult(Activity.RESULT_OK);
-                    getActivity().finish();
-                }
-
+                confirmLogout(getContext());
                 return true;
             default:
                 return super.onOptionsItemSelected(item);
         }
+    }
+
+
+    private void confirmLogout(Context context) {
+        new MaterialAlertDialogBuilder(context)
+                .setTitle("Confirm Logout")
+                .setMessage("Are you sure you want to logout?")
+                .setPositiveButton("Yes", new DialogInterface.OnClickListener() {
+                    @Override
+                    public void onClick(DialogInterface dialog, int which) {
+                        LoginRepository loginRepository = LoginRepository.getInstance();
+
+                        if (nameChanged) {
+                            makeRequestToUpdateName();
+                            nameChanged = false;
+                        }
+
+                        // Say bye
+                        String goodbye = getString(R.string.goodbye) + loginRepository.getLoggedInUser().getFirstName();
+                        Toast.makeText(getContext(), goodbye, Toast.LENGTH_LONG).show();
+
+                        loginRepository.logoutUser();
+
+                        Intent toLogin = new Intent(getActivity(), LoginActivity.class);
+                        startActivity(toLogin);
+                        if (getActivity() != null) {
+                            getActivity().setResult(Activity.RESULT_OK);
+                            getActivity().finish();
+                        }
+                    }
+                })
+                .setNegativeButton("No", null)
+                .show();
     }
 }

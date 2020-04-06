@@ -20,7 +20,7 @@
     <string name="action_switch_to_sign_up">Not a User? Sign up!</string>
     <string name="invalid_first_name">First name must not be empty!</string>
     <string name="invalid_last_name">Last name must not be empty!</string>
-    <string name="invalid_email">Not a valid email!</string>
+    <string name="invalid_email">Email is not valid!</string>
     <string name="invalid_password">Password must be a minimum of 6 characters!</string>
     <string name="invalid_confirm_password">Passwords do not match!</string>
     <string name="welcome">"Welcome "</string>
