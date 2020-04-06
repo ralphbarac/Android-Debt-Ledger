@@ -1,6 +1,7 @@
 package cs4474.g9.debtledger;
 
 import android.content.DialogInterface;
+import android.content.Intent;
 import android.content.SharedPreferences;
 import android.graphics.Color;
 import android.os.Bundle;
@@ -42,6 +43,7 @@ import cs4474.g9.debtledger.ui.shared.OnActionButtonClickedListener;
 public class ViewContactActivity extends AppCompatActivity implements OnActionButtonClickedListener {
 
     public static final String CONTACT = "contact";
+    public static final String MODIFIED = "modified";
 
     private UserAccount contactAccount;
     private ContactHistoryListAdapter historyAdapter;
@@ -126,7 +128,7 @@ public class ViewContactActivity extends AppCompatActivity implements OnActionBu
                                 if (result.compareTo(BigDecimal.ZERO) > 0) {
                                     tempList.add(new Transaction(loggedInUser.getId(), contactAccount.getId(), "Forgiven", result));
                                 } else {
-                                    tempList.add(new Transaction(contactAccount.getId(), loggedInUser.getId(), "Repayment", result));
+                                    tempList.add(new Transaction(contactAccount.getId(), loggedInUser.getId(), "Repayment", result.abs()));
                                 }
                                 makeAddTransactionsRequest(tempList);
 
@@ -179,8 +181,12 @@ public class ViewContactActivity extends AppCompatActivity implements OnActionBu
                                     || response.getJSONObject(0).has("failure")) {
                                 throw new Exception();
                             } else {
-                                // On success, return to dashboard
+                                // On success
                                 response.getJSONObject(0).get("success");
+
+                                Intent data = new Intent();
+                                data.putExtra(MODIFIED, true);
+                                setResult(RESULT_OK, data);
 
                                 // Update the list
                                 makeRequestForTransactionHistory();

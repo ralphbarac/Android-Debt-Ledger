@@ -34,12 +34,14 @@ import androidx.appcompat.app.AppCompatActivity;
 import androidx.recyclerview.widget.LinearLayoutManager;
 import androidx.recyclerview.widget.RecyclerView;
 import cs4474.g9.debtledger.R;
+import cs4474.g9.debtledger.ViewContactActivity;
 import cs4474.g9.debtledger.data.ConnectionAdapter;
 import cs4474.g9.debtledger.data.RedirectableJsonArrayRequest;
 import cs4474.g9.debtledger.data.login.LoginRepository;
 import cs4474.g9.debtledger.data.model.Group;
 import cs4474.g9.debtledger.data.model.UserAccount;
 import cs4474.g9.debtledger.logic.ColourGenerator;
+import cs4474.g9.debtledger.ui.MainActivity;
 import cs4474.g9.debtledger.ui.contacts.ContactListAdapter;
 import cs4474.g9.debtledger.ui.settings.AccessibleColours;
 import cs4474.g9.debtledger.ui.settings.Preference;
@@ -111,6 +113,12 @@ public class ViewGroupActivity extends AppCompatActivity {
                         setGroupDetails();
                         makeRequestForBalances(group.getGroupMembers());
                     }
+                }
+            }
+        } else if (requestCode == MainActivity.VIEW_CONTACT_REQUEST) {
+            if (resultCode == RESULT_OK) {
+                if (data != null && (data.hasExtra(ViewContactActivity.MODIFIED))) {
+                    makeRequestForBalances(group.getGroupMembers());
                 }
             }
         }

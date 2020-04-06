@@ -1,5 +1,6 @@
 package cs4474.g9.debtledger.ui.dashboard;
 
+import android.app.Activity;
 import android.content.Intent;
 import android.util.Log;
 import android.util.Pair;
@@ -19,6 +20,7 @@ import cs4474.g9.debtledger.R;
 import cs4474.g9.debtledger.ViewContactActivity;
 import cs4474.g9.debtledger.data.model.UserAccount;
 import cs4474.g9.debtledger.logic.ColourGenerator;
+import cs4474.g9.debtledger.ui.MainActivity;
 import cs4474.g9.debtledger.ui.settings.AccessibleColours;
 
 public class OutstandingBalanceListAdapter extends RecyclerView.Adapter<OutstandingBalanceListAdapter.Item> {
@@ -104,7 +106,12 @@ public class OutstandingBalanceListAdapter extends RecyclerView.Adapter<Outstand
             Log.d("DASHBOARD", "Contact clicked.");
             Intent toViewContact = new Intent(v.getContext(), ViewContactActivity.class);
             toViewContact.putExtra(ViewContactActivity.CONTACT, outstandingBalances.get(getAdapterPosition()).first);
-            v.getContext().startActivity(toViewContact);
+
+            if (v.getContext() instanceof Activity) {
+                ((Activity) v.getContext()).startActivityForResult(toViewContact, MainActivity.VIEW_CONTACT_REQUEST);
+            } else {
+                v.getContext().startActivity(toViewContact);
+            }
         }
     }
 }

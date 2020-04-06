@@ -1,5 +1,6 @@
 package cs4474.g9.debtledger.ui.contacts;
 
+import android.app.Activity;
 import android.content.Intent;
 import android.util.Log;
 import android.util.Pair;
@@ -19,6 +20,7 @@ import cs4474.g9.debtledger.R;
 import cs4474.g9.debtledger.ViewContactActivity;
 import cs4474.g9.debtledger.data.model.UserAccount;
 import cs4474.g9.debtledger.logic.ColourGenerator;
+import cs4474.g9.debtledger.ui.MainActivity;
 import cs4474.g9.debtledger.ui.settings.AccessibleColours;
 
 public class ContactListAdapter extends RecyclerView.Adapter<ContactListAdapter.Item> {
@@ -98,7 +100,12 @@ public class ContactListAdapter extends RecyclerView.Adapter<ContactListAdapter.
             Log.d("CONTACTS", "Contact clicked.");
             Intent toViewContact = new Intent(v.getContext(), ViewContactActivity.class);
             toViewContact.putExtra(ViewContactActivity.CONTACT, contactsWithBalances.get(getAdapterPosition()).first);
-            v.getContext().startActivity(toViewContact);
+
+            if (v.getContext() instanceof Activity) {
+                ((Activity) v.getContext()).startActivityForResult(toViewContact, MainActivity.VIEW_CONTACT_REQUEST);
+            } else {
+                v.getContext().startActivity(toViewContact);
+            }
         }
     }
 }
